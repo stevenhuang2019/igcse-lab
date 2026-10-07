@@ -55,6 +55,8 @@
             <button data-page="page-practice" class="nav-btn px-3 py-1 rounded bg-indigo-700">习题练习</button>
             <button data-page="page-assessment" class="nav-btn px-3 py-1 rounded bg-indigo-700">📝 测评</button>
             <button data-page="page-mistake" class="nav-btn px-3 py-1 rounded bg-indigo-700">错题复盘</button>
+            <button data-page="page-quickref" class="nav-btn px-3 py-1 rounded bg-indigo-700">📇 速查卡</button>
+            <button data-page="page-resources" class="nav-btn px-3 py-1 rounded bg-indigo-700">🔗 资源</button>
             <button data-page="page-homework" class="nav-btn px-3 py-1 rounded bg-indigo-700">作业自查</button>
             <button data-page="page-profile" class="nav-btn px-3 py-1 rounded bg-indigo-700">成长档案</button>
         </nav>
@@ -64,6 +66,8 @@
 
         <!-- 首页 -->
         <div id="page-home" class="page active">
+            <!-- 今日推荐三卡片 -->
+            <div id="todayCards" class="grid md:grid-cols-3 gap-4 mb-4"></div>
             <div class="bg-white rounded-xl shadow p-6">
                 <h2 class="text-2xl font-bold mb-4">欢迎来到 IGCSE 自习实验室</h2>
                 <p class="mb-2">选择上方科目，开始学习。学完知识点立即练题，答错自动进错题本，坚持练习积累 XP 升级解锁徽章。</p>
@@ -110,6 +114,8 @@
         <div id="page-practice" class="page">
             <div class="bg-white rounded-xl shadow p-6">
                 <h2 class="text-2xl font-bold mb-4">习题练习</h2>
+                <div id="mockEntry" class="mb-4"></div>
+                <div id="mockTimerBar" class="hidden mb-3 rounded-lg p-2 text-center text-sm font-semibold"></div>
                 <div id="practiceTopicSelect" class="mb-4"></div>
                 <div id="questionArea"></div>
                 <div id="practiceResult" class="mt-4 hidden"></div>
@@ -127,7 +133,11 @@
 
         <!-- 英语自习室页（iframe 固定在线地址） -->
         <div id="page-english" class="page">
-            <iframe id="englishLabFrame" src="https://stevenhuang2019.github.io/english-learning-app/" style="width:100%; height:calc(100vh - 220px); border:0; border-radius:12px; background:#fff;" title="英语自习室"></iframe>
+            <div class="mb-2 bg-white rounded-xl shadow p-3 flex items-center justify-between flex-wrap gap-2">
+                <button id="englishBackBtn" class="bg-indigo-600 text-white px-4 py-2 rounded text-sm hover:bg-indigo-700">← 返回 IGCSE</button>
+                <span class="text-sm text-gray-600">当前在英语自习室 · 可点上方下拉切换回数学 / 物理 / 化学等科目</span>
+            </div>
+            <iframe id="englishLabFrame" src="https://stevenhuang2019.github.io/english-learning-app/" style="width:100%; height:calc(100vh - 260px); border:0; border-radius:12px; background:#fff;" title="英语自习室"></iframe>
         </div>
 
         <!-- 错题复盘页 -->
@@ -166,7 +176,52 @@
             </div>
         </div>
 
+        <!-- 公式速查卡页 -->
+        <div id="page-quickref" class="page">
+            <div class="bg-white rounded-xl shadow p-6">
+                <h2 class="text-2xl font-bold mb-2">📇 公式速查卡</h2>
+                <p class="text-sm text-gray-600 mb-4">按科目汇总核心公式与要点，考前快速翻阅。</p>
+                <div id="quickrefContent"></div>
+            </div>
+        </div>
+
+        <!-- 学习资源外链页 -->
+        <div id="page-resources" class="page">
+            <div class="bg-white rounded-xl shadow p-6">
+                <h2 class="text-2xl font-bold mb-2">🔗 免费学习资源</h2>
+                <p class="text-sm text-gray-600 mb-4">点击卡片在新标签页打开官方 / 权威免费站点。</p>
+                <div class="grid md:grid-cols-2 gap-4" id="resourceList">
+                    <a href="https://www.cambridgeinternational.org/what-we-qualifications/cambridge-igcse/" target="_blank" rel="noopener" class="border rounded-xl p-4 hover:border-indigo-400 hover:bg-indigo-50 transition block">
+                        <div class="text-2xl">🎓</div><div class="font-semibold mt-1">CAIE 官网 · IGCSE 大纲</div>
+                        <div class="text-xs text-gray-500 mt-1">Cambridge Assessment International Education 官方大纲与考试信息</div>
+                    </a>
+                    <a href="https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-past-papers/" target="_blank" rel="noopener" class="border rounded-xl p-4 hover:border-indigo-400 hover:bg-indigo-50 transition block">
+                        <div class="text-2xl">📜</div><div class="font-semibold mt-1">CAIE Past Papers</div>
+                        <div class="text-xs text-gray-500 mt-1">历年真题与 Mark Scheme 官方入口</div>
+                    </a>
+                    <a href="https://www.khanacademy.org/" target="_blank" rel="noopener" class="border rounded-xl p-4 hover:border-indigo-400 hover:bg-indigo-50 transition block">
+                        <div class="text-2xl">🧮</div><div class="font-semibold mt-1">Khan Academy</div>
+                        <div class="text-xs text-gray-500 mt-1">数学 / 物理 / 化学免费视频课与练习</div>
+                    </a>
+                    <a href="https://en.wikipedia.org/wiki/International_General_Certificate_of_Secondary_Education" target="_blank" rel="noopener" class="border rounded-xl p-4 hover:border-indigo-400 hover:bg-indigo-50 transition block">
+                        <div class="text-2xl">📖</div><div class="font-semibold mt-1">Wikipedia · IGCSE 词条</div>
+                        <div class="text-xs text-gray-500 mt-1">IGCSE 体系总览，可顺藤摸瓜查各学科词条</div>
+                    </a>
+                    <a href="https://www.physicsclassroom.com/" target="_blank" rel="noopener" class="border rounded-xl p-4 hover:border-indigo-400 hover:bg-indigo-50 transition block">
+                        <div class="text-2xl">⚛️</div><div class="font-semibold mt-1">The Physics Classroom</div>
+                        <div class="text-xs text-gray-500 mt-1">物理概念讲解、例题与模拟测试，免费</div>
+                    </a>
+                    <a href="https://www.bbc.co.uk/bitesize" target="_blank" rel="noopener" class="border rounded-xl p-4 hover:border-indigo-400 hover:bg-indigo-50 transition block">
+                        <div class="text-2xl">📺</div><div class="font-semibold mt-1">BBC Bitesize</div>
+                        <div class="text-xs text-gray-500 mt-1">数学 / 科学 / 商业研究各科复习笔记与视频</div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
     </main>
+
+    <footer id="appFooter" class="text-center text-xs text-gray-500 py-4"></footer>
 
 <script src="data/igcse_content.js"></script>
 <script src="data/igcse_questions.js"></script>
@@ -176,6 +231,8 @@
 <script src="data/igcse_questions_dt.js"></script>
 <script src="data/igcse_questions_business.js"></script>
 <script src="data/igcse_assessment.js"></script>
+<script src="data/igcse_quickref.js"></script>
+<script src="data/igcse_mockpapers.js"></script>
 
 <script>
 /* ===================== 用户状态管理 ===================== */
@@ -183,12 +240,23 @@ const DEFAULT_USER_STATE = {
     level: 1, xp: 0, xpNextLevel: 100, badges: [],
     globalStats: { totalAnswered:0, totalCorrect:0 },
     subjectStats: { math:{answered:0,correct:0}, physics:{answered:0,correct:0}, chemistry:{answered:0,correct:0}, dt:{answered:0,correct:0}, business:{answered:0,correct:0} },
-    learnedTopics: [], mistakes: [], assessmentRecords: [], homeworkRecords: []
+    learnedTopics: [], mistakes: [], assessmentRecords: [], homeworkRecords: [],
+    topicStats: {}, lastSciSubject: 'math'
 };
 const SUBJECT_NAMES = { math:'数学', physics:'物理', chemistry:'化学', dt:'设计DT', business:'商业研究' };
 
+function deepMerge(base, override){
+    if(Array.isArray(base)){ return (override === undefined || override === null) ? base.slice() : override; }
+    if(base && typeof base === 'object'){
+        const out = {};
+        for(const k in base){ out[k] = deepMerge(base[k], override ? override[k] : undefined); }
+        if(override){ for(const k in override){ if(!(k in out)) out[k] = override[k]; } }
+        return out;
+    }
+    return (override === undefined) ? base : override;
+}
 function loadUserState(){
-    try{ const raw = localStorage.getItem('igcseUserState'); if(raw){ const s = JSON.parse(raw); return Object.assign({}, JSON.parse(JSON.stringify(DEFAULT_USER_STATE)), s); } }catch(e){}
+    try{ const raw = localStorage.getItem('igcseUserState'); if(raw){ const st = JSON.parse(raw); return deepMerge(JSON.parse(JSON.stringify(DEFAULT_USER_STATE)), st); } }catch(e){}
     return JSON.parse(JSON.stringify(DEFAULT_USER_STATE));
 }
 function saveUserState(state){ try{ localStorage.setItem('igcseUserState', JSON.stringify(state)); }catch(e){} }
@@ -268,7 +336,7 @@ function switchPage(id){
     document.getElementById(id).classList.add('active');
     navBtns.forEach(b => b.classList.toggle('active', b.dataset.page === id));
 }
-navBtns.forEach(btn => { btn.onclick = () => { switchPage(btn.dataset.page); if(btn.dataset.page === 'page-mistake') renderMistakePage(); if(btn.dataset.page === 'page-homework') renderHomeworkRecords(); if(btn.dataset.page === 'page-profile') renderProfile(); if(btn.dataset.page === 'page-assessment') renderAssessmentPage(); if(btn.dataset.page === 'page-practice'){ practiceSession = null; renderPracticeTopicSelect(); } }; });
+navBtns.forEach(btn => { btn.onclick = () => { switchPage(btn.dataset.page); const pg = btn.dataset.page; if(pg === 'page-mistake') renderMistakePage(); else if(pg === 'page-homework') renderHomeworkRecords(); else if(pg === 'page-profile') renderProfile(); else if(pg === 'page-assessment') renderAssessmentPage(); else if(pg === 'page-quickref') renderQuickrefPage(); else if(pg === 'page-home') renderTodayCards(); else if(pg === 'page-practice'){ practiceSession = null; stopMockTimer(); renderPracticeTopicSelect(); renderMockEntry(); } else { stopMockTimer(); } }; });
 
 /* ===================== 全局变量 ===================== */
 let contentData = window.IGCSE_CONTENT || [];
@@ -350,9 +418,40 @@ function startPractice(topicId){
     currentTopicId = topicId;
     const qs = questionData.filter(q => q.subject === currentSubject && q.topicId === topicId);
     if(!qs.length){ document.getElementById('questionArea').innerHTML = '<p class="text-gray-500 text-sm">该主题暂无习题。</p>'; return; }
-    practiceSession = { topicId, order: shuffle(qs.map(q => q.id)), idx: 0, combo: 0, correct: 0, total: qs.length };
+    practiceSession = { topicId, order: shuffle(qs.map(q => q.id)), idx: 0, combo: 0, correct: 0, total: qs.length, mode: 'normal', label: '', startedAt: Date.now(), timeLimitSec: 0, timedOut: false };
     renderPracticeTopicSelect();
     renderQuestion();
+}
+function startSessionFromIds(qids, mode, opts){
+    opts = opts || {};
+    const valid = qids.filter(id => findQuestion(id));
+    if(!valid.length){ showToast('暂无可用题目'); return; }
+    document.getElementById('practiceResult').classList.add('hidden');
+    practiceSession = {
+        topicId: opts.topicId || null,
+        order: shuffle(valid.slice()),
+        idx: 0, combo: 0, correct: 0, total: valid.length,
+        mode: mode || 'normal', label: opts.label || '',
+        startedAt: Date.now(), timeLimitSec: opts.timeLimitSec || 0, timedOut: false
+    };
+    switchPage('page-practice');
+    navBtns.forEach(b => b.classList.toggle('active', b.dataset.page === 'page-practice'));
+    if(mode === 'normal' && opts.topicId){ renderPracticeTopicSelect(); }
+    else { document.getElementById('practiceTopicSelect').innerHTML = '<div class="text-sm font-semibold text-indigo-700 mb-2">' + esc(opts.label || '') + '</div>'; }
+    renderMockEntry();
+    startMockTimerIfNeeded();
+    renderQuestion();
+}
+function gotoTopicPractice(topicId){
+    const topic = contentData.find(t => t.topicId === topicId);
+    if(!topic){ showToast('主题不存在'); return; }
+    const sel = document.getElementById('subjectSelect');
+    sel.value = topic.subject;
+    setEnglishMode(false);
+    currentSubject = topic.subject;
+    userState.lastSciSubject = topic.subject;
+    renderTopicList();
+    startPractice(topicId);
 }
 function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
 function findQuestion(id){ return questionData.find(q => q.id === id); }
@@ -394,18 +493,60 @@ function markAnswered(q, isCorrect, area){
     const s = practiceSession;
     s.idx++;
     userState.globalStats.totalAnswered++;
-    userState.subjectStats[currentSubject].answered++;
+    const subj = (q.subject && userState.subjectStats[q.subject]) ? q.subject : currentSubject;
+    userState.subjectStats[subj].answered++;
+    /* 薄弱主题统计：每次判分（选择 + 作文自评）累计 */
+    userState.topicStats = userState.topicStats || {};
+    const tstat = userState.topicStats[q.topicId] = userState.topicStats[q.topicId] || { answered:0, correct:0, lastWrongAt:null };
+    tstat.answered++;
     if(isCorrect){
         s.correct++; s.combo++;
         userState.globalStats.totalCorrect++;
-        userState.subjectStats[currentSubject].correct++;
+        userState.subjectStats[subj].correct++;
+        tstat.correct++;
         addXp(q.xpReward || 10);
         if(s.combo >= 5) grantBadge('combo_5');
         if(s.combo >= 3){ showToast('连对 ' + s.combo + ' 题！'); }
     } else {
         s.combo = 0;
-        if(!userState.mistakes.find(m => m.questionId === q.id)){
-            userState.mistakes.push({ questionId: q.id, subject: currentSubject, time: new Date().toISOString(), wrongCount: 0 });
+        tstat.lastWrongAt = new Date().toISOString();
+        const existing = userState.mistakes.find(m => mistakeQid(m) === q.id);
+        if(existing){
+            existing.wrongCount = (existing.wrongCount || 0) + 1;
+            if(s.mode === 'srs'){
+                existing.srsStage = 0;
+                existing.nextReviewAt = new Date(Date.now() + 864e5).toISOString();
+                existing.lastResult = 'fail';
+            }
+        } else {
+            userState.mistakes.push({
+                questionId: q.id, subject: q.subject || currentSubject, topicId: q.topicId || '',
+                time: new Date().toISOString(), wrongCount: 1,
+                srsStage: 0, nextReviewAt: new Date(Date.now() + 864e5).toISOString(),
+                mastered: false, reviewedCount: 0, lastResult: null
+            });
+        }
+    }
+    /* 复习模式：答对后的 SRS 流转 / 错题重练直接掌握 */
+    if(isCorrect && (s.mode === 'srs' || s.mode === 'mistake-review')){
+        const existing = userState.mistakes.find(m => mistakeQid(m) === q.id);
+        if(existing){
+            existing.reviewedCount = (existing.reviewedCount || 0) + 1;
+            if(s.mode === 'srs'){
+                const st = existing.srsStage || 0;
+                if(st >= 3){
+                    existing.mastered = true;
+                    userState.mistakes = userState.mistakes.filter(m => mistakeQid(m) !== q.id);
+                    showToast('该题已彻底掌握，自动移出错题本');
+                } else {
+                    existing.srsStage = st + 1;
+                    existing.nextReviewAt = new Date(Date.now() + SRS_INTERVAL_DAYS[existing.srsStage] * 864e5).toISOString();
+                    existing.lastResult = 'pass';
+                }
+            } else {
+                existing.mastered = true;
+                userState.mistakes = userState.mistakes.filter(m => mistakeQid(m) !== q.id);
+            }
         }
     }
     saveUserState(userState);
@@ -458,34 +599,91 @@ function finishPractice(){
     const rate = total ? Math.round(correct / total * 100) : 0;
     const stars = rate >= 90 ? 3 : rate >= 60 ? 2 : 1;
     const area = document.getElementById('questionArea');
+    stopMockTimer();
     document.getElementById('practiceResult').classList.remove('hidden');
+    let headTitle = '练习完成';
+    let subInfo = '本主题共 ' + total + ' 题，答对 ' + correct + ' 题（' + rate + '%）';
+    let subNote = '答错的题已自动进入错题复盘';
+    if(s.mode === 'mock'){
+        const usedSec = s.timedOut ? s.timeLimitSec : Math.floor((Date.now() - s.startedAt) / 1000);
+        headTitle = '📝 模拟考交卷';
+        subInfo = '共 ' + total + ' 题 · 答对 ' + correct + ' 题（' + rate + '%） · 用时 ' + Math.floor(usedSec/60) + ' 分 ' + (usedSec % 60) + ' 秒' + (s.timedOut ? '（超时自动交卷）' : '');
+        subNote = '错题已自动入库，明日起进入 SRS 间隔复习';
+    } else if(s.mode === 'paper'){
+        headTitle = '📄 模拟卷完成';
+        subInfo = '共 ' + total + ' 题 · 答对 ' + correct + ' 题（' + rate + '%）';
+    } else if(s.mode === 'srs'){
+        headTitle = '🔂 SRS 复习完成';
+        subInfo = '本轮复习 ' + total + ' 题，通过 ' + correct + ' 题';
+        subNote = '通过的题已按 1→3→7→14 天自动排程，答错的题回到 1 天后重测';
+    } else if(s.mode === 'mistake-review'){
+        headTitle = '✅ 错题重练完成';
+        subInfo = '重练 ' + total + ' 题，通过 ' + correct + ' 题';
+        subNote = '答对的题已自动移出错题本';
+    }
     area.innerHTML = '<div class="border rounded-lg p-6 text-center bg-slate-50"><div class="text-3xl mb-1">' + '★'.repeat(stars) + '☆'.repeat(3 - stars) + '</div>'
-        + '<div class="text-lg font-bold">练习完成</div>'
-        + '<p class="text-gray-600 mt-1">本主题共 ' + total + ' 题，答对 ' + correct + ' 题（' + rate + '%）</p>'
-        + '<p class="text-sm text-gray-500 mt-1">答错的题已自动进入错题复盘</p>'
-        + '<div class="mt-4 flex gap-2 justify-center flex-wrap"><button data-act="again" class="bg-indigo-600 text-white px-4 py-2 rounded text-sm">再练一次</button><button data-act="mistakes" class="px-4 py-2 rounded text-sm border border-slate-300">去错题本</button></div></div>';
-    area.querySelector('[data-act=again]').onclick = () => startPractice(s.topicId);
+        + '<div class="text-lg font-bold">' + headTitle + '</div>'
+        + '<p class="text-gray-600 mt-1">' + subInfo + '</p>'
+        + '<p class="text-sm text-gray-500 mt-1">' + subNote + '</p>'
+        + '<div class="mt-4 flex gap-2 justify-center flex-wrap"><button data-act="again" class="bg-indigo-600 text-white px-4 py-2 rounded text-sm">再来一轮</button><button data-act="mistakes" class="px-4 py-2 rounded text-sm border border-slate-300">去错题本</button></div></div>';
+    area.querySelector('[data-act=again]').onclick = () => {
+        if(s.mode && s.mode !== 'normal'){ startSessionFromIds(s.order.slice(), s.mode, { label: s.label, timeLimitSec: s.timeLimitSec }); }
+        else if(s.topicId){ startPractice(s.topicId); }
+    };
     area.querySelector('[data-act=mistakes]').onclick = () => { switchPage('page-mistake'); navBtns.forEach(b => b.classList.toggle('active', b.dataset.page === 'page-mistake')); renderMistakePage(); };
     practiceSession = null;
 }
 
 /* ===================== 错题模块 ===================== */
+const SRS_INTERVAL_DAYS = [1, 3, 7, 14];
+function mistakeQid(m){ return m.questionId || m.qid || m.id; }
+function mistakeSubject(m){
+    if(m.subject) return m.subject;
+    const q = findQuestion(mistakeQid(m));
+    return q ? q.subject : null;
+}
+function subjectMatchesMistake(m, subject){
+    if(!subject) return true;
+    const msbj = mistakeSubject(m);
+    return !!msbj && msbj === subject;
+}
+function todayEndMs(){ const d = new Date(); d.setHours(23,59,59,999); return d.getTime(); }
+function isDueReview(m){
+    const nra = m.nextReviewAt ? new Date(m.nextReviewAt).getTime() : Date.now();
+    return !m.mastered && nra <= todayEndMs();
+}
+function getDueMistakes(subject){
+    return userState.mistakes.filter(m => subjectMatchesMistake(m, subject) && isDueReview(m));
+}
+function mistakeStatusBadge(m){
+    const st = m.srsStage || 0;
+    const due = isDueReview(m);
+    if(m.lastResult === 'pass'){
+        return '<span class="text-xs px-2 py-0.5 rounded-full ' + (due ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700') + '">已重练通过 · Stage' + st + (due ? ' · 今日到期' : ' · 待下次复习') + '</span>';
+    }
+    return '<span class="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">待重练 · Stage' + st + (due ? ' · 今日到期' : '') + '</span>';
+}
 function renderMistakePage(){
     const container = document.getElementById('mistakeList');
     const stats = document.getElementById('mistakeStats');
-    const subjectMistakes = userState.mistakes.filter(m => m.subject === currentSubject);
-    stats.innerHTML = '<p class="text-sm text-gray-600">当前科目错题总数：<b class="text-indigo-700">' + subjectMistakes.length + '</b></p>';
+    const subjectMistakes = userState.mistakes.filter(m => subjectMatchesMistake(m, currentSubject));
+    const dueAll = getDueMistakes();
+    stats.innerHTML = '<p class="text-sm text-gray-600">当前科目错题总数：<b class="text-indigo-700">' + subjectMistakes.length + '</b> ｜ 今日全站待 SRS 复习：<b class="text-amber-600">' + dueAll.length + '</b> 题</p>'
+        + '<div class="mt-2 flex gap-2 flex-wrap">'
+        + '<button id="btnRetryMistakes" class="bg-indigo-600 text-white px-4 py-2 rounded text-sm hover:bg-indigo-700">🔁 重练本学科错题（' + subjectMistakes.length + '）</button>'
+        + '<button id="btnSrsReview" class="bg-amber-500 text-white px-4 py-2 rounded text-sm hover:bg-amber-600">🔂 今日 SRS 复习（' + dueAll.length + '）</button>'
+        + '</div>';
     container.innerHTML = '';
     if(!subjectMistakes.length){
         container.innerHTML = '<div class="border rounded-lg p-6 text-center text-gray-500 text-sm">暂无错题，继续保持！</div>';
-        return;
     }
     subjectMistakes.forEach(m => {
-        const q = findQuestion(m.questionId);
+        const q = findQuestion(mistakeQid(m));
         if(!q) return;
         const div = document.createElement('div');
         div.className = 'border rounded-lg p-4 mb-3';
-        div.innerHTML = '<div class="mb-2">' + (q.question || '') + '</div>'
+        div.innerHTML = '<div class="mb-1 flex items-center justify-between flex-wrap gap-2"><span>' + mistakeStatusBadge(m) + '</span><span class="text-xs text-gray-400">错 ' + (m.wrongCount||0) + ' 次</span></div>'
+            + '<div class="mb-2">' + (q.question || '') + '</div>'
             + (q.type === 'choice' ? '<div class="text-sm text-gray-600">你的选项 / 正确答案：<b class="text-green-700">' + (q.answer || '') + '</b></div>' : '')
             + '<div class="text-sm mt-1 text-gray-600">参考答案：<span class="ms-block">' + esc(q.answer || '') + '</span></div>'
             + (q.explain ? '<div class="text-sm mt-1 text-gray-600">解析：' + q.explain + '</div>' : '')
@@ -495,13 +693,23 @@ function renderMistakePage(){
     });
     container.querySelectorAll('.remove-mistake').forEach(btn => {
         btn.onclick = () => {
-            userState.mistakes = userState.mistakes.filter(m => m.questionId !== btn.dataset.qid);
+            userState.mistakes = userState.mistakes.filter(m => mistakeQid(m) !== btn.dataset.qid);
             saveUserState(userState);
             userState._cleared = (userState._cleared || 0) + 1;
             if(userState._cleared >= 10) grantBadge('clear_10');
             renderMistakePage();
         };
     });
+    const btnRetry = document.getElementById('btnRetryMistakes');
+    if(btnRetry) btnRetry.onclick = () => {
+        if(!subjectMistakes.length){ showToast('本学科暂无错题'); return; }
+        startSessionFromIds(subjectMistakes.map(m => mistakeQid(m)), 'mistake-review', { label: '错题重练 · ' + (SUBJECT_NAMES[currentSubject]||currentSubject) });
+    };
+    const btnSrs = document.getElementById('btnSrsReview');
+    if(btnSrs) btnSrs.onclick = () => {
+        if(!dueAll.length){ showToast('今日暂无到期复习题，太棒了！'); return; }
+        startSessionFromIds(dueAll.map(m => mistakeQid(m)), 'srs', { label: '今日 SRS 间隔复习（' + dueAll.length + ' 题）' });
+    };
 }
 
 /* ===================== 作业自查模块 ===================== */
@@ -556,6 +764,7 @@ function renderProfile(){
         html += '<div class="border rounded-lg p-3 text-center"><div class="font-semibold text-sm">' + (SUBJECT_NAMES[key] || key) + '</div><div class="text-xs text-gray-600 mt-1">作答 ' + s.answered + ' · 正确 ' + s.correct + '</div><div class="text-lg font-bold ' + (s.answered ? (r >= 70 ? 'text-green-600' : r >= 50 ? 'text-amber-600' : 'text-red-600') : 'text-gray-400') + '">' + (s.answered ? r + '%' : '--') + '</div></div>';
     }
     html += '</div>';
+    html += weakTopicsBlockHtml();
     /* 测评分级概览 */
     html += '<h3 class="font-semibold mb-2">测评分级</h3><div class="grid md:grid-cols-5 gap-3 mb-4">';
     ASSESS_SUBJECTS.forEach(sub => {
@@ -590,6 +799,9 @@ function renderProfile(){
     });
     html += '</div>';
     p.innerHTML = html;
+    p.querySelectorAll('[data-weak-topic]').forEach(el => {
+        el.onclick = () => gotoTopicPractice(el.dataset.weakTopic);
+    });
 }
 
 /* ===================== 英语模式 / 科目切换 ===================== */
@@ -608,6 +820,8 @@ document.getElementById('subjectSelect').onchange = function(){
     }
     setEnglishMode(false);
     currentSubject = this.value;
+    userState.lastSciSubject = this.value;
+    saveUserState(userState);
     renderTopicList();
     if(document.getElementById('page-practice').classList.contains('active')) renderPracticeTopicSelect();
 };
@@ -825,6 +1039,203 @@ function renderAssessmentResult(){
     area.querySelector('[data-act=back-home]').onclick = () => { assessmentSession = null; renderAssessmentPage(); };
 }
 
+/* ===================== SRS / 薄弱诊断 / 首页 / 模拟考 / 速查卡 ===================== */
+function getWeakTopics(topN){
+    const ts = userState.topicStats || {};
+    const rows = [];
+    for(const tid in ts){
+        const st = ts[tid];
+        if(!st || st.answered < 3) continue;
+        const topic = contentData.find(t => t.topicId === tid);
+        if(!topic) continue;
+        rows.push({ topicId: tid, subject: topic.subject, title: topic.title, answered: st.answered, correct: st.correct, rate: Math.round(st.correct / st.answered * 100) });
+    }
+    rows.sort((a, b) => a.rate - b.rate);
+    return rows.slice(0, topN || 3);
+}
+function weakTopicsBlockHtml(){
+    const weak = getWeakTopics(3);
+    let h = '<h3 class="font-semibold mb-2">🎯 薄弱主题诊断（正确率最低 TOP3 · 仅统计作答≥3 题的主题）</h3>';
+    if(!weak.length){
+        h += '<p class="text-sm text-gray-500 mb-4">每个主题累计作答 3 题以上，即可生成薄弱诊断。</p>';
+        return h;
+    }
+    h += '<div class="grid md:grid-cols-3 gap-3 mb-6">';
+    weak.forEach(w => {
+        const color = w.rate >= 70 ? 'text-green-600' : w.rate >= 50 ? 'text-amber-600' : 'text-red-600';
+        h += '<div class="border rounded-lg p-3 cursor-pointer hover:border-indigo-300 hover:bg-indigo-50" data-weak-topic="' + esc(w.topicId) + '">'
+            + '<div class="text-xs text-gray-500">' + (SUBJECT_NAMES[w.subject] || w.subject) + '</div>'
+            + '<div class="font-medium text-sm">' + esc(w.title) + '</div>'
+            + '<div class="text-lg font-bold ' + color + '">' + w.rate + '%</div>'
+            + '<div class="text-xs text-gray-400">答对 ' + w.correct + ' / ' + w.answered + '</div>'
+            + '<div class="text-xs text-indigo-600 mt-1">点击直达该主题练习 →</div></div>';
+    });
+    h += '</div>';
+    return h;
+}
+function pickTodayRecommend(){
+    let sub = null, bestLevel = 99;
+    ASSESS_SUBJECTS.forEach(s => { const rec = lastAssessmentRecord(s); if(rec && rec.level < bestLevel){ bestLevel = rec.level; sub = s; } });
+    if(!sub) sub = 'math';
+    const topics = contentData.filter(t => t.subject === sub);
+    let chosen = null, bestScore = -1;
+    topics.forEach(t => {
+        const qs = questionData.filter(q => q.subject === sub && q.topicId === t.topicId);
+        if(qs.length < 3) return;
+        const ts = (userState.topicStats || {})[t.topicId];
+        const practiced = ts ? ts.answered : 0;
+        const score = 1000 - practiced;
+        if(score > bestScore){ bestScore = score; chosen = { topic: t, qs: qs }; }
+    });
+    if(!chosen) return null;
+    const qids = shuffle(chosen.qs.map(q => q.id)).slice(0, 5);
+    return { subject: sub, topicId: chosen.topic.topicId, label: (SUBJECT_NAMES[sub] || sub) + ' · ' + chosen.topic.title + '（5 题快练）', qids: qids };
+}
+function renderTodayCards(){
+    const box = document.getElementById('todayCards');
+    if(!box) return;
+    const due = getDueMistakes();
+    const weak = getWeakTopics(3);
+    const rec = pickTodayRecommend();
+    let html = '';
+    html += '<div id="homeCardSrs" class="bg-indigo-600 text-white rounded-xl shadow p-4 cursor-pointer hover:bg-indigo-700 transition">'
+        + '<div class="text-2xl">🔂</div><div class="font-bold mt-1">今日 SRS 待复习</div>'
+        + '<div class="text-indigo-100 text-sm mt-1">今日到期 ' + due.length + ' 题 · 点击进入间隔复习</div></div>';
+    html += '<div class="bg-white rounded-xl shadow p-4"><div class="text-2xl">🎯</div><div class="font-bold mt-1">薄弱主题 TOP3</div><div id="homeWeakList" class="mt-2">';
+    if(!weak.length){
+        html += '<p class="text-sm text-gray-400">作答≥3 题后自动生成</p>';
+    } else {
+        weak.forEach(w => {
+            html += '<div data-home-weak="' + esc(w.topicId) + '" class="text-sm py-1 cursor-pointer hover:text-indigo-600">'
+                + '<span class="text-gray-400 text-xs">' + (SUBJECT_NAMES[w.subject]||w.subject) + ' · </span>' + esc(w.title) + ' <b class="' + (w.rate>=50?'text-amber-600':'text-red-600') + '">' + w.rate + '%</b></div>';
+        });
+    }
+    html += '</div></div>';
+    html += '<div id="homeCardRec" class="bg-amber-50 border border-amber-200 rounded-xl shadow p-4 cursor-pointer hover:bg-amber-100 transition">'
+        + '<div class="text-2xl">✨</div><div class="font-bold mt-1">今日推荐快练</div>'
+        + '<div class="text-amber-800 text-sm mt-1">' + (rec ? esc(rec.label) : '先去测评分级，解锁每日推荐') + '</div></div>';
+    box.innerHTML = html;
+    const cSrs = document.getElementById('homeCardSrs');
+    if(cSrs) cSrs.onclick = () => {
+        if(!due.length){ showToast('今日暂无到期复习题'); return; }
+        startSessionFromIds(due.map(m => mistakeQid(m)), 'srs', { label: '今日 SRS 间隔复习（' + due.length + ' 题）' });
+    };
+    box.querySelectorAll('[data-home-weak]').forEach(el => {
+        el.onclick = () => gotoTopicPractice(el.dataset.homeWeak);
+    });
+    const cRec = document.getElementById('homeCardRec');
+    if(cRec) cRec.onclick = () => {
+        if(!rec){ switchPage('page-assessment'); navBtns.forEach(b => b.classList.toggle('active', b.dataset.page === 'page-assessment')); renderAssessmentPage(); return; }
+        startSessionFromIds(rec.qids, 'normal', { topicId: rec.topicId, label: rec.label });
+    };
+}
+/* 模拟考倒计时 */
+let mockTimerId = null;
+function stopMockTimer(){
+    if(mockTimerId){ clearInterval(mockTimerId); mockTimerId = null; }
+    const bar = document.getElementById('mockTimerBar');
+    if(bar) bar.classList.add('hidden');
+}
+function startMockTimerIfNeeded(){
+    stopMockTimer();
+    const sess = practiceSession;
+    if(!sess || sess.mode !== 'mock') return;
+    mockTimerId = setInterval(() => {
+        if(!practiceSession || practiceSession.mode !== 'mock' || !document.getElementById('page-practice').classList.contains('active')){ stopMockTimer(); return; }
+        const s = practiceSession;
+        const elapsed = Math.floor((Date.now() - s.startedAt) / 1000);
+        const left = s.timeLimitSec - elapsed;
+        const bar = document.getElementById('mockTimerBar');
+        if(left <= 0){
+            s.timedOut = true;
+            stopMockTimer();
+            showToast('时间到，自动交卷');
+            finishPractice();
+            return;
+        }
+        const mm = String(Math.floor(left/60)).padStart(2, '0');
+        const ss = String(left % 60).padStart(2, '0');
+        bar.classList.remove('hidden');
+        bar.innerHTML = '⏱️ 模拟考倒计时：<b>' + mm + ':' + ss + '</b>（超时自动交卷）';
+        bar.className = 'mb-3 rounded-lg p-2 text-center text-sm font-semibold ' + (left < 300 ? 'bg-red-100 text-red-700' : 'bg-indigo-50 text-indigo-700');
+    }, 1000);
+}
+function renderMockEntry(){
+    const el = document.getElementById('mockEntry');
+    if(!el) return;
+    let html = '<div class="bg-slate-50 border border-slate-200 rounded-lg p-3 flex flex-wrap gap-2 items-center">'
+        + '<span class="text-sm font-semibold text-gray-700">🧪 模拟考：</span>';
+    ['math','physics','chemistry','dt','business'].forEach(sub => {
+        html += '<button data-mock="' + sub + '" class="px-2 py-1 rounded border text-xs bg-white hover:border-indigo-400">' + (SUBJECT_NAMES[sub]||sub) + ' 30题/30分钟</button>';
+    });
+    html += '<button data-mock="mixed" class="px-2 py-1 rounded border text-xs bg-white hover:border-indigo-400">🌐 全科混合 30题/30分钟</button>';
+    const MP = window.IGCSE_MOCKPAPERS || {};
+    const keys = Object.keys(MP);
+    if(keys.length){
+        html += '<span class="text-sm font-semibold text-gray-700 ml-3">📄 模拟卷：</span>';
+        keys.forEach(k => {
+            const p = MP[k];
+            html += '<button data-paper="' + esc(k) + '" class="px-2 py-1 rounded border text-xs bg-indigo-50 text-indigo-700 hover:border-indigo-400">' + (SUBJECT_NAMES[k]||k) + ' ' + (p && p.qids ? p.qids.length : 20) + '题</button>';
+        });
+    }
+    html += '</div>';
+    el.innerHTML = html;
+    el.querySelectorAll('[data-mock]').forEach(b => { b.onclick = () => startMock(b.dataset.mock); });
+    el.querySelectorAll('[data-paper]').forEach(b => { b.onclick = () => startMockPaper(b.dataset.paper); });
+}
+function startMock(subject){
+    const pool = questionData.filter(q => subject === 'mixed' ? true : q.subject === subject);
+    if(pool.length < 10){ showToast('该科目题库不足，暂无法组卷'); return; }
+    const qids = shuffle(pool.map(q => q.id)).slice(0, Math.min(30, pool.length));
+    startSessionFromIds(qids, 'mock', { label: '模拟考 · ' + (subject === 'mixed' ? '全科混合' : (SUBJECT_NAMES[subject]||subject)), timeLimitSec: 30 * 60 });
+}
+function startMockPaper(key){
+    const MP = window.IGCSE_MOCKPAPERS || {};
+    const p = MP[key];
+    if(!p || !p.qids || !p.qids.length){ showToast('该模拟卷尚未就绪'); return; }
+    startSessionFromIds(p.qids.slice(), 'paper', { label: '模拟卷 · ' + (SUBJECT_NAMES[key]||key) + '（' + p.qids.length + ' 题）' });
+}
+/* 公式速查卡 */
+function renderQuickrefPage(){
+    const area = document.getElementById('quickrefContent');
+    if(!area) return;
+    const QR = window.IGCSE_QUICKREF || [];
+    if(!QR.length){
+        area.innerHTML = '<p class="text-gray-500 text-sm">速查卡数据正在整理中，敬请期待。</p>';
+        return;
+    }
+    let html = '';
+    QR.forEach(section => {
+        html += '<h3 class="text-lg font-bold mt-6 mb-2">📗 ' + (SUBJECT_NAMES[section.subject] || section.subject) + '</h3>';
+        (section.groups || []).forEach(g => {
+            html += '<div class="border rounded-lg p-4 mb-3"><h4 class="font-semibold mb-2 text-indigo-700">' + esc(g.title) + '</h4>';
+            (g.items || []).forEach(it => {
+                html += '<div class="border-t border-slate-100 py-2"><div class="katex-line">' + (it.formula || '') + '</div>' + (it.note ? '<div class="text-sm text-gray-600 mt-1">' + esc(it.note) + '</div>' : '') + '</div>';
+            });
+            html += '</div>';
+        });
+    });
+    area.innerHTML = html;
+    if(window.renderMathInElement) renderMathInElement(area, { delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}] });
+}
+/* footer 版本号 */
+function renderFooter(){
+    const f = document.getElementById('appFooter');
+    if(f) f.textContent = '题库 v1.1 · ' + (window.IGCSE_QUESTIONS ? window.IGCSE_QUESTIONS.length : 0) + ' 题 · 更新于 2026-10-07';
+}
+/* 英语页返回 IGCSE */
+document.getElementById('englishBackBtn').onclick = () => {
+    const sel = document.getElementById('subjectSelect');
+    const back = userState.lastSciSubject || 'math';
+    sel.value = back;
+    setEnglishMode(false);
+    currentSubject = back;
+    renderTopicList();
+    switchPage('page-home');
+    renderTodayCards();
+    navBtns.forEach(b => b.classList.toggle('active', b.dataset.page === 'page-home'));
+};
+
 /* ===================== 工具 ===================== */
 function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c])); }
 
@@ -833,6 +1244,9 @@ function init(){
     renderUserStatus();
     renderTopicList();
     checkBadges();
+    renderFooter();
+    renderTodayCards();
+    renderMockEntry();
     document.getElementById('page-home').classList.add('active');
     navBtns.forEach(b => b.classList.toggle('active', b.dataset.page === 'page-home'));
 }
