@@ -44,14 +44,16 @@
                     <option value="chemistry">化学 Chemistry</option>
                     <option value="dt">设计 DT</option>
                     <option value="business">商业研究 Business</option>
+                    <option value="english">英语 English（English Lab）</option>
                 </select>
                 <div id="userStatus" class="text-sm font-semibold bg-indigo-700 px-3 py-1.5 rounded-lg">Lv.1 | XP:0 | 徽章:0</div>
             </div>
         </div>
-        <nav class="max-w-7xl mx-auto mt-3 flex flex-wrap gap-2">
+        <nav id="mainNav" class="max-w-7xl mx-auto mt-3 flex flex-wrap gap-2">
             <button data-page="page-home" class="nav-btn px-3 py-1 rounded bg-indigo-700">首页</button>
             <button data-page="page-textbook" class="nav-btn px-3 py-1 rounded bg-indigo-700">教材学习</button>
             <button data-page="page-practice" class="nav-btn px-3 py-1 rounded bg-indigo-700">习题练习</button>
+            <button data-page="page-assessment" class="nav-btn px-3 py-1 rounded bg-indigo-700">📝 测评</button>
             <button data-page="page-mistake" class="nav-btn px-3 py-1 rounded bg-indigo-700">错题复盘</button>
             <button data-page="page-homework" class="nav-btn px-3 py-1 rounded bg-indigo-700">作业自查</button>
             <button data-page="page-profile" class="nav-btn px-3 py-1 rounded bg-indigo-700">成长档案</button>
@@ -71,6 +73,19 @@
                     <div class="bg-slate-50 border border-slate-200 rounded-lg p-3">章节习题逐题作答，自动判分记录错题</div>
                     <div class="bg-slate-50 border border-slate-200 rounded-lg p-3">XP 成长系统、等级与 8 枚徽章</div>
                     <div class="bg-slate-50 border border-slate-200 rounded-lg p-3">作业图片上传自查，仅本地预览不上传</div>
+                </div>
+            </div>
+
+            <!-- 科目总览 -->
+            <div class="bg-white rounded-xl shadow p-6 mt-4">
+                <h2 class="text-xl font-bold mb-3">科目总览</h2>
+                <div id="subjectOverview" class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    <button data-subject="math" class="border rounded-xl p-4 text-left hover:bg-indigo-50 hover:border-indigo-300 transition"><div class="text-2xl">📐</div><div class="font-semibold mt-1">数学</div><div class="text-xs text-gray-500">Math</div></button>
+                    <button data-subject="physics" class="border rounded-xl p-4 text-left hover:bg-indigo-50 hover:border-indigo-300 transition"><div class="text-2xl">⚛️</div><div class="font-semibold mt-1">物理</div><div class="text-xs text-gray-500">Physics</div></button>
+                    <button data-subject="chemistry" class="border rounded-xl p-4 text-left hover:bg-indigo-50 hover:border-indigo-300 transition"><div class="text-2xl">🧪</div><div class="font-semibold mt-1">化学</div><div class="text-xs text-gray-500">Chemistry</div></button>
+                    <button data-subject="dt" class="border rounded-xl p-4 text-left hover:bg-indigo-50 hover:border-indigo-300 transition"><div class="text-2xl">🛠️</div><div class="font-semibold mt-1">设计 DT</div><div class="text-xs text-gray-500">Design &amp; Technology</div></button>
+                    <button data-subject="business" class="border rounded-xl p-4 text-left hover:bg-indigo-50 hover:border-indigo-300 transition"><div class="text-2xl">💼</div><div class="font-semibold mt-1">商业研究</div><div class="text-xs text-gray-500">Business Studies</div></button>
+                    <button data-subject="english" class="border rounded-xl p-4 text-left hover:bg-indigo-50 hover:border-indigo-300 transition"><div class="text-2xl">🇬🇧</div><div class="font-semibold mt-1">英语</div><div class="text-xs text-gray-500">English Lab</div></button>
                 </div>
             </div>
         </div>
@@ -99,6 +114,20 @@
                 <div id="questionArea"></div>
                 <div id="practiceResult" class="mt-4 hidden"></div>
             </div>
+        </div>
+
+        <!-- 测评分级页 -->
+        <div id="page-assessment" class="page">
+            <div class="bg-white rounded-xl shadow p-6">
+                <h2 class="text-2xl font-bold mb-2">📝 测评分级</h2>
+                <p class="text-sm text-gray-600 mb-4">每科 12 题 · 难度递进 · 完成后按得分率映射 L1-L10 等级，并生成专属学习路径。</p>
+                <div id="assessmentArea"></div>
+            </div>
+        </div>
+
+        <!-- 英语自习室页（iframe 固定在线地址） -->
+        <div id="page-english" class="page">
+            <iframe id="englishLabFrame" src="https://stevenhuang2019.github.io/english-learning-app/" style="width:100%; height:calc(100vh - 220px); border:0; border-radius:12px; background:#fff;" title="英语自习室"></iframe>
         </div>
 
         <!-- 错题复盘页 -->
@@ -141,6 +170,12 @@
 
 <script src="data/igcse_content.js"></script>
 <script src="data/igcse_questions.js"></script>
+<script src="data/igcse_questions_math.js"></script>
+<script src="data/igcse_questions_physics.js"></script>
+<script src="data/igcse_questions_chemistry.js"></script>
+<script src="data/igcse_questions_dt.js"></script>
+<script src="data/igcse_questions_business.js"></script>
+<script src="data/igcse_assessment.js"></script>
 
 <script>
 /* ===================== 用户状态管理 ===================== */
@@ -191,7 +226,10 @@ const BADGES = [
     { id:'all_subjects',   name:'全面开花',     desc:'五个科目都完成过练习', icon:'🧩' },
     { id:'clear_10',       name:'知错就改',     desc:'在错题本标记 10 道题已掌握', icon:'✅' },
     { id:'topic_master',   name:'主题达人',     desc:'学完任一科目全部主题', icon:'🏆' },
-    { id:'level_5',        name:'等级新星',     desc:'等级达到 Lv.5', icon:'⭐' }
+    { id:'level_5',        name:'等级新星',     desc:'等级达到 Lv.5', icon:'⭐' },
+    { id:'assess_first',   name:'测评达人',     desc:'完成第一次测评分级', icon:'📝' },
+    { id:'assess_all',     name:'全科测评',     desc:'五个科目均完成测评', icon:'🏅' },
+    { id:'assess_top',     name:'巅峰测评',     desc:'任一科目测评达到 L10', icon:'💎' }
 ];
 function checkBadges(){
     const g = userState.globalStats;
@@ -230,7 +268,7 @@ function switchPage(id){
     document.getElementById(id).classList.add('active');
     navBtns.forEach(b => b.classList.toggle('active', b.dataset.page === id));
 }
-navBtns.forEach(btn => { btn.onclick = () => { switchPage(btn.dataset.page); if(btn.dataset.page === 'page-mistake') renderMistakePage(); if(btn.dataset.page === 'page-homework') renderHomeworkRecords(); if(btn.dataset.page === 'page-profile') renderProfile(); if(btn.dataset.page === 'page-practice'){ practiceSession = null; renderPracticeTopicSelect(); } }; });
+navBtns.forEach(btn => { btn.onclick = () => { switchPage(btn.dataset.page); if(btn.dataset.page === 'page-mistake') renderMistakePage(); if(btn.dataset.page === 'page-homework') renderHomeworkRecords(); if(btn.dataset.page === 'page-profile') renderProfile(); if(btn.dataset.page === 'page-assessment') renderAssessmentPage(); if(btn.dataset.page === 'page-practice'){ practiceSession = null; renderPracticeTopicSelect(); } }; });
 
 /* ===================== 全局变量 ===================== */
 let contentData = window.IGCSE_CONTENT || [];
@@ -518,6 +556,27 @@ function renderProfile(){
         html += '<div class="border rounded-lg p-3 text-center"><div class="font-semibold text-sm">' + (SUBJECT_NAMES[key] || key) + '</div><div class="text-xs text-gray-600 mt-1">作答 ' + s.answered + ' · 正确 ' + s.correct + '</div><div class="text-lg font-bold ' + (s.answered ? (r >= 70 ? 'text-green-600' : r >= 50 ? 'text-amber-600' : 'text-red-600') : 'text-gray-400') + '">' + (s.answered ? r + '%' : '--') + '</div></div>';
     }
     html += '</div>';
+    /* 测评分级概览 */
+    html += '<h3 class="font-semibold mb-2">测评分级</h3><div class="grid md:grid-cols-5 gap-3 mb-4">';
+    ASSESS_SUBJECTS.forEach(sub => {
+        const rec = lastAssessmentRecord(sub);
+        html += '<div class="border rounded-lg p-3 text-center ' + (rec ? 'bg-indigo-50 border-indigo-200' : 'bg-slate-50') + '">'
+            + '<div class="font-semibold text-sm">' + (SUBJECT_NAMES[sub] || sub) + '</div>'
+            + '<div class="text-lg font-bold mt-1 ' + (rec ? 'text-indigo-700' : 'text-gray-400') + '">' + (rec ? 'L' + rec.level : '未测评') + '</div>'
+            + '</div>';
+    });
+    html += '</div>';
+    const profRecs = (userState.assessmentRecords || []).slice().reverse().slice(0, 5);
+    html += '<h4 class="font-semibold mb-2 text-sm">最近测评记录</h4>';
+    if(!profRecs.length){
+        html += '<p class="text-sm text-gray-500 mb-6">暂无测评记录</p>';
+    } else {
+        html += '<div class="mb-6">';
+        profRecs.forEach(r => {
+            html += '<div class="flex justify-between items-center text-sm border-b py-1"><span>' + (SUBJECT_NAMES[r.subject] || r.subject) + '</span><span class="text-indigo-700 font-semibold">L' + r.level + ' · ' + r.score + '/' + r.total + '</span><span class="text-xs text-gray-400">' + fmtTime(r.time) + '</span></div>';
+        });
+        html += '</div>';
+    }
     html += '<h3 class="font-semibold mb-2">徽章墙（' + userState.badges.length + '/' + BADGES.length + '）</h3><div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">';
     BADGES.forEach(b => {
         const earned = userState.badges.includes(b.id);
@@ -533,12 +592,238 @@ function renderProfile(){
     p.innerHTML = html;
 }
 
-/* ===================== 科目切换 ===================== */
+/* ===================== 英语模式 / 科目切换 ===================== */
+function setEnglishMode(on){
+    document.querySelectorAll('#mainNav .nav-btn').forEach(b => {
+        const p = b.dataset.page;
+        const keep = (p === 'page-home' || p === 'page-profile');
+        b.classList.toggle('hidden', on && !keep);
+    });
+}
 document.getElementById('subjectSelect').onchange = function(){
+    if(this.value === 'english'){
+        setEnglishMode(true);
+        switchPage('page-english');
+        return;
+    }
+    setEnglishMode(false);
     currentSubject = this.value;
     renderTopicList();
     if(document.getElementById('page-practice').classList.contains('active')) renderPracticeTopicSelect();
 };
+
+/* 首页科目总览：事件委托 */
+document.getElementById('subjectOverview').addEventListener('click', function(e){
+    const btn = e.target.closest('[data-subject]');
+    if(!btn) return;
+    const sub = btn.dataset.subject;
+    const sel = document.getElementById('subjectSelect');
+    if(sub === 'english'){
+        sel.value = 'english';
+        setEnglishMode(true);
+        switchPage('page-english');
+    } else {
+        sel.value = sub;
+        setEnglishMode(false);
+        currentSubject = sub;
+        renderTopicList();
+        switchPage('page-textbook');
+    }
+});
+
+/* ===================== 测评分级模块 ===================== */
+let assessmentSession = null; // { subject, order:[qid], idx, answers:{qid:选项下标}, right, done, pct, level }
+const ASSESS_DATA = window.IGCSE_ASSESSMENT || { papers:{}, levels:[], paths:[] };
+const ASSESS_SUBJECTS = ['math','physics','chemistry','dt','business'];
+const ASSESS_DELIMS = [{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}];
+function assessLevelFor(pct){ return Math.max(1, Math.min(10, Math.ceil(pct / 10))); }
+function lastAssessmentRecord(sub){
+    const recs = (userState.assessmentRecords || []).filter(r => r.subject === sub);
+    return recs.length ? recs[recs.length - 1] : null;
+}
+function fmtTime(t){
+    try{ const d = new Date(t); if(!isNaN(d)) return d.toLocaleString(); }catch(e){}
+    return t || '';
+}
+function renderAssessmentPage(){
+    const area = document.getElementById('assessmentArea');
+    if(!area) return;
+    if(assessmentSession && assessmentSession.done){ renderAssessmentResult(); return; }
+    if(assessmentSession && !assessmentSession.done){ renderAssessmentQuestion(); return; }
+    let html = '<div class="grid md:grid-cols-3 gap-3 mb-6">';
+    ASSESS_SUBJECTS.forEach(sub => {
+        const rec = lastAssessmentRecord(sub);
+        const ready = ASSESS_DATA.papers && ASSESS_DATA.papers[sub] && ASSESS_DATA.papers[sub].length;
+        html += '<div class="border rounded-lg p-4 flex flex-col justify-between">'
+            + '<div><h3 class="font-semibold">' + (SUBJECT_NAMES[sub] || sub) + '</h3>'
+            + '<p class="text-xs text-gray-500 mt-1">12 题 · 难度递进</p>'
+            + '<p class="text-sm mt-2">' + (rec ? '最近等级：<b class="text-indigo-700">L' + rec.level + '</b>' : '<span class="text-gray-400">未测评</span>') + '</p></div>'
+            + (ready
+                ? '<button data-assess-subject="' + sub + '" class="mt-3 self-start bg-indigo-600 text-white px-3 py-1.5 rounded text-sm hover:bg-indigo-700">开始测评</button>'
+                : '<button disabled class="mt-3 self-start px-3 py-1.5 rounded text-sm bg-slate-200 text-gray-400 cursor-not-allowed">题库准备中</button>')
+            + '</div>';
+    });
+    html += '</div>';
+    const recs = (userState.assessmentRecords || []).slice().reverse().slice(0, 5);
+    html += '<h3 class="font-semibold mb-2">最近测评记录</h3>';
+    if(!recs.length){
+        html += '<p class="text-sm text-gray-500">暂无记录，开始第一次测评分级吧。</p>';
+    } else {
+        recs.forEach(r => {
+            html += '<div class="border rounded-lg p-3 mb-2 text-sm flex justify-between items-center flex-wrap gap-1"><span>' + (SUBJECT_NAMES[r.subject] || r.subject) + '</span><span class="font-semibold text-indigo-700">L' + r.level + ' · ' + r.score + '/' + r.total + '</span><span class="text-xs text-gray-400">' + fmtTime(r.time) + '</span></div>';
+        });
+    }
+    area.innerHTML = html;
+    area.querySelectorAll('[data-assess-subject]').forEach(b => {
+        b.onclick = () => startAssessment(b.dataset.assessSubject);
+    });
+}
+function startAssessment(subject){
+    const qids = ASSESS_DATA.papers && ASSESS_DATA.papers[subject];
+    if(!qids || !qids.length){ showToast('该科目测评题库尚未就绪'); return; }
+    assessmentSession = { subject, order: qids.slice(), idx: 0, answers: {}, right: 0, done: false, pct: 0, level: 1, total: qids.length };
+    renderAssessmentQuestion();
+}
+function renderAssessmentQuestion(){
+    const s = assessmentSession;
+    if(!s) return;
+    const area = document.getElementById('assessmentArea');
+    const q = findQuestion(s.order[s.idx]);
+    if(!q){ submitAssessment(); return; }
+    const total = s.order.length;
+    const barPct = Math.round(s.idx / total * 100);
+    let html = '<div class="mb-3">'
+        + '<div class="flex justify-between text-xs text-gray-500 mb-1"><span>第 ' + (s.idx + 1) + ' / ' + total + ' 题</span><span>' + (SUBJECT_NAMES[s.subject] || s.subject) + '</span></div>'
+        + '<div class="w-full bg-slate-200 rounded-full h-2"><div class="bg-indigo-600 h-2 rounded-full" style="width:' + barPct + '%"></div></div></div>';
+    html += '<div class="border rounded-lg p-4">';
+    html += '<div class="font-medium mb-3">' + (q.question || '') + '</div>';
+    html += '<div class="grid gap-2">';
+    (q.options || []).forEach((opt, i) => {
+        html += '<button data-opt="' + i + '" class="opt-btn text-left border border-slate-300 rounded-lg px-3 py-2 text-sm">' + opt + '</button>';
+    });
+    html += '</div>';
+    html += '<div class="q-feedback mt-3"></div>';
+    html += '<div class="q-next mt-3"></div>';
+    html += '</div>';
+    area.innerHTML = html;
+    if(window.renderMathInElement) renderMathInElement(area, { delimiters: ASSESS_DELIMS });
+    area.querySelectorAll('.opt-btn').forEach(btn => {
+        btn.onclick = () => answerAssessment(parseInt(btn.dataset.opt, 10));
+    });
+}
+function answerAssessment(optIdx){
+    const s = assessmentSession;
+    const q = findQuestion(s.order[s.idx]);
+    if(!q) return;
+    const area = document.getElementById('assessmentArea');
+    const picked = (q.options || [])[optIdx];
+    if(picked === undefined) return;
+    s.answers[s.order[s.idx]] = optIdx;
+    const isCorrect = (picked === q.answer);
+    if(isCorrect) s.right++;
+    const correctIdx = (q.options || []).findIndex(o => o === q.answer);
+    area.querySelectorAll('.opt-btn').forEach(b => {
+        b.classList.add('disabled');
+        const oi = parseInt(b.dataset.opt, 10);
+        if(oi === correctIdx) b.classList.add('correct');
+        if(oi === optIdx && !isCorrect) b.classList.add('wrong');
+    });
+    const fb = area.querySelector('.q-feedback');
+    fb.innerHTML = (isCorrect
+        ? '<div class="border border-green-200 bg-green-50 text-green-800 rounded-lg p-3 text-sm">回答正确！' + (q.explain ? '<div class="mt-1 text-green-700">' + q.explain + '</div>' : '') + '</div>'
+        : '<div class="border border-red-200 bg-red-50 text-red-800 rounded-lg p-3 text-sm">回答错误。<div class="mt-1"><span class="font-semibold">正确答案：</span>' + (q.answer || '') + '</div>' + (q.explain ? '<div class="mt-1 text-red-700">' + q.explain + '</div>' : '') + '</div>');
+    if(window.renderMathInElement) renderMathInElement(fb, { delimiters: ASSESS_DELIMS });
+    const isLast = s.idx >= s.order.length - 1;
+    const nxt = area.querySelector('.q-next');
+    nxt.innerHTML = '<button class="bg-indigo-600 text-white px-4 py-2 rounded text-sm hover:bg-indigo-700">' + (isLast ? '查看结果' : '下一题') + '</button>';
+    nxt.querySelector('button').onclick = () => {
+        if(isLast){ submitAssessment(); } else { s.idx++; renderAssessmentQuestion(); }
+    };
+}
+function submitAssessment(){
+    const s = assessmentSession;
+    const total = s.order.length;
+    const pct = total ? Math.round(s.right / total * 100) : 0;
+    const level = assessLevelFor(pct);
+    userState.assessmentRecords.push({ subject: s.subject, score: s.right, total: total, level: level, time: new Date().toISOString() });
+    saveUserState(userState);
+    addXp(30);
+    grantBadge('assess_first');
+    const covered = {};
+    userState.assessmentRecords.forEach(r => { covered[r.subject] = true; });
+    if(Object.keys(covered).length >= 5) grantBadge('assess_all');
+    if(userState.assessmentRecords.some(r => r.level >= 10)) grantBadge('assess_top');
+    s.done = true;
+    s.pct = pct;
+    s.level = level;
+    renderAssessmentResult();
+}
+function renderAssessmentResult(){
+    const s = assessmentSession;
+    const area = document.getElementById('assessmentArea');
+    const lvInfo = (ASSESS_DATA.levels || [])[s.level - 1] || {};
+    let html = '<div class="text-center mb-6">'
+        + '<div class="inline-flex flex-col items-center bg-indigo-600 text-white rounded-2xl px-10 py-6 shadow">'
+        + '<div class="text-4xl font-bold">L' + s.level + '</div>'
+        + '<div class="mt-1 text-indigo-100">' + esc(lvInfo.title || '等级 ' + s.level) + '</div></div>'
+        + '<p class="mt-3 text-lg font-semibold">得分 ' + s.right + ' / ' + s.total + '（' + s.pct + '%）</p>'
+        + '</div>';
+    if(lvInfo.comment) html += '<div class="bg-indigo-50 border border-indigo-200 rounded-lg p-4 mb-4 text-sm">' + esc(lvInfo.comment) + '</div>';
+    if(lvInfo.advice) html += '<div class="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6 text-sm"><b>建议：</b>' + esc(lvInfo.advice) + '</div>';
+    const pathInfo = (ASSESS_DATA.paths || []).find(p => p.level === s.level) || {};
+    const topics = pathInfo.topics || [];
+    if(topics.length){
+        html += '<h3 class="font-semibold mb-2">等级学习路径</h3>';
+        if(pathInfo.goal) html += '<p class="text-sm text-gray-600 mb-3">目标：' + esc(pathInfo.goal) + '</p>';
+        html += '<div class="grid md:grid-cols-2 gap-3 mb-6">';
+        topics.forEach(t => {
+            const topicObj = contentData.find(c => c.topicId === t.topicId);
+            const learned = userState.learnedTopics.includes(t.topicId);
+            html += '<div class="border rounded-lg p-3 ' + (learned ? 'opacity-60' : '') + '">'
+                + '<div class="text-xs text-gray-500">' + (SUBJECT_NAMES[t.subject] || t.subject) + '</div>'
+                + '<div class="font-medium">' + esc(topicObj ? topicObj.title : (t.topicId || '')) + '</div>'
+                + (t.note ? '<p class="text-xs text-gray-500 mt-1">' + esc(t.note) + '</p>' : '')
+                + (learned
+                    ? '<span class="text-xs text-green-600 mt-2 inline-block">已学</span>'
+                    : '<button data-goto-topic="' + esc(t.topicId) + '" data-goto-subject="' + esc(t.subject) + '" class="mt-2 text-xs bg-indigo-600 text-white px-2 py-1 rounded">去学习</button>')
+                + '</div>';
+        });
+        html += '</div>';
+    }
+    html += '<h3 class="font-semibold mb-2">答题回顾</h3>';
+    s.order.forEach((qid, i) => {
+        const q = findQuestion(qid);
+        if(!q) return;
+        const ansIdx = s.answers[qid];
+        const pickedOpt = (q.options || [])[ansIdx];
+        const isRight = ansIdx !== undefined && pickedOpt === q.answer;
+        html += '<div class="border rounded-lg p-3 mb-2 text-sm">'
+            + '<div class="flex items-start gap-2 mb-1"><span class="font-bold ' + (isRight ? 'text-green-600' : 'text-red-600') + '">' + (isRight ? '✓' : '✗') + '</span><span>' + (q.question || '') + '</span></div>'
+            + '<div class="text-xs text-gray-600 ml-5">你的答案：' + (pickedOpt || '—') + ' ｜ 正确答案：<span class="text-green-700">' + (q.answer || '') + '</span></div>'
+            + '</div>';
+    });
+    html += '<div class="mt-6 flex gap-3 flex-wrap">'
+        + '<button data-act="retry" class="bg-indigo-600 text-white px-4 py-2 rounded text-sm">再测一次</button>'
+        + '<button data-act="back-home" class="px-4 py-2 rounded border border-slate-300 text-sm">返回测评首页</button></div>';
+    area.innerHTML = html;
+    if(window.renderMathInElement) renderMathInElement(area, { delimiters: ASSESS_DELIMS });
+    area.querySelectorAll('[data-goto-topic]').forEach(btn => {
+        btn.onclick = () => {
+            const tsub = btn.dataset.gotoSubject;
+            const tid = btn.dataset.gotoTopic;
+            const topicObj = contentData.find(c => c.topicId === tid && c.subject === tsub);
+            const sel = document.getElementById('subjectSelect');
+            sel.value = tsub;
+            setEnglishMode(false);
+            currentSubject = tsub;
+            renderTopicList();
+            if(topicObj) openTopic(topicObj);
+            switchPage('page-textbook');
+        };
+    });
+    area.querySelector('[data-act=retry]').onclick = () => startAssessment(s.subject);
+    area.querySelector('[data-act=back-home]').onclick = () => { assessmentSession = null; renderAssessmentPage(); };
+}
 
 /* ===================== 工具 ===================== */
 function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c])); }
