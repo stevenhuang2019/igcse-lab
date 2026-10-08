@@ -800,7 +800,7 @@ function renderProfile(){
     html += '</div>';
     html += weakTopicsBlockHtml();
     /* 测评分级概览 */
-    html += '<h3 class="font-semibold mb-2">测评分级</h3><div class="grid md:grid-cols-5 gap-3 mb-4">';
+    html += '<h3 class="font-semibold mb-2">测评分级</h3><div class="grid md:grid-cols-2 lg:grid-cols-6 gap-3 mb-4">';
     ASSESS_SUBJECTS.forEach(sub => {
         const rec = lastAssessmentRecord(sub);
         html += '<div class="border rounded-lg p-3 text-center ' + (rec ? 'bg-indigo-50 border-indigo-200' : 'bg-slate-50') + '">'
@@ -884,7 +884,7 @@ document.getElementById('subjectOverview').addEventListener('click', function(e)
 /* ===================== 测评分级模块 ===================== */
 let assessmentSession = null; // { subject, order:[qid], idx, answers:{qid:选项下标}, right, done, pct, level }
 const ASSESS_DATA = window.IGCSE_ASSESSMENT || { papers:{}, levels:[], paths:[] };
-const ASSESS_SUBJECTS = ['math','physics','chemistry','dt','business'];
+const ASSESS_SUBJECTS = ['math','physics','chemistry','dt','business','computer_science'];
 const ASSESS_DELIMS = [{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}];
 function assessLevelFor(pct){ return Math.max(1, Math.min(10, Math.ceil(pct / 10))); }
 function lastAssessmentRecord(sub){
