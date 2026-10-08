@@ -390,30 +390,29 @@ function renderTopicList(){
 }
 function openTopic(topic){
     currentTopicId = topic.topicId;
-    document.getElementById('topicTitle').innerText = topic.title;
-    let bodyHtml = topic.knowledge || '';
+    const L = window.getTopicLanguage ? window.getTopicLanguage(topic) : {title:topic.title,body:topic.knowledge||''};
+    document.getElementById('topicTitle').innerText = L.title;
+    let bodyHtml = '';
+    if(L.fallback && (window.IGCSE_GLOBAL_LANG||'learn') === 'exam'){
+        bodyHtml += '<div class="mb-3 p-3 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-sm">English content is being expanded for this topic. Bilingual content is shown as a temporary learning fallback.</div>';
+    }
+    bodyHtml += L.body || '';
     if(topic.formulas && topic.formulas.length){
-        bodyHtml += '<div class="my-3 bg-slate-50 border border-slate-200 rounded p-3">';
+        bodyHtml += '<div class="my-3 bg-slate-50 border border-slate-200 rounded p-3"><strong>Formula / Key relationships</strong>';
         topic.formulas.forEach(f => { bodyHtml += '<p class="my-1">' + f + '</p>'; });
         bodyHtml += '</div>';
     }
-    if(topic.imageUrls && topic.imageUrls.length){
-        topic.imageUrls.forEach(img => { bodyHtml += '<img src="' + img + '" class="my-3 max-w-full rounded">'; });
-    }
+    if(topic.imageUrls && topic.imageUrls.length){ topic.imageUrls.forEach(img => { bodyHtml += '<img src="' + img + '" class="my-3 max-w-full rounded">'; }); }
     if(topic.commonMistake){
-        bodyHtml += '<div class="bg-amber-50 border-l-4 border-amber-400 p-3 mt-4"><strong>常见误区：</strong>' + esc(topic.commonMistake) + '</div>';
+        bodyHtml += '<div class="bg-amber-50 border-l-4 border-amber-400 p-3 mt-4"><strong>' + ((window.IGCSE_GLOBAL_LANG||'learn')==='exam'?'Common mistake:':'常见误区：') + '</strong>' + esc(topic.commonMistake) + '</div>';
     }
     document.getElementById('topicBody').innerHTML = bodyHtml;
-    if(window.renderMathInElement){
-        renderMathInElement(document.getElementById('topicBody'), { delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}] });
-    }
+    if(window.renderMathInElement) renderMathInElement(document.getElementById('topicBody'), { delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}] });
     document.getElementById('topicContent').classList.remove('hidden');
-    if(!userState.learnedTopics.includes(topic.topicId)){
-        userState.learnedTopics.push(topic.topicId);
-        saveUserState(userState);
-    }
+    if(!userState.learnedTopics.includes(topic.topicId)){ userState.learnedTopics.push(topic.topicId); saveUserState(userState); }
     addXp(3);
 }
+
 document.getElementById('backTopicList').onclick = renderTopicList;
 document.getElementById('startPracticeBtn').onclick = () => {
     if(!currentTopicId) return;
