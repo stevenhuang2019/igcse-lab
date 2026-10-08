@@ -561,7 +561,7 @@ window.IGCSE_SYLLABUS_REGISTRY = {
         "ref": "5.2",
         "label": "数字货币",
         "topicIds": [
-          "cs0478_5"
+          "cs0478_5_currency"
         ]
       },
       {
@@ -617,7 +617,7 @@ window.IGCSE_SYLLABUS_REGISTRY = {
         "ref": "8.3",
         "label": "文件操作",
         "topicIds": [
-          "cs0478_8"
+          "cs0478_8_files"
         ]
       },
       {

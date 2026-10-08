@@ -46,7 +46,7 @@
   function auditPanel(subject){
     const a=window.getIGCSESyllabusAudit?.(subject);if(!a)return '';
     const labels={'sample-practice':'已有样题','preparation-only':'准备练习','content-linked':'内容关联 · 待补样题','gap':'尚未建设'};
-    return '<section class="db-panel" id="dbSyllabusAudit"><h3>官方考纲建设清单</h3><p>'+esc(a.code)+' · '+esc(a.year)+' · <a href="'+esc(a.sourceUrl)+'" target="_blank" rel="noopener">查看官方考纲</a></p><p>'+esc(a.note)+'</p><p>'+a.sampled+'/'+a.sectionCount+' 项有明确关联样题。样题数不代表完整考纲覆盖或能力达标。</p><details><summary>展开各项建设状态</summary><div class="db-topics">'+a.sections.map(x=>'<article><div><b>'+esc(x.ref)+' · '+esc(x.label)+'</b><small>'+labels[x.status]+' · '+x.practiceCount+' 道样题 · '+x.preparationCount+' 道准备练习</small></div></article>').join('')+'</div></details></section>';
+    return '<section class="db-panel" id="dbSyllabusAudit"><h3>官方考纲建设清单</h3><p>'+esc(a.code)+' · '+esc(a.year)+' · <a href="'+esc(a.sourceUrl)+'" target="_blank" rel="noopener">查看官方考纲</a></p><p>'+esc(a.note)+'</p><p>'+a.sampled+'/'+a.sectionCount+' 项有明确关联样题。样题数不代表完整考纲覆盖或能力达标。</p><details><summary>展开各项建设状态</summary><label class="db-audit-filter">显示条目 <select id="dbAuditFilter"><option value="all">全部</option><option value="needs-practice">待建设样题</option><option value="preparation-only">只有准备练习</option></select></label><div class="db-topics">'+a.sections.map(x=>'<article data-audit-status="'+x.status+'"><div><b>'+esc(x.ref)+' · '+esc(x.label)+'</b><small>'+labels[x.status]+' · '+x.practiceCount+' 道样题 · '+x.preparationCount+' 道准备练习</small><small>样题已作答 '+x.attemptedCount+'/'+x.practiceCount+' · 准备练习已作答 '+x.preparationAttemptedCount+'/'+x.preparationCount+'</small></div><div class="db-actions">'+(x.topicIds.length?'<button data-db-learn="'+esc(x.topicIds[0])+'" aria-label="学习 '+esc(x.ref)+'">学习</button>':'')+(x.questionIds.length?'<button data-syllabus-practice="'+esc(x.ref)+'" aria-label="'+(x.practiceCount?'练习 ':'准备练习 ')+esc(x.ref)+'">'+(x.practiceCount?'练习样题':'准备练习')+'</button>':'')+'</div></article>').join('')+'</div><p id="dbAuditEmpty" hidden>当前筛选没有条目。</p></details></section>';
   }
   function build(){
     const nav=document.getElementById('mainNav'),main=document.querySelector('main');
@@ -66,6 +66,23 @@
       p.querySelectorAll('[data-db-subject]').forEach(x=>x.onclick=()=>{setCurrentSubjectSafe(x.dataset.dbSubject);render();});
       p.querySelectorAll('[data-db-practice]').forEach(x=>x.onclick=()=>gotoTopicPractice(x.dataset.dbPractice));
       p.querySelectorAll('[data-db-learn]').forEach(x=>x.onclick=()=>{const t=catalog().topic(sub,x.dataset.dbLearn);setCurrentSubjectSafe(sub);renderTopicList();switchPage('page-textbook');openTopic(t);});
+      p.querySelectorAll('[data-syllabus-practice]').forEach(x=>x.onclick=()=>{
+        const a=window.getIGCSESyllabusAudit(sub),section=a?.sections.find(t=>t.ref===x.dataset.syllabusPractice);
+        if(!section?.questionIds.length)return;
+        if(state().mockExams?.activePractice){switchPage('page-practice');renderMockEntry();return;}
+        setCurrentSubjectSafe(sub);
+        startSessionFromIds(section.questionIds,'normal',{subject:sub,label:(section.practiceCount?'考纲样题 · ':'准备练习 · ')+section.ref+' '+section.label});
+      });
+      const filter=p.querySelector('#dbAuditFilter');
+      if(filter)filter.onchange=()=>{
+        let visible=0;
+        p.querySelectorAll('[data-audit-status]').forEach(row=>{
+          const status=row.dataset.auditStatus;
+          row.hidden=filter.value==='needs-practice'?!['gap','content-linked'].includes(status):filter.value!=='all'&&status!==filter.value;
+          if(!row.hidden)visible++;
+        });
+        p.querySelector('#dbAuditEmpty').hidden=visible>0;
+      };
       p.querySelector('#dbMistakes').onclick=()=>{switchPage('page-mistake');renderMistakePage();};
       p.querySelector('#dbMock').onclick=()=>{switchPage('page-practice');renderPracticeTopicSelect();renderMockEntry();};
     }

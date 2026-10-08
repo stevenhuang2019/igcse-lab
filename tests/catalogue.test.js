@@ -13,7 +13,7 @@ function load(){
 }
 test('all seven subjects have valid uniquely identified questions mapped to real topics',()=>{
  const {window}=load(),catalog=window.IGCSE_CATALOG,audit=catalog.audit();
- assert.equal(catalog.subjects.length,7);assert.ok(catalog.questions.length>=980);
+ assert.equal(catalog.subjects.length,7);assert.ok(catalog.questions.length>=996);
  assert.equal(audit.orphanQuestions.length,0);
  for(const subject of audit.subjects){assert.equal(subject.emptyTopics.length,0,subject.subject);assert.ok(subject.questions>0);}
  for(const q of catalog.questions){
@@ -64,7 +64,8 @@ test('source-linked audit distinguishes samples, preparation and gaps without cr
  assert.equal(audit('unknown'),null);
  assert.equal(audit('math').sections.find(s=>s.ref==='7').status,'gap');
  const cs=audit('computer_science');assert.equal(cs.sectionCount,24);assert.equal(cs.invalidReferences.length,0);
- assert.equal(cs.sections.find(s=>s.ref==='8.3').status,'content-linked');
+ assert.equal(cs.sections.find(s=>s.ref==='8.3').status,'sample-practice');
+ assert.equal(cs.sampled,24);assert.equal(cs.sections.find(s=>s.ref==='5.2').questionIds.length,4);
  const phy=audit('physics');assert.equal(phy.invalidReferences.length,0);assert.ok(!phy.sections.some(s=>s.ref==='4.6'));
  assert.equal(phy.sections.find(s=>s.ref==='4.5.6').questionIds.length,2);
  assert.match(window.IGCSE_CATALOG.topic('physics','phy0625_4_6').title,/^4.5 /);
@@ -79,12 +80,25 @@ test('source-linked audit distinguishes samples, preparation and gaps without cr
 });
 test('authored depth has meaningful unique prompts and balanced answer positions',()=>{
  const {window}=load(),qs=window.IGCSE_DEPTH_QUESTIONS;
- assert.equal(qs.length,118);assert.equal(new Set(qs.map(q=>q.question.trim().toLowerCase())).size,118);
+ assert.equal(qs.length,134);assert.equal(new Set(qs.map(q=>q.question.trim().toLowerCase())).size,134);
  for(const subject of ['computer_science','english']){
   const added=qs.filter(q=>q.subject===subject),counts=[0,0,0,0];
   for(const q of added){assert.equal(q.source,'original');assert.equal(q.pastPaper,false);assert.ok(q.syllabusRef);counts[q.options.indexOf(q.answer)]++;}
   assert.ok(Math.max(...counts)-Math.min(...counts)<=1);
  }
- assert.equal(window.IGCSE_CATALOG.questions.filter(q=>q.subject==='computer_science').length,106);
+ assert.equal(window.IGCSE_CATALOG.questions.filter(q=>q.subject==='computer_science').length,114);
  assert.equal(window.IGCSE_CATALOG.questions.filter(q=>q.subject==='english').length,66);
+});
+
+test('section progress counts unique answered samples separately from preparation',()=>{
+ const {window,run}=load();run('syllabus_registry.js');run('syllabus_audit.js');
+ const audit=window.getIGCSESyllabusAudit;
+ window.userState.questionStats.gap_cs_005={answered:5,correct:3};
+ const files=audit('computer_science').sections.find(s=>s.ref==='8.3');
+ assert.equal(files.attemptedCount,1);assert.equal(files.practiceCount,4);
+ window.userState.questionStats.depth_en_022={answered:1,correct:1};
+ const listening=audit('english').sections.find(s=>s.ref==='L1');
+ assert.equal(listening.preparationAttemptedCount,1);assert.equal(listening.attemptedCount,0);
+ assert.equal(audit('physics').sampled,29);
+ for(const subject of ['computer_science','physics'])assert.equal(audit(subject).invalidReferences.length,0);
 });

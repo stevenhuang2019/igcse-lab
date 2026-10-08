@@ -11,7 +11,9 @@
    const questions=qs.filter(q=>editionMatches(q)&&q.syllabusRef===s.ref);
    const preparation=questions.filter(q=>q.assessmentMode==='preparation');
    const practice=questions.filter(q=>q.assessmentMode!=='preparation');
+   const attempted=q=>Number(window.userState?.questionStats?.[q.id]?.answered)>0;
    return {...s,topicIds:topics,questionIds:questions.map(q=>q.id),practiceCount:practice.length,preparationCount:preparation.length,
+    attemptedCount:practice.filter(attempted).length,preparationAttemptedCount:preparation.filter(attempted).length,
     status:practice.length?'sample-practice':preparation.length?'preparation-only':topics.length?'content-linked':'gap'};
   });
   return {...registry,sections,sectionCount:sections.length,sampled:sections.filter(s=>s.practiceCount).length,

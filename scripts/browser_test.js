@@ -32,6 +32,31 @@ const server=http.createServer((req,res)=>{
    assert.equal(await page.locator('#dbSyllabusAudit article').count(),16);
    const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1);assert.equal(overflow,false,'dashboard overflow '+width);
    await page.screenshot({path:path.join(results,'dashboard-'+width+'.png'),fullPage:true});
+   // Section actions must select only the matching edition/reference, preserve evidence and label preparation.
+   await page.locator('#dbAuditFilter').selectOption('preparation-only');
+   assert.ok(await page.locator('#dbSyllabusAudit article:visible').count()>0);
+   assert.ok(await page.locator('#dbSyllabusAudit article:visible').evaluateAll(rows=>rows.every(r=>r.dataset.auditStatus==='preparation-only')));
+   await page.getByRole('button',{name:'准备练习 L1',exact:true}).click();
+   assert.ok(await page.evaluate(()=>practiceSession.order.every(id=>{const q=findQuestion(id);return q.syllabusRef==='L1'&&q.assessmentMode==='preparation';})));
+   assert.match(await page.locator('#practiceTopicSelect').textContent(),/准备练习/);
+   await page.locator('#questionArea .opt-btn').first().click();
+   await page.locator('#dashboard-nav').click();await page.locator('[data-db-subject="computer_science"]').click();
+   await page.locator('#dbSyllabusAudit summary').click();
+   await page.locator('#dbAuditFilter').selectOption('needs-practice');
+   assert.equal(await page.locator('#dbSyllabusAudit article:visible').count(),0);
+   assert.equal(await page.locator('#dbAuditEmpty').isVisible(),true);
+   await page.locator('#dbAuditFilter').selectOption('all');
+   await page.getByRole('button',{name:'学习 8.3',exact:true}).click();
+   assert.match(await page.locator('#topicTitle').textContent(),/8.3 File handling/);
+   assert.ok(await page.evaluate(()=>userState.learnedTopics.includes('cs0478_8_files')));
+   await page.locator('#dashboard-nav').click();await page.locator('#dbSyllabusAudit summary').click();
+   await page.getByRole('button',{name:'练习 8.3',exact:true}).click();
+   assert.equal(await page.evaluate(()=>practiceSession.order.length),4);
+   assert.ok(await page.evaluate(()=>practiceSession.order.every(id=>{const q=findQuestion(id);return q.syllabus==='0478'&&q.syllabusYear==='2026-2028'&&q.syllabusRef==='8.3';})));
+   await page.locator('#questionArea .opt-btn').first().click();
+   await page.reload();await page.locator('#dashboard-nav').click();
+   assert.equal(await page.evaluate(()=>getIGCSESyllabusAudit('computer_science').sections.find(s=>s.ref==='8.3').attemptedCount),1);
+   assert.equal(await page.evaluate(()=>getIGCSESyllabusAudit('english').sections.find(s=>s.ref==='L1').preparationAttemptedCount),1);
    // Newly authored questions must enter the real practice flow and record evidence.
    await page.evaluate(()=>{setCurrentSubjectSafe('computer_science');startSessionFromIds(['depth_cs_001'],'normal',{subject:'computer_science'});});
    const depthAnswer=await page.evaluate(()=>{const q=findQuestion('depth_cs_001');return q.options.indexOf(q.answer);});
@@ -62,6 +87,12 @@ const server=http.createServer((req,res)=>{
    await page.locator('#questionArea .opt-btn').nth(answer).click();
    assert.match(await page.locator('.q-feedback').textContent(),/答案已记录/);
    assert.equal(await page.locator('#questionArea .correct').count(),0);
+   // Entering an outline practice during a live mock must return to resumption without replacing the exam.
+   const liveId=await page.evaluate(()=>practiceSession.id);
+   await page.locator('#dashboard-nav').click();await page.locator('[data-db-subject="computer_science"]').click();
+   await page.locator('#dbSyllabusAudit summary').click();await page.getByRole('button',{name:'练习 8.3',exact:true}).click();
+   assert.equal(await page.locator('#page-practice.active').count(),1);
+   assert.equal(await page.evaluate(()=>practiceSession.id),liveId);
    await page.reload();await page.locator('#resumeMock').click();
    assert.equal(await page.evaluate(()=>practiceSession.startedAt),before.startedAt);
    assert.equal(await page.evaluate(()=>practiceSession.idx),1);

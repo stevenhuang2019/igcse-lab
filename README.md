@@ -4,7 +4,7 @@ A static learning application with seven subject catalogues, topic practice, a s
 
 ## Current coverage
 
-- 980 questions across 86 local topics and seven subjects.
+- 996 questions across 88 local topics and seven subjects.
 - 62 new original questions: 50 Physics questions spanning 25 course-map sections, plus two each for Math, Chemistry, D&T, Business, CS and English.
 - Every local topic has linked questions. This is **local catalogue coverage**, not proof of full official syllabus coverage, exam readiness or a predicted grade. CS and English still have comparatively shallow banks.
 - The legacy `phy0625_4_6` ID is retained for saved progress, while its display/reference uses official 4.5 subdivisions (induction 4.5.1, generator 4.5.2, transformer 4.5.6), not a nonexistent official 4.6.
@@ -27,7 +27,9 @@ Official references checked on 2026-10-09:
 
 The Dashboard includes a source-linked construction checklist for all seven subjects. `data/syllabus_registry.js` stores original concise labels, official section/assessment-objective identifiers, source PDF, edition and explicit local topic links. This is an outline, not an exhaustive transcription or a completed objective audit. `data/syllabus_audit.js` counts samples only when the question explicitly names the reference **and** matches the syllabus code and edition. Legacy questions without references are not silently credited. Status distinguishes sample practice, preparation only, content association and a construction gap; no percentage claims full official coverage.
 
-The additional 118 authored questions comprise 76 CS questions and 42 English questions. Answer positions are rotated and all prompts, answers and rationales are distinct. The 0510 English references R1–R4, W1–W4, L1–L4 and S1–S4 are tracked separately. English writing strategy, transcript and speaking-planning choices are labelled preparation, not evidence of full writing, auditory comprehension or oral performance. English 0511 is not independently audited. CS digital currency (5.2) and file handling (8.3), for example, currently have content associations but no explicitly mapped sample questions.
+The additional 118 authored questions comprise 76 CS questions and 42 English questions. Answer positions are rotated and all prompts, answers and rationales are distinct. The 0510 English references R1–R4, W1–W4, L1–L4 and S1–S4 are tracked separately. English writing strategy, transcript and speaking-planning choices are labelled preparation, not evidence of full writing, auditory comprehension or oral performance. English 0511 is not independently audited. A further 16 original questions and two focused CS lessons cover digital currency (5.2), file handling (8.3) and Physics electromagnetic subsections. CS now has 114 questions, Physics 208 and English 66. The 24 registered CS sections and 29 registered Physics entries each have a referenced sample; this is still an outline, not proof of exhaustive bullet-level coverage.
+
+The checklist has section-specific learning and practice actions, filters for missing samples or preparation-only items, and persisted unique-question completion counts. Repeated attempts count once in section completion. Preparation records remain separate from sample practice. Starting a section exercise while a mock is active returns to the existing mock instead of replacing it.
 
 ## Mock practice
 
