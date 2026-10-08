@@ -12,7 +12,15 @@
     window.userState=window.userState||{};
     return window.userState;
   }
-  function topics(sub){return (window.contentData||[]).filter(x=>x.subject===sub);}
+  function topics(sub){
+    const base=(window.contentData||[]).filter(x=>x.subject===sub);
+    if(sub==='physics'&&window.PHYSICS_0625_COURSE_MAP){
+      const ids=new Set(base.map(x=>x.topicId));
+      const extra=window.PHYSICS_0625_COURSE_MAP.filter(x=>!ids.has(x.topicId)).map(x=>({subject:'physics',chapter:x.chapter,topicId:x.topicId,title:x.title,knowledge:x.knowledge,formulas:x.formulas,commonMistake:x.commonMistake}));
+      return base.concat(extra);
+    }
+    return base;
+  }
   function questions(sub){return (window.questionData||[]).filter(x=>x.subject===sub);}
   function chapters(sub){return [...new Set(topics(sub).map(x=>x.chapter).filter(Boolean))];}
   function topicStats(){
