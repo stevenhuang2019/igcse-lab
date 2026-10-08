@@ -20,13 +20,14 @@ const requiredFiles=[
   'igcse_questions_business.js','igcse_cs_0478.js','igcse_questions_cs.js',
   'igcse_cs_deep.js','igcse_english_esl.js','igcse_questions_english.js',
   'igcse_english_deep.js','english_master_database.js','mastery_engine.js',
-  'learning_dashboard.js','chapter_learning_engine.js','user_state_schema.js'
+  'learning_dashboard.js','chapter_learning_engine.js','user_state_schema.js','syllabus_map.js'
 ];
 for(const f of requiredFiles) files.includes(f)?ok('required '+f):bad('missing '+f);
 
 const index=fs.readFileSync(path.join(ROOT,'index.html'),'utf8');
 [
   'data/user_state_schema.js',
+  'data/syllabus_map.js',
   'data/mastery_engine.js',
   'data/learning_dashboard.js',
   'data/chapter_learning_engine.js',
