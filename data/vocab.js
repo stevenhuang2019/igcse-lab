@@ -1897,6 +1897,28 @@ window.SUBJECT_VOCAB = [
   { "subject": "business", "chapter": "外部环境", "en": "monopoly", "zh": "垄断" },
   { "subject": "business", "chapter": "外部环境", "en": "oligopoly", "zh": "寡头垄断" },
   { "subject": "business", "chapter": "外部环境", "en": "market liberalisation", "zh": "市场自由化" }
+/* ============ English ESL ============ */
+{ "subject":"english","chapter":"ESL","en":"gist","zh":"主旨大意" },
+{ "subject":"english","chapter":"ESL","en":"infer","zh":"推断" },
+{ "subject":"english","chapter":"ESL","en":"imply","zh":"暗示" },
+{ "subject":"english","chapter":"ESL","en":"evidence","zh":"证据" },
+{ "subject":"english","chapter":"ESL","en":"context","zh":"语境" },
+{ "subject":"english","chapter":"ESL","en":"purpose","zh":"目的" },
+{ "subject":"english","chapter":"ESL","en":"audience","zh":"受众" },
+{ "subject":"english","chapter":"ESL","en":"register","zh":"语体" },
+{ "subject":"english","chapter":"ESL","en":"coherence","zh":"连贯性" },
+{ "subject":"english","chapter":"ESL","en":"cohesion","zh":"衔接" },
+{ "subject":"english","chapter":"ESL","en":"distractor","zh":"干扰信息" },
+{ "subject":"english","chapter":"ESL","en":"paraphrase","zh":"改述" },
+{ "subject":"english","chapter":"ESL","en":"fluency","zh":"流利度" },
+{ "subject":"english","chapter":"ESL","en":"interaction","zh":"互动" },
+{ "subject":"english","chapter":"ESL","en":"collocation","zh":"词语搭配" },
+{ "subject":"english","chapter":"ESL","en":"phrasal verb","zh":"短语动词" },
+{ "subject":"english","chapter":"ESL","en":"qualifier","zh":"限定词" },
+{ "subject":"english","chapter":"ESL","en":"command word","zh":"指令词" },
+{ "subject":"english","chapter":"ESL","en":"justify","zh":"论证理由" },
+{ "subject":"english","chapter":"ESL","en":"evaluate","zh":"评价" },
+
 ];
 
 
