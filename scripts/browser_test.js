@@ -1,7 +1,7 @@
 /* Real Chromium regression flows. npm ci; npx playwright install chromium; npm run test:browser */
 const {chromium}=require('playwright');
 const fs=require('node:fs'),path=require('node:path'),http=require('node:http'),assert=require('node:assert/strict');
-const root=path.resolve(__dirname,'..'),results=path.join(root,'test-results');
+const root=path.resolve(__dirname,'..'),results=path.join(root,'test-results'),metrics=[];
 fs.mkdirSync(results,{recursive:true});
 const server=http.createServer((req,res)=>{
  const route=decodeURIComponent(new URL(req.url,'http://localhost').pathname),file=path.resolve(root,'.'+(route==='/'?'/index.html':route));
@@ -19,6 +19,8 @@ const server=http.createServer((req,res)=>{
    // Application flows must work even when optional external math resources are unavailable.
    await page.route('**/*',route=>route.request().url().startsWith(base)?route.continue():route.abort());
    const started=Date.now();await page.goto(base+'/#page-dashboard');await page.locator('#dbMock').waitFor();
+   const performance=await page.evaluate(()=>({domReadyMs:Math.round(window.performance.getEntriesByType('navigation')[0].domContentLoadedEventEnd),localAssetBytes:window.performance.getEntriesByType('resource').filter(r=>r.name.startsWith(location.origin)).reduce((n,r)=>n+r.decodedBodySize,0)}));
+   assert.ok(performance.domReadyMs<5000,'startup budget '+width);assert.ok(performance.localAssetBytes<3*1024*1024,'local asset budget '+width);metrics.push({width,...performance});
    assert.equal(await page.locator('.page.active').count(),1);
    assert.equal(await page.locator('#dashboard-nav').getAttribute('aria-current'),'page');
    assert.equal(await page.evaluate(()=>userState===window.userState),true);
@@ -57,6 +59,33 @@ const server=http.createServer((req,res)=>{
    await page.reload();await page.locator('#dashboard-nav').click();
    assert.equal(await page.evaluate(()=>getIGCSESyllabusAudit('computer_science').sections.find(s=>s.ref==='8.3').attemptedCount),1);
    assert.equal(await page.evaluate(()=>getIGCSESyllabusAudit('english').sections.find(s=>s.ref==='L1').preparationAttemptedCount),1);
+   // Previously empty outline sections now have a lesson -> practice -> progress path.
+   for(const [subject,ref,title] of [['chemistry','4','电解'],['math','7','平移']]){
+    await page.locator('[data-db-subject="'+subject+'"]').click();await page.locator('#dbSyllabusAudit summary').click();
+    await page.getByRole('button',{name:'学习 '+ref,exact:true}).click();assert.match(await page.locator('#topicTitle').textContent(),new RegExp(title));
+    await page.locator('#startPracticeBtn').click();
+    const correct=await page.evaluate(()=>{const q=findQuestion(practiceSession.order[0]);return q.options.indexOf(q.answer);});
+    await page.locator('#questionArea .opt-btn').nth(correct).click();
+    assert.match(await page.locator('.q-feedback').textContent(),/回答正确/);
+    assert.equal(await page.locator('[data-act="next-q"]').count(),1,'feedback remains until explicit next');
+    await page.locator('[data-act="next-q"]').click();assert.equal(await page.evaluate(()=>practiceSession.idx),1);
+    await page.locator('#dashboard-nav').click();
+   }
+   await page.locator('#dbProgress').click();assert.equal(await page.locator('#page-progress.active').count(),1);
+   assert.equal(await page.locator('[data-progress-topic]').count(),9);
+   const transform=page.locator('[data-progress-topic="math_transform_01"]');assert.match(await transform.textContent(),/样本有限/);
+   await transform.locator('summary').click();assert.match(await transform.textContent(),/未测量/);
+   assert.ok(await page.evaluate(()=>IGCSE_PROGRESS_VIEW.model('math').days.at(-1).answered>=1));
+   await page.locator('#progressFilter').selectOption('established');assert.equal(await page.locator('#progressEmpty').isVisible(),true);
+   await page.locator('#progressFilter').selectOption('all');
+   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,'progress overflow '+width);
+   await page.screenshot({path:path.join(results,'progress-'+width+'.png'),fullPage:true});
+   const downloadPromise=page.waitForEvent('download');await page.locator('#exportLearningBackup').click();const download=await downloadPromise;
+   assert.match(download.suggestedFilename(),/^igcse-learning-backup-.*\.json$/);
+   const backup=JSON.parse(fs.readFileSync(await download.path(),'utf8'));assert.ok(backup.questionStats&&backup.activityByDay);
+   await page.reload();assert.equal(await page.locator('#page-progress.active').count(),1);
+   assert.equal(await page.locator('#progress-nav').getAttribute('aria-current'),'page');
+   await page.locator('#progressDashboard').click();
    // Newly authored questions must enter the real practice flow and record evidence.
    await page.evaluate(()=>{setCurrentSubjectSafe('computer_science');startSessionFromIds(['depth_cs_001'],'normal',{subject:'computer_science'});});
    const depthAnswer=await page.evaluate(()=>{const q=findQuestion('depth_cs_001');return q.options.indexOf(q.answer);});
@@ -76,7 +105,7 @@ const server=http.createServer((req,res)=>{
    assert.equal(await page.evaluate(id=>userState.questionStats[id].answered,qid),1);
    assert.ok(await page.evaluate(id=>IGCSE_DASHBOARD.day().completed.includes(id),taskId));
    // Subject controls, chapters and all existing page renderers must execute without exceptions.
-   for(const id of ['page-textbook','page-assessment','page-mistake','page-quickref','page-vocab','page-resources','page-homework','page-profile','page-chapters','motion-lab-page','page-home','page-dashboard']){
+   for(const id of ['page-textbook','page-assessment','page-mistake','page-quickref','page-vocab','page-resources','page-homework','page-profile','page-progress','page-chapters','motion-lab-page','page-home','page-dashboard']){
     const button=page.locator('#mainNav [data-page="'+id+'"]');
     if(await button.count()){await button.click();assert.equal(await page.locator('.page.active').count(),1,'single active '+id);}
    }
@@ -124,9 +153,11 @@ const server=http.createServer((req,res)=>{
     assert.equal(await page.locator('#page-dashboard.active').count(),1);
     assert.match(await page.locator('.db-hero').textContent(),/英语/);
    }
+   await page.goto(base);await page.locator('#dbProgress').waitFor();assert.equal(await page.locator('#page-dashboard.active').count(),1,'default landing');
    assert.deepEqual(errors,[],'browser errors '+width);
    console.log('[ok] '+width+'px: dashboard, seven subjects, task completion, storage, navigation, mock resume/submit/timeout/report; '+(Date.now()-started)+'ms');
    await context.close();
   }
+  fs.writeFileSync(path.join(results,'performance.json'),JSON.stringify(metrics,null,2));console.log('[ok] startup budgets: '+JSON.stringify(metrics));
  }finally{if(browser)await browser.close();server.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

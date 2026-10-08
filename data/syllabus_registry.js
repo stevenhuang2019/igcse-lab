@@ -11,7 +11,9 @@ window.IGCSE_SYLLABUS_REGISTRY = {
       {
         "ref": "1",
         "label": "数与运算",
-        "topicIds": []
+        "topicIds": [
+          "math_number_01"
+        ]
       },
       {
         "ref": "2",
@@ -38,7 +40,9 @@ window.IGCSE_SYLLABUS_REGISTRY = {
       {
         "ref": "5",
         "label": "量度与面积体积",
-        "topicIds": []
+        "topicIds": [
+          "math_mensuration_01"
+        ]
       },
       {
         "ref": "6",
@@ -50,7 +54,9 @@ window.IGCSE_SYLLABUS_REGISTRY = {
       {
         "ref": "7",
         "label": "变换与向量",
-        "topicIds": []
+        "topicIds": [
+          "math_transform_01"
+        ]
       },
       {
         "ref": "8",
@@ -292,7 +298,9 @@ window.IGCSE_SYLLABUS_REGISTRY = {
       {
         "ref": "1",
         "label": "物质状态",
-        "topicIds": []
+        "topicIds": [
+          "chem_states_01"
+        ]
       },
       {
         "ref": "2",
@@ -311,12 +319,16 @@ window.IGCSE_SYLLABUS_REGISTRY = {
       {
         "ref": "4",
         "label": "电解过程",
-        "topicIds": []
+        "topicIds": [
+          "chem_electrolysis_01"
+        ]
       },
       {
         "ref": "5",
         "label": "能量变化",
-        "topicIds": []
+        "topicIds": [
+          "chem_energetics_01"
+        ]
       },
       {
         "ref": "6",
@@ -342,12 +354,16 @@ window.IGCSE_SYLLABUS_REGISTRY = {
       {
         "ref": "9",
         "label": "金属及其应用",
-        "topicIds": []
+        "topicIds": [
+          "chem_metals_01"
+        ]
       },
       {
         "ref": "10",
         "label": "环境化学",
-        "topicIds": []
+        "topicIds": [
+          "chem_environment_01"
+        ]
       },
       {
         "ref": "11",
@@ -359,7 +375,9 @@ window.IGCSE_SYLLABUS_REGISTRY = {
       {
         "ref": "12",
         "label": "实验与鉴别",
-        "topicIds": []
+        "topicIds": [
+          "chem_experimental_01"
+        ]
       }
     ]
   },

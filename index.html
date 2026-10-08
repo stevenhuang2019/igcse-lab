@@ -300,6 +300,7 @@
 <script src="data/physics_0625_course_map.js"></script>
 <script src="data/igcse_questions_extension.js"></script>
 <script src="data/igcse_questions_depth.js"></script>
+<script src="data/igcse_foundation.js"></script>
 <script src="data/learning_catalog.js"></script>
 <script>
 /* ===================== 用户状态管理 ===================== */
@@ -677,15 +678,12 @@ function markAnswered(q, isCorrect, area){
             : '<div class="border border-red-200 bg-red-50 text-red-800 rounded-lg p-3 text-sm">回答错误，已记入错题本。<div class="mt-1"><span class="font-semibold">正确答案：</span>' + (q.answer || '') + '</div>' + (q.explain ? '<div class="mt-1 text-red-700">' + q.explain + '</div>' : '') + '</div>');
         if(window.renderMathInElement) renderMathInElement(fb, { delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}] });
     }
-    if(isCorrect){
-        setTimeout(()=>{if(practiceSession===s)nextQuestion();},850);
-    } else {
-        const next = document.createElement('div');
-        next.className = 'mt-3';
-        next.innerHTML = '<button data-act="next-q" class="bg-indigo-600 text-white px-4 py-2 rounded text-sm hover:bg-indigo-700">下一题</button>';
-        area.appendChild(next);
-        next.querySelector('[data-act=next-q]').onclick = nextQuestion;
-    }
+    const next = document.createElement('div');
+    next.className = 'mt-3';
+    const button=document.createElement('button');button.dataset.act='next-q';
+    button.className='bg-indigo-600 text-white px-4 py-2 rounded text-sm';
+    button.textContent=s.idx>=s.total?'查看练习结果':'下一题';button.onclick=nextQuestion;
+    next.appendChild(button);area.appendChild(next);
 }
 function submitChoice(q, idx, area){
     if(practiceSession?.mode==='mock' && Date.now()-practiceSession.startedAt>=practiceSession.timeLimitSec*1000){practiceSession.timedOut=true;finishPractice();return;}
@@ -1899,6 +1897,7 @@ document.addEventListener('DOMContentLoaded',function(){
 <script src="data/mock_exam_engine.js"></script>
 <script src="data/learning_progress.js"></script>
 <script src="data/learning_dashboard.js"></script>
+<script src="data/progress_view.js"></script>
 
 <script>
 // Use existing navigation handlers so history restores page-specific views too.
@@ -1915,7 +1914,7 @@ function restoreLearningRoute(){
 }
 window.addEventListener('popstate', restoreLearningRoute);
 window.addEventListener('hashchange', restoreLearningRoute);
-window.addEventListener('DOMContentLoaded',()=>{if(location.hash) restoreLearningRoute();if(window.renderMathInElement)renderMathInElement(document.querySelector('.page.active'),{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});});
+window.addEventListener('DOMContentLoaded',()=>{if(!location.hash)history.replaceState(null,'','#page-dashboard');restoreLearningRoute();if(window.renderMathInElement)renderMathInElement(document.querySelector('.page.active'),{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});});
 </script>
 </body>
 </html>

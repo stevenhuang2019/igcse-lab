@@ -2,9 +2,13 @@
 
 A static learning application with seven subject catalogues, topic practice, a shared local learner state, a daily plan and timed mock practice. Serve this directory over HTTP and open `index.html`. No account or backend is required.
 
+[使用说明](USER_GUIDE.md) · [产品化验收范围](PRODUCT_ACCEPTANCE.md)
+
+Start a local preview with `python3 scripts/preview.py` or double-click `start-local.command` on macOS. It uses a stable loopback origin at port 4173 and opens the Dashboard. Python 3 is required only for serving, not for application logic.
+
 ## Current coverage
 
-- 996 questions across 88 local topics and seven subjects.
+- 1038 questions across 97 local topics and seven subjects.
 - 62 new original questions: 50 Physics questions spanning 25 course-map sections, plus two each for Math, Chemistry, D&T, Business, CS and English.
 - Every local topic has linked questions. This is **local catalogue coverage**, not proof of full official syllabus coverage, exam readiness or a predicted grade. CS and English still have comparatively shallow banks.
 - The legacy `phy0625_4_6` ID is retained for saved progress, while its display/reference uses official 4.5 subdivisions (induction 4.5.1, generator 4.5.2, transformer 4.5.6), not a nonexistent official 4.6.
@@ -31,6 +35,12 @@ The additional 118 authored questions comprise 76 CS questions and 42 English qu
 
 The checklist has section-specific learning and practice actions, filters for missing samples or preparation-only items, and persisted unique-question completion counts. Repeated attempts count once in section completion. Preparation records remain separate from sample practice. Starting a section exercise while a mock is active returns to the existing mock instead of replacing it.
 
+## Learning and mastery UX
+
+The default landing page is the Dashboard. A new Progress page explains the five base weights (20/30/20/20/10), normalises only observed dimensions and keeps unmeasured evidence null. Legacy inferred SRS and past-paper defaults are excluded without deleting answer history. Actual review events control retention; ordinary practice scheduling cannot overwrite it. An initial assessment uses its score rather than a binary pass/fail proxy. High scores remain provisional until enough distinct objective items and attempts exist; preparation and self-assessed attempts are disclosed separately.
+
+The 42 original foundation questions supply two explicit chapter samples for each of nine Math and twelve Chemistry outline entries, alongside nine new lessons. This is chapter-level coverage, not a Core/Extended or bullet-level completion claim. Correct feedback now remains until the learner explicitly proceeds. Daily activity starts with this version; no historical daily activity is fabricated. Learning data can be exported locally as JSON; import and device sync are not implemented.
+
 ## Mock practice
 
 Quick mocks use up to 30 multiple-choice questions, spread across available topics, for a 30-minute session. The preparation screen shows actual counts. Answers are revealed after submission. A refresh offers resumption using the original start time; an expired resumed session is submitted with unanswered questions in the denominator. Submitted reports include per-topic gaps, answer review and practice links. Recent reports can be reopened. Structured legacy papers can include essay self-assessment and are not equivalent to externally marked examination results.
@@ -51,7 +61,7 @@ npm run test:browser
 
 `node scripts/validate.js` is a compatibility entry point for syntax, catalogue and behavioural tests. No tests exempt browser assets from syntax checking.
 
-Browser tests use isolated Chromium contexts at 1280, 768 and 390 px, block optional external resources, fail on application exceptions or missing local assets, and exercise Dashboard, all seven subject maps, task completion, persisted records, dynamic navigation/history, mock submission, refresh/resumption, timeouts and report repair links. Screenshots go to ignored `test-results/` and are uploaded by CI. Set `CHROME_PATH` to test with a locally installed Chrome instead of Playwright Chromium.
+Browser tests use isolated Chromium contexts at 1280, 768 and 390 px, block optional external resources, fail on application exceptions or missing local assets, and exercise Dashboard, all seven subject maps, task completion, persisted records, dynamic navigation/history, mock submission, refresh/resumption, timeouts and report repair links. The suite also checks Progress filters and history, backup download content, foundation lesson-to-practice flows and explicit progression after feedback. It records DOM-ready timing and decoded local asset bytes, with regression budgets of 5 seconds and 3 MiB; these local controlled measurements are not public-network or Lighthouse scores. Screenshots and performance records go to ignored `test-results/` and are uploaded by CI. Set `CHROME_PATH` to test with a locally installed Chrome instead of Playwright Chromium.
 
 Tailwind styles are precompiled and committed as `data/tailwind.css`. CI rebuilds and checks for drift. The runtime no longer downloads or executes the Tailwind compiler. Catalogue maps index question lookups and topic membership.
 

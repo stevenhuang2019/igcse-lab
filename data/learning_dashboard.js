@@ -15,7 +15,7 @@
     return {subject,topics:ts.length,questions:qs.length,learned:ts.filter(t=>state().learnedTopics.includes(t.topicId)).length,
       withQuestions:ts.filter(t=>catalog().questionsFor(subject,t.topicId).length).length,
       practiced:attempts.length,accuracy:answered?Math.round(correct/answered*100):null,
-      mastery:ts.length?Math.round(mastery.reduce((a,b)=>a+b,0)/ts.length):0,mastered:mastery.filter(n=>n>=85).length};
+      mastery:ts.length?Math.round(mastery.reduce((a,b)=>a+b,0)/ts.length):0,mastered:ts.filter(t=>window.getTopicMasteryEvidence?.(t.topicId,subject).established).length};
   }
   function day(){
     const s=state();s.dailyPlan=s.dailyPlan||{};
@@ -56,10 +56,10 @@
     const bar=n=>'<progress class="db-progress" max="100" value="'+n+'" aria-label="掌握度 '+n+'%">'+n+'%</progress>';
     function render(){
       const sub=document.getElementById('subjectSelect').value,s=summary(sub),d=day(),errors=window.IGCSE_ERROR_DIAGNOSIS.top(sub).slice(0,3),done=d.tasks.filter(t=>d.completed.includes(t.id)).length;
-      p.innerHTML='<div class="db-hero"><div><p class="section-label">IGCSE PERSONAL LEARNING OS</p><h2>今天，从下一步开始</h2><p>'+esc(names[sub])+' · '+s.learned+'/'+s.topics+' 个主题已学 · '+s.mastered+' 个主题达到掌握标准</p></div><div><strong>'+s.mastery+'%</strong><p>当前科目平均掌握度</p></div></div>'+
+      p.innerHTML='<div class="db-hero"><div><p class="section-label">IGCSE PERSONAL LEARNING OS</p><h2>今天，从下一步开始</h2><p>'+esc(names[sub])+' · '+s.learned+'/'+s.topics+' 个主题已学 · '+s.mastered+' 个主题练习表现稳固</p></div><div><strong>'+s.mastery+'%</strong><p>当前科目平均掌握估计</p></div></div>'+
         '<div class="db-stats"><div><b>'+done+'/'+d.tasks.length+'</b><span>今日任务完成</span></div><div><b>'+s.practiced+'/'+s.questions+'</b><span>实际练过的题目</span></div><div><b>'+(s.accuracy===null?'—':s.accuracy+'%')+'</b><span>已记录答题正确率</span></div><div><b>'+s.withQuestions+'/'+s.topics+'</b><span>本站有题的主题</span></div></div>'+
-        '<section class="db-panel"><h3>今日学习计划</h3><p>优先复习到期错题，再练习薄弱主题。每项完成一次作答后计入完成。</p><div class="db-tasks">'+d.tasks.map(t=>'<button data-task="'+esc(t.id)+'" class="db-task"><small>'+esc(names[t.subject])+' · '+t.minutes+' 分钟</small><b>'+esc(t.title)+'</b><span>'+esc(catalog().topic(t.subject,t.topic)?.title||t.topic)+'</span><em>'+(d.completed.includes(t.id)?'✓ 已完成 · 再练习':'开始练习 →')+'</em></button>').join('')+'</div></section>'+
-        '<section class="db-panel"><h3>全科学习概览</h3><div class="db-subjects">'+catalog().subjects.map(subject=>{const x=summary(subject);return '<button data-db-subject="'+subject+'" class="db-task"><b>'+esc(names[subject])+'</b><span>'+x.mastery+'% 掌握 · '+x.withQuestions+'/'+x.topics+' 主题有题</span>'+bar(x.mastery)+'</button>';}).join('')+'</div></section>'+
+        '<div class="db-actions"><button id="dbProgress">查看进度与掌握依据</button></div><section class="db-panel"><h3>今日学习计划</h3><p>优先复习到期错题，再练习薄弱主题。每项完成一次作答后计入完成。</p><div class="db-tasks">'+d.tasks.map(t=>'<button data-task="'+esc(t.id)+'" class="db-task"><small>'+esc(names[t.subject])+' · '+t.minutes+' 分钟</small><b>'+esc(t.title)+'</b><span>'+esc(catalog().topic(t.subject,t.topic)?.title||t.topic)+'</span><em>'+(d.completed.includes(t.id)?'✓ 已完成 · 再练习':'开始练习 →')+'</em></button>').join('')+'</div></section>'+
+        '<section class="db-panel"><h3>全科学习概览</h3><div class="db-subjects">'+catalog().subjects.map(subject=>{const x=summary(subject);return '<button data-db-subject="'+subject+'" class="db-task"><b>'+esc(names[subject])+'</b><span>'+x.mastery+'% 估计 · '+x.withQuestions+'/'+x.topics+' 主题有题</span>'+bar(x.mastery)+'</button>';}).join('')+'</div></section>'+
         '<section class="db-panel"><h3>课程地图与练习覆盖</h3><p>以下比例只统计本站课程主题，不代表完整官方考纲或考试等级预测。</p><div class="db-topics">'+catalog().topicsFor(sub).map(t=>{const count=catalog().questionsFor(sub,t.topicId).length,n=window.calculateMasteryV2(t.topicId,sub);return '<article><div><b>'+esc(t.title)+'</b><small>'+esc(t.chapter)+' · '+count+' 道题 · 掌握 '+n+'%</small>'+bar(n)+'</div><div class="db-actions"><button data-db-learn="'+esc(t.topicId)+'">学习</button><button data-db-practice="'+esc(t.topicId)+'" '+(!count?'disabled':'')+'>练习</button></div></article>';}).join('')+'</div></section>'+
         auditPanel(sub)+'<section class="db-panel"><h3>错题与模拟考</h3><p>当前科目 '+state().mistakes.filter(m=>m.subject===sub&&!m.mastered).length+' 道待复习错题。</p>'+ (errors.length?'<p>常见错误类型：'+errors.map(e=>esc(e.type)+' ('+e.count+')').join('、')+'</p>':'')+'<div class="db-actions"><button id="dbMistakes">打开错题本</button><button id="dbMock">准备模拟考</button></div></section>';
       p.querySelectorAll('[data-task]').forEach(x=>x.onclick=()=>startTask(d.tasks.find(t=>t.id===x.dataset.task)));
@@ -83,6 +83,7 @@
         });
         p.querySelector('#dbAuditEmpty').hidden=visible>0;
       };
+      p.querySelector('#dbProgress').onclick=()=>switchPage('page-progress');
       p.querySelector('#dbMistakes').onclick=()=>{switchPage('page-mistake');renderMistakePage();};
       p.querySelector('#dbMock').onclick=()=>{switchPage('page-practice');renderPracticeTopicSelect();renderMockEntry();};
     }

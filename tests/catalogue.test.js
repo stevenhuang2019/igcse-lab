@@ -7,13 +7,13 @@ function load(){
  const document={readyState:'loading',addEventListener(){}};
  const ctx=vm.createContext({window,document,console,Date,CustomEvent:function(type,{detail}){this.type=type;this.detail=detail;}});
  const run=f=>vm.runInContext(fs.readFileSync(path.join(root,'data',f),'utf8'),ctx,{filename:f});
- for(const f of ['igcse_content.js','igcse_questions.js','igcse_questions_math.js','igcse_questions_physics.js','igcse_questions_chemistry.js','igcse_questions_dt.js','igcse_questions_business.js','igcse_cs_0478.js','igcse_questions_cs.js','igcse_english_esl.js','igcse_questions_english.js','igcse_english_deep.js','igcse_cs_deep.js','physics_0625_course_map.js','igcse_questions_extension.js','igcse_questions_depth.js','learning_catalog.js'])run(f);
+ for(const f of ['igcse_content.js','igcse_questions.js','igcse_questions_math.js','igcse_questions_physics.js','igcse_questions_chemistry.js','igcse_questions_dt.js','igcse_questions_business.js','igcse_cs_0478.js','igcse_questions_cs.js','igcse_english_esl.js','igcse_questions_english.js','igcse_english_deep.js','igcse_cs_deep.js','physics_0625_course_map.js','igcse_questions_extension.js','igcse_questions_depth.js','igcse_foundation.js','learning_catalog.js'])run(f);
  window.userState={topicStats:{},questionStats:{},learnedTopics:[],dailyPlan:{},mistakes:[]};window.saveUserState=()=>{};
  return {window,run,listeners};
 }
 test('all seven subjects have valid uniquely identified questions mapped to real topics',()=>{
  const {window}=load(),catalog=window.IGCSE_CATALOG,audit=catalog.audit();
- assert.equal(catalog.subjects.length,7);assert.ok(catalog.questions.length>=996);
+ assert.equal(catalog.subjects.length,7);assert.ok(catalog.questions.length>=1038);
  assert.equal(audit.orphanQuestions.length,0);
  for(const subject of audit.subjects){assert.equal(subject.emptyTopics.length,0,subject.subject);assert.ok(subject.questions>0);}
  for(const q of catalog.questions){
@@ -38,7 +38,7 @@ test('dashboard counts individual question evidence and averages over unstarted 
  run('learning_progress.js');run('learning_dashboard.js');
  const answer={detail:{qid:'math_q001',subject:'math',topicId:'math_algebra_01',correct:true}};
  listeners['igcse-answer-recorded'].forEach(fn=>fn(answer));
- let summary=window.IGCSE_DASHBOARD.summary('math');assert.equal(summary.practiced,1);assert.equal(summary.mastery,10);assert.equal(summary.accuracy,100);
+ let summary=window.IGCSE_DASHBOARD.summary('math');assert.equal(summary.practiced,1);assert.equal(summary.mastery,7);assert.equal(summary.accuracy,100);
  answer.detail.correct=false;listeners['igcse-answer-recorded'].forEach(fn=>fn(answer));
  summary=window.IGCSE_DASHBOARD.summary('math');assert.equal(summary.practiced,1);assert.equal(summary.accuracy,50);
  assert.equal(window.IGCSE_DASHBOARD.localDate(new Date(2026,9,9,0,5)),'2026-10-09');
@@ -62,7 +62,7 @@ test('source-linked audit distinguishes samples, preparation and gaps without cr
   for(const section of a.sections)for(const id of section.topicIds)assert.ok(window.IGCSE_CATALOG.topic(subject,id),id);
  }
  assert.equal(audit('unknown'),null);
- assert.equal(audit('math').sections.find(s=>s.ref==='7').status,'gap');
+ assert.equal(audit('math').sections.find(s=>s.ref==='7').status,'sample-practice');
  const cs=audit('computer_science');assert.equal(cs.sectionCount,24);assert.equal(cs.invalidReferences.length,0);
  assert.equal(cs.sections.find(s=>s.ref==='8.3').status,'sample-practice');
  assert.equal(cs.sampled,24);assert.equal(cs.sections.find(s=>s.ref==='5.2').questionIds.length,4);
@@ -101,4 +101,16 @@ test('section progress counts unique answered samples separately from preparatio
  assert.equal(listening.preparationAttemptedCount,1);assert.equal(listening.attemptedCount,0);
  assert.equal(audit('physics').sampled,29);
  for(const subject of ['computer_science','physics'])assert.equal(audit(subject).invalidReferences.length,0);
+});
+
+test('foundation chapters have edition-linked samples and new lessons retain all legacy topics',()=>{
+ const {window:w,run}=load();run('syllabus_registry.js');run('syllabus_audit.js');
+ assert.equal(w.IGCSE_FOUNDATION_CONTENT.length,9);assert.equal(w.IGCSE_FOUNDATION_QUESTIONS.length,42);
+ assert.equal(w.IGCSE_CATALOG.topics.length,97);assert.equal(w.IGCSE_CATALOG.questions.length,1038);
+ assert.equal(new Set(w.IGCSE_FOUNDATION_QUESTIONS.map(q=>q.question)).size,42);
+ for(const [subject,n] of [['math',9],['chemistry',12]]){
+  const a=w.getIGCSESyllabusAudit(subject);assert.equal(a.sampled,n);
+  for(const section of a.sections){const added=w.IGCSE_FOUNDATION_QUESTIONS.filter(q=>q.subject===subject&&q.syllabusRef===section.ref);assert.equal(added.length,2);for(const q of added){assert.equal(q.source,'original');assert.equal(q.alignmentLevel,'chapter-sample');assert.equal(q.pastPaper,false);}}
+ }
+ assert.ok(w.IGCSE_CATALOG.topic('math','math_algebra_01'));assert.ok(w.IGCSE_CATALOG.topic('chemistry','chem_bonding_01'));
 });
