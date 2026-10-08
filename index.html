@@ -74,7 +74,7 @@
             <div class="bg-white rounded-xl shadow p-6">
                 <h2 class="text-2xl font-bold mb-4">欢迎来到 IGCSE 自习实验室</h2>
                 <p class="mb-2">选择上方科目，开始学习。学完知识点立即练题，答错自动进错题本，坚持练习积累 XP 升级解锁徽章。</p>
-                <p class="text-gray-600 mb-4">支持：CIE IGCSE 数学 / 物理 / 化学 / 设计DT / 商业研究</p>
+                <p class="text-gray-600 mb-4">支持：CIE IGCSE 数学 / 物理 / 化学 / 设计DT / 商业研究 / 计算机科学</p>
                 <div class="grid md:grid-cols-2 gap-3 text-sm text-gray-600">
                     <div class="bg-slate-50 border border-slate-200 rounded-lg p-3">教材知识点浏览，支持 LaTeX 公式渲染</div>
                     <div class="bg-slate-50 border border-slate-200 rounded-lg p-3">章节习题逐题作答，自动判分记录错题</div>
@@ -320,12 +320,12 @@ const BADGES = [
     { id:'sharp_10',       name:'渐入佳境',     desc:'累计答对 10 题', icon:'✏️' },
     { id:'sharp_50',       name:'勤学不辍',     desc:'累计答对 50 题', icon:'📚' },
     { id:'combo_5',        name:'连击小能手',   desc:'一次练习连续答对 5 题', icon:'🔥' },
-    { id:'all_subjects',   name:'全面开花',     desc:'五个科目都完成过练习', icon:'🧩' },
+    { id:'all_subjects',   name:'全面开花',     desc:'六个科目都完成过练习', icon:'🧩' },
     { id:'clear_10',       name:'知错就改',     desc:'在错题本标记 10 道题已掌握', icon:'✅' },
     { id:'topic_master',   name:'主题达人',     desc:'学完任一科目全部主题', icon:'🏆' },
     { id:'level_5',        name:'等级新星',     desc:'等级达到 Lv.5', icon:'⭐' },
     { id:'assess_first',   name:'测评达人',     desc:'完成第一次测评分级', icon:'📝' },
-    { id:'assess_all',     name:'全科测评',     desc:'五个科目均完成测评', icon:'🏅' },
+    { id:'assess_all',     name:'全科测评',     desc:'六个科目均完成测评', icon:'🏅' },
     { id:'assess_top',     name:'巅峰测评',     desc:'任一科目测评达到 L10', icon:'💎' }
 ];
 function checkBadges(){
@@ -334,7 +334,7 @@ function checkBadges(){
     if(g.totalCorrect >= 10) grantBadge('sharp_10');
     if(g.totalCorrect >= 50) grantBadge('sharp_50');
     const practiced = Object.values(userState.subjectStats).filter(s => s.answered > 0).length;
-    if(practiced >= 5) grantBadge('all_subjects');
+    if(practiced >= 6) grantBadge('all_subjects');
     if(userState.level >= 5) grantBadge('level_5');
     // 主题达人：任一科目全部主题已学
     const bySubject = {};
