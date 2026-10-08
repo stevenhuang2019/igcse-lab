@@ -15,8 +15,17 @@
   function todayKey(){return new Date().toISOString().slice(0,10);}
   function dailyState(){
     const st=getState(); st.dailyPlan=st.dailyPlan||{}; const k=todayKey();
-    if(!st.dailyPlan[k])st.dailyPlan[k]={completed:[],startedAt:null};
+    if(!st.dailyPlan[k])st.dailyPlan[k]={completed:[],startedAt:null,tasks:null,pendingTask:null};
     return st.dailyPlan[k];
+  }
+  function dailyPlanTasks(){
+    const d=dailyState();
+    if(!Array.isArray(d.tasks)){
+      const plan=adaptivePlan();
+      d.tasks=plan.tasks.map(x=>({id:x.id,type:x.type,title:x.title,text:x.text,minutes:x.minutes,priority:x.priority,subject:x.subject||'',topic:x.topic||'',qid:x.qid||''}));
+      if(window.saveUserState)window.saveUserState(getState());
+    }
+    return d.tasks;
   }
   function markDailyTask(id){
     const d=dailyState(); if(!d.completed.includes(id))d.completed.push(id);
@@ -24,8 +33,8 @@
     if(window.saveUserState)window.saveUserState(getState());
   }
   function dailyStats(){
-    const d=dailyState(), plan=adaptivePlan(), total=Math.max(plan.tasks.length,1);
-    return {completed:d.completed.length,total:plan.tasks.length,rate:Math.min(100,Math.round(d.completed.length/total*100))};
+    const d=dailyState(), tasks=dailyPlanTasks(), total=Math.max(tasks.length,1);
+    return {completed:d.completed.length,total:tasks.length,rate:Math.min(100,Math.round(d.completed.length/total*100))};
   }
   function streakDays(){
     const plans=getState().dailyPlan||{}, today=new Date(); let n=0;
@@ -51,7 +60,9 @@
   function topicPriority(t){
     const n=masteryForTopic(t);
     const qs=questions(t.subject||currentSubject()).filter(q=>q.topicId===t.topicId);
-    const unanswered=qs.filter(q=>!(topicStats()[t.topicId]?.answered)).length;
+    const key=(window.masteryTopicKey?window.masteryTopicKey(t.topicId,t.subject||currentSubject()):t.topicId);
+    const legacy=topicStats()[t.topicId], ns=topicStats()[key]||legacy;
+    const unanswered=qs.filter(q=>!(ns?.answered)).length;
     return (100-n)*0.7+Math.min(20,unanswered*2);
   }
   function examProfile(sub){
@@ -85,7 +96,11 @@
       return s.includes(id)||k.includes(id)||t.includes(id);
     });
     if(!qs.length)return null;
-    const st=topicStats(), vals=qs.map(q=>{const x=st[q.topicId];return x&&x.answered?Math.min(100,(x.correct||0)/x.answered*100):0});
+    const st=topicStats(), vals=qs.map(q=>{
+      const k=window.masteryTopicKey?window.masteryTopicKey(q.topicId,sub):q.topicId;
+      const x=st[k]||st[q.topicId];
+      return x&&x.answered?Math.min(100,(x.correct||0)/x.answered*100):0;
+    });
     return Math.round(vals.reduce((a,b)=>a+b,0)/vals.length);
   }
   function globalWeaknesses(){
@@ -101,7 +116,19 @@
     const readinessWeak=examReadiness(currentSubject()).gaps.slice(0,2);
     const mistakes=(getState().mistakes||[]).filter(m=>m.nextReviewAt&&new Date(m.nextReviewAt)<=new Date()).slice(0,6);
     const tasks=[];
-    readinessWeak.forEach((g,i)=>tasks.push({id:'skill_'+currentSubject()+'_'+g.id,type:'skill',icon:'🧠',title:subjName(currentSubject())+' · '+g.cn+'强化',text:'针对考试能力弱项训练 · 当前 '+g.score+'%',minutes:10,priority:96-i*3,subject:currentSubject()}));
+    readinessWeak.forEach((g,i)=>{
+      const candidates=questions(currentSubject()).filter(q=>{
+        const s=String(q.skill||'').toLowerCase(), id=g.id;
+        if(id==='calculation')return s.includes('calculation')||String(q.commandWord||'').toLowerCase()==='calculate';
+        if(id==='graph')return s.includes('graph')||s.includes('data');
+        if(id==='practical')return s.includes('practical')||q.type==='practical';
+        if(id==='command')return !!q.commandWord;
+        if(id==='explanation')return String(q.commandWord||'').toLowerCase()==='explain';
+        return s.includes(id);
+      });
+      const target=candidates[0];
+      tasks.push({id:'skill_'+currentSubject()+'_'+g.id,type:'skill',icon:'🧠',title:subjName(currentSubject())+' · '+g.cn+'强化',text:'针对考试能力弱项训练 · 当前 '+g.score+'%'+(target?' · 推荐主题 '+(target.topicId||'') :''),minutes:10,priority:96-i*3,subject:currentSubject(),topic:target&&target.topicId||'' ,qid:target&&target.id||''});
+    });
     mistakes.slice(0,2).forEach((m,i)=>tasks.push({id:'srs_'+(m.qid||i),type:'srs',icon:'🔁',title:'SRS 错题复习',text:'复习到期错题并重新作答',minutes:5,priority:100-i*2,qid:m.qid}));
     weak.slice(0,5).forEach((x,i)=>{
       const type=x.n===0?'learn':x.n<50?'practice':x.n<70?'repair':'reinforce';
@@ -182,7 +209,7 @@
   
   
     function mission(){
-      const plan=adaptivePlan(), cards=plan.tasks.slice(0,3), daily=dailyState(), ds=dailyStats();
+      const daily=dailyState(), cards=dailyPlanTasks().slice(0,3), ds=dailyStats(), plan={tasks:dailyPlanTasks(),totalMinutes:dailyPlanTasks().reduce((a,x)=>a+x.minutes,0)};
       return '<section class="bg-white rounded-2xl shadow p-5"><div class="flex flex-wrap justify-between gap-3 items-center"><div><h3 class="text-xl font-bold">🎯 今日学习计划</h3><p class="text-sm text-slate-500 mt-1">系统按 SRS、薄弱知识点与掌握阶段自动安排下一步。</p></div><div class="text-right"><div class="text-lg font-bold text-indigo-700">'+plan.totalMinutes+' min</div><div class="text-xs text-slate-500">预计学习时间</div><div class="text-xs text-slate-500 mt-1">今日完成 '+ds.completed+'/'+ds.total+' · '+ds.rate+'% · 🔥 '+streakDays()+' 天</div></div></div><div class="grid md:grid-cols-3 gap-3 mt-4">'+(cards.length?cards.map((c,i)=>'<button data-topic="'+esc(c.topic||'')+'" data-subject="'+esc(c.subject||'')+'" data-qid="'+esc(c.qid||'')+'" class="text-left border rounded-xl p-4 hover:bg-indigo-50"><div class="flex justify-between"><span class="text-2xl">'+c.icon+'</span><span class="text-xs px-2 py-1 rounded-full bg-slate-100">'+c.minutes+' min</span></div><div class="font-bold mt-2">'+esc(c.title)+'</div><div class="text-sm text-slate-600 mt-1">'+esc(c.text)+'</div><div class="text-xs text-indigo-600 mt-3">优先级 '+c.priority+(daily.completed.includes(c.id)?' · ✅ 已完成':'')+'</div></button>').join(''):'<div class="col-span-full p-4 rounded-xl bg-green-50 text-green-700">🏆 今日没有明显弱项，可以进入 Boss Challenge。</div>')+'</div></section>';
     }
     function courseMap(){
