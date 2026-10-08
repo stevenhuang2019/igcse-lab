@@ -34,5 +34,8 @@ const mobileChecks=[
   '@media (max-width:430px)'
 ];
 mobileChecks.forEach(x=>index.includes(x)?ok('mobile rule '+x):bad('mobile rule missing '+x));
+const checks=["#mainNav{display:flex","min-height:44px","touch-action:manipulation","font-size:16px","@media (max-width:768px)","@media (max-width:430px)","data-eng-topic","data-start-topic","startPracticeBtn"];
+
+checks.forEach(x=>index.includes(x)?ok('interaction '+x):bad('interaction missing '+x));
 console.log(fail?'SMOKE FAILED: '+fail+' failure(s)':'SMOKE PASSED');
 process.exit(fail?1:0);
