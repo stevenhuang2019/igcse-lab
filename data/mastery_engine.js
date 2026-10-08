@@ -26,7 +26,7 @@
     const recent=rr.length?rr.reduce((a,x)=>a+(x?1:0),0)/rr.length*100:accuracy;
     const age=st.lastStudiedAt?Math.max(0,(Date.now()-new Date(st.lastStudiedAt).getTime())/86400000):999;
     const recency=st.lastStudiedAt?Math.max(0,100-age*5):0;
-    const past=st.pastPaperAccuracy==null?accuracy:clamp(st.pastPaperAccuracy);
+    const past=st.pastPaperAccuracy==null?0:clamp(st.pastPaperAccuracy);
     const srs=st.srsRetention==null?(answered?80:0):clamp(st.srsRetention);
     const initial=st.initialAssessment==null?(answered?accuracy:0):clamp(st.initialAssessment);
     const mastery=answered?clamp(initial*.20+accuracy*.30+recent*.20+past*.20+srs*.10):0;
@@ -51,7 +51,7 @@
     st.recentResults.push(!!correct);
     if(st.recentResults.length>10)st.recentResults.shift();
     if(meta&&meta.initialAssessment&&st.initialAssessment==null)st.initialAssessment=correct?100:0;
-    if(meta&&meta.pastPaper){
+    if(meta&&meta.pastPaper&&meta.pastPaperType==='official'){
       const n=Number(st.pastPaperAttempts||0)+1;
       st.pastPaperAccuracy=((Number(st.pastPaperAccuracy||0)*(n-1))+(correct?100:0))/n;
       st.pastPaperAttempts=n;
