@@ -606,7 +606,7 @@ function markAnswered(q, isCorrect, area){
     saveUserState(userState);
     const paperMode = !!q.pastPaper || s.mode === 'mock' || s.mode === 'paper';
     const sessionAccuracy = s.idx ? Math.round((s.correct / s.idx) * 100) : (isCorrect ? 100 : 0);
-    window.dispatchEvent(new CustomEvent('igcse-answer-recorded',{detail:{topicId:q.topicId,qid:q.id,subject:subj,correct:isCorrect,srs:s.mode==='srs',pastPaper:paperMode,accuracy:sessionAccuracy,mode:s.mode}}));
+    window.dispatchEvent(new CustomEvent('igcse-answer-recorded',{detail:{topicId:q.topicId,qid:q.id,subject:subj,correct:isCorrect,srs:s.mode==='srs',pastPaper:paperMode,pastPaperType:(q.pastPaperType||((s.mode==='paper'&&q.pastPaper)?'official':'mock')),accuracy:sessionAccuracy,mode:s.mode}}));
     checkBadges();
     const fb = area.querySelector('.q-feedback');
     if(fb){
@@ -995,7 +995,7 @@ function answerEnglish(q,idx){
     userState.subjectStats.english.answered++; if(correct) userState.subjectStats.english.correct++;
     userState.globalStats.totalAnswered++; if(correct) userState.globalStats.totalCorrect++;
     saveUserState(userState);
-    window.dispatchEvent(new CustomEvent('igcse-answer-recorded',{detail:{topicId:q.topicId,qid:q.id,subject:'english',correct:correct,srs:false,pastPaper:!!q.pastPaper}}));
+    window.dispatchEvent(new CustomEvent('igcse-answer-recorded',{detail:{topicId:q.topicId,qid:q.id,subject:'english',correct:correct,srs:false,pastPaper:!!q.pastPaper,pastPaperType:q.pastPaperType||'official'}}));
     addXp(correct?10:3);
     const fb=document.getElementById('engFeedback');
     fb.innerHTML=correct?'<div class="bg-green-50 border border-green-200 rounded p-3 text-green-700">✓ Correct · '+esc(q.explain||'')+'</div>':'<div class="bg-red-50 border border-red-200 rounded p-3 text-red-700">✗ 正确答案：'+esc(q.answer)+'<div class="mt-1">'+esc(q.explain||'')+'</div></div>';
