@@ -197,7 +197,7 @@
                     <div class="flex flex-wrap gap-2 items-center">
                         <span class="font-semibold text-indigo-800">🎮 词汇小游戏（当前科目）：</span>
                         <button id="vocabGameEn2Zh" class="bg-indigo-600 text-white px-3 py-1.5 rounded text-sm hover:bg-indigo-700">英 → 选中释义</button>
-                        <button id="vocabGameZh2En" class="bg-indigo-600 text-white px-3 py-1.5 rounded text-sm hover:bg-indigo-700">中 → 选英文</button>
+                        <button id="vocabGameZh2En" class="bg-indigo-600 text-white px-3 py-1.5 rounded text-sm hover:bg-indigo-700">中 → 选英文</button><button id="vocabGameListenZh" class="bg-indigo-600 text-white px-3 py-1.5 rounded text-sm hover:bg-indigo-700">🔊 听音 → 选中文</button><button id="vocabGameListenEn" class="bg-indigo-600 text-white px-3 py-1.5 rounded text-sm hover:bg-indigo-700">🔊 听音 → 选英文</button>
                         <span id="vocabGameMeta" class="text-xs text-gray-500 ml-2"></span>
                     </div>
                     <div id="vocabGameArea" class="mt-3"></div>
@@ -390,30 +390,29 @@ function renderTopicList(){
 }
 function openTopic(topic){
     currentTopicId = topic.topicId;
-    document.getElementById('topicTitle').innerText = topic.title;
-    let bodyHtml = topic.knowledge || '';
+    const L = window.getTopicLanguage ? window.getTopicLanguage(topic) : {title:topic.title,body:topic.knowledge||''};
+    document.getElementById('topicTitle').innerText = L.title;
+    let bodyHtml = '';
+    if(L.fallback && (window.IGCSE_GLOBAL_LANG||'learn') === 'exam'){
+        bodyHtml += '<div class="mb-3 p-3 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-sm">English content is being expanded for this topic. Bilingual content is shown as a temporary learning fallback.</div>';
+    }
+    bodyHtml += L.body || '';
     if(topic.formulas && topic.formulas.length){
-        bodyHtml += '<div class="my-3 bg-slate-50 border border-slate-200 rounded p-3">';
+        bodyHtml += '<div class="my-3 bg-slate-50 border border-slate-200 rounded p-3"><strong>Formula / Key relationships</strong>';
         topic.formulas.forEach(f => { bodyHtml += '<p class="my-1">' + f + '</p>'; });
         bodyHtml += '</div>';
     }
-    if(topic.imageUrls && topic.imageUrls.length){
-        topic.imageUrls.forEach(img => { bodyHtml += '<img src="' + img + '" class="my-3 max-w-full rounded">'; });
-    }
+    if(topic.imageUrls && topic.imageUrls.length){ topic.imageUrls.forEach(img => { bodyHtml += '<img src="' + img + '" class="my-3 max-w-full rounded">'; }); }
     if(topic.commonMistake){
-        bodyHtml += '<div class="bg-amber-50 border-l-4 border-amber-400 p-3 mt-4"><strong>常见误区：</strong>' + esc(topic.commonMistake) + '</div>';
+        bodyHtml += '<div class="bg-amber-50 border-l-4 border-amber-400 p-3 mt-4"><strong>' + ((window.IGCSE_GLOBAL_LANG||'learn')==='exam'?'Common mistake:':'常见误区：') + '</strong>' + esc(topic.commonMistake) + '</div>';
     }
     document.getElementById('topicBody').innerHTML = bodyHtml;
-    if(window.renderMathInElement){
-        renderMathInElement(document.getElementById('topicBody'), { delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}] });
-    }
+    if(window.renderMathInElement) renderMathInElement(document.getElementById('topicBody'), { delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}] });
     document.getElementById('topicContent').classList.remove('hidden');
-    if(!userState.learnedTopics.includes(topic.topicId)){
-        userState.learnedTopics.push(topic.topicId);
-        saveUserState(userState);
-    }
+    if(!userState.learnedTopics.includes(topic.topicId)){ userState.learnedTopics.push(topic.topicId); saveUserState(userState); }
     addXp(3);
 }
+
 document.getElementById('backTopicList').onclick = renderTopicList;
 document.getElementById('startPracticeBtn').onclick = () => {
     if(!currentTopicId) return;
@@ -1392,16 +1391,18 @@ function nextVocabQuestion(){
     const others = shuffle(g.pool.filter(v => v !== answer).slice()).slice(0, 3);
     const opts = shuffle(others.concat([answer]));
     g._opts = opts; g._answer = answer;
-    const prompt = g.mode === 'en2zh' ? answer.en : answer.zh;
-    const askLabel = g.mode === 'en2zh' ? '这个英文的中文释义是？' : '这个中文对应的英文是？';
+    const isListen = g.mode === 'listen2zh' || g.mode === 'listen2en';
+    const prompt = isListen ? '🔊 听发音，选择正确释义' : (g.mode === 'en2zh' ? answer.en : answer.zh);
+    const askLabel = g.mode === 'en2zh' ? '这个英文的中文释义是？' : (g.mode === 'zh2en' ? '这个中文对应的英文是？' : (g.mode === 'listen2zh' ? '听音后选择中文释义' : '听音后选择英文术语'));
     let html = '<div class="border rounded-lg p-3 bg-white"><div class="text-xs text-gray-500 mb-1">' + askLabel + ' · 第 ' + (g.idx + 1) + '/' + g.pool.length + ' · 连对 ' + g.combo + '</div>';
     html += '<div class="text-lg font-semibold mb-3">' + esc(prompt) + '</div><div class="grid gap-2">';
     opts.forEach((o, i) => {
-        const label = g.mode === 'en2zh' ? o.zh : o.en;
+        const label = (g.mode === 'en2zh' || g.mode === 'listen2zh') ? o.zh : o.en;
         html += '<button data-vopt="' + i + '" class="opt-btn text-left border border-slate-300 rounded-lg px-3 py-2 text-sm">' + esc(label) + '</button>';
     });
     html += '</div><div class="vfb mt-2 text-sm"></div></div>';
     ga.innerHTML = html;
+    if(isListen && window.speakIGCSE){ setTimeout(function(){ window.speakIGCSE(answer.en); },120); var sp=document.createElement('button'); sp.className='mt-2 border rounded px-3 py-1 text-sm'; sp.textContent='🔊 再听一次'; sp.onclick=function(){window.speakIGCSE(answer.en);}; ga.querySelector('.border.rounded-lg.p-3.bg-white').appendChild(sp); }
     ga.querySelectorAll('[data-vopt]').forEach(b => {
         b.onclick = () => answerVocab(parseInt(b.dataset.vopt, 10), b);
     });
@@ -1602,5 +1603,44 @@ function init(){
 }
 init();
 </script>
-</body>
+<script src="data/physics_motion_lab.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded',function(){
+  var nav=document.getElementById('mainNav'), main=document.querySelector('main');
+  if(!nav||!main||document.getElementById('motion-lab-page')) return;
+  var b=document.createElement('button'); b.id='motion-lab-nav'; b.className='nav-btn px-3 py-1 rounded'; b.textContent='⚡ Motion Lab';
+  b.onclick=function(){if(window.switchPage)window.switchPage('motion-lab-page');};
+  nav.appendChild(b);
+  var p=document.createElement('div'); p.id='motion-lab-page'; p.className='page';
+  p.innerHTML='<div class="grid lg:grid-cols-12 gap-4"><section class="lg:col-span-8"><div class="bg-gradient-to-r from-indigo-700 to-violet-700 text-white rounded-2xl shadow p-5"><div class="text-xs opacity-80">CAMBRIDGE IGCSE PHYSICS · 0625 · 2026–2028 · 1.2 MOTION</div><h2 class="text-3xl font-bold mt-2">⚡ Motion Lab</h2><p class="text-indigo-100 mt-1">Learn · Play · Master · English</p></div><div class="bg-white rounded-2xl shadow p-5 mt-4"><div class="flex flex-wrap gap-2"><button class="mltab bg-indigo-600 text-white px-3 py-2 rounded-lg" data-t="learn">📚 Learn</button><button class="mltab bg-slate-100 px-3 py-2 rounded-lg" data-t="english">🇬🇧 English</button><button class="mltab bg-slate-100 px-3 py-2 rounded-lg" data-t="practice">🎯 Practice</button><button class="mltab bg-slate-100 px-3 py-2 rounded-lg" data-t="boss">👑 Boss</button></div><div id="mlcontent" class="mt-4"></div></div></section><aside class="lg:col-span-4"><div class="bg-white rounded-2xl shadow p-5"><h3 class="font-bold">🌳 Motion Skill Tree</h3><div id="mltree" class="mt-3 space-y-2"></div><div class="mt-4 p-3 rounded-xl bg-slate-50 text-sm">XP: <b id="mlxp">0</b> · Mistakes: <b id="mlwrong">0</b></div></div></aside></div>';
+  main.appendChild(p);
+  var active='M1',vi=0,qi=0,score=0,session=[];
+  function m(id){return Math.round((window.IGCSE_MOTION_STATE.mastery[id]||0));}
+  function bar(n){return '<div class="h-2 bg-slate-200 rounded-full overflow-hidden"><div class="h-full bg-indigo-500" style="width:'+n+'%"></div></div>';}
+  function draw(){document.getElementById('mltree').innerHTML=window.PHYSICS_MOTION_LAB.objectives.map(function(o){var z=m(o.id);return '<button data-k="'+o.id+'" class="w-full text-left border rounded-xl p-3 hover:bg-indigo-50"><div class="flex justify-between text-sm"><b>'+o.title+'</b><span>'+z+'%</span></div>'+bar(z)+'<div class="text-xs text-slate-500">'+o.ref+'</div></button>'}).join('');document.querySelectorAll('[data-k]').forEach(function(x){x.onclick=function(){active=x.dataset.k;learn();}});document.getElementById('mlxp').textContent=window.IGCSE_MOTION_STATE.xp||0;document.getElementById('mlwrong').textContent=(window.IGCSE_MOTION_STATE.wrong||[]).length;}
+  function learn(){var o=window.PHYSICS_MOTION_LAB.objectives.find(function(x){return x.id===active});var k={M1:['Speed','speed','速率','v = s / t','Distance travelled per unit time.'],M2:['Velocity','velocity','速度（有方向）','velocity = speed + direction','Speed in a given direction.'],M3:['Average speed','average speed','平均速率','total distance / total time','Total distance divided by total time.'],M4:['Motion graphs','distance-time graph','路程-时间图','speed = gradient','The gradient of a distance-time graph represents speed.'],M5:['Gradient and area','area under the graph','图像下方面积','distance = area','Area under a speed-time graph gives distance.'],M6:['Acceleration','acceleration','加速度','a = Δv / Δt','Change in velocity per unit time.'],M7:['Deceleration','deceleration','减速度','a < 0','Negative acceleration in the chosen positive direction.'],M8:['Terminal velocity','terminal velocity','终端速度','resultant force = 0','Constant falling speed when resistance balances weight.']}[active];document.getElementById('mlcontent').innerHTML='<div class="text-xs text-indigo-600 font-bold">'+o.level+' · '+o.ref+'</div><h3 class="text-2xl font-bold mt-1">'+k[0]+' <span class="text-base text-slate-400">'+k[1]+'</span></h3><div class="mt-4 p-4 rounded-xl bg-indigo-50"><b>Definition</b><p class="mt-1">'+k[4]+'</p></div><div class="mt-3 p-4 rounded-xl bg-slate-50"><b>Formula / relationship</b><div class="text-xl mt-1">'+k[3]+'</div></div><div class="mt-3 border rounded-xl p-4"><b>🇨🇳 中文理解</b><p class="mt-1">'+k[2]+'</p></div><button id="learned" class="mt-4 bg-indigo-600 text-white px-4 py-2 rounded-lg">✓ Mark learned · +10 XP</button>';document.getElementById('learned').onclick=function(){if(!window.IGCSE_MOTION_STATE.learned[active]){window.IGCSE_MOTION_STATE.learned[active]=1;window.updateMotionMastery(active,true);window.addMotionXP(10);}draw();learn();};}
+  function english(){var v=window.PHYSICS_MOTION_LAB.vocabulary[vi%window.PHYSICS_MOTION_LAB.vocabulary.length];document.getElementById('mlcontent').innerHTML='<div class="text-xs text-indigo-600 font-bold">SUBJECT ENGLISH · MOTION</div><h3 class="text-3xl font-bold mt-2">'+v[0]+'</h3><div class="text-xl text-slate-500">'+v[1]+'</div><div class="mt-4 p-4 rounded-xl bg-slate-50">Use this term in an exam question. Try to recall the English before revealing it.</div><button id="knowv" class="bg-indigo-600 text-white px-4 py-2 rounded-lg mt-4">I know it · +5 XP</button><button id="nextv" class="border px-4 py-2 rounded-lg mt-4 ml-2">Next →</button>';document.getElementById('knowv').onclick=function(){window.addMotionXP(5);this.disabled=true;draw();};document.getElementById('nextv').onclick=function(){vi++;english();};}
+  function practice(){if(!session.length){session=window.PHYSICS_MOTION_LAB.questions.slice();qi=0;score=0;}var q=session[qi];if(!q){document.getElementById('mlcontent').innerHTML='<div class="text-center py-8"><div class="text-5xl">🏆</div><h3 class="text-2xl font-bold">Practice complete</h3><p class="mt-2">Score <b>'+score+' / '+session.length+'</b></p><button id="again" class="mt-4 bg-indigo-600 text-white px-4 py-2 rounded-lg">Try again</button></div>';document.getElementById('again').onclick=function(){session=[];practice();};return;}var html='<div class="text-xs text-indigo-600 font-bold">Question '+(qi+1)+' / '+session.length+'</div><h3 class="text-xl font-bold mt-2">'+q.question+'</h3>';if(q.type==='choice')html+='<div class="grid gap-2 mt-4">'+q.options.map(function(x,i){return '<button data-a="'+i+'" class="text-left border rounded-xl p-3">'+String.fromCharCode(65+i)+'. '+x+'</button>';}).join('')+'</div>';else html+='<input id="num" type="number" step="any" class="border rounded-xl p-3 mt-4" placeholder="Answer"> <span>'+q.unit+'</span><button id="check" class="block bg-indigo-600 text-white px-4 py-2 rounded-lg mt-3">Check</button>';document.getElementById('mlcontent').innerHTML=html;document.querySelectorAll('[data-a]').forEach(function(x){x.onclick=function(){answer(+x.dataset.a);};});if(q.type==='number')document.getElementById('check').onclick=function(){answer(parseFloat(document.getElementById('num').value));};}
+  function answer(a){var q=session[qi],ok=q.type==='choice'?a===q.answer:Math.abs(a-q.answer)<.0001;window.updateMotionMastery(q.kp,ok);if(ok){score++;window.addMotionXP(10);}else{window.IGCSE_MOTION_STATE.wrong=window.IGCSE_MOTION_STATE.wrong||[];window.IGCSE_MOTION_STATE.wrong.unshift(q.id);window.saveMotion();}document.getElementById('mlcontent').innerHTML='<div class="p-4 rounded-xl '+(ok?'bg-green-50':'bg-red-50')+'"><b>'+(ok?'✅ Correct':'❌ Review')+'</b><p class="mt-2">'+q.explanation+'</p></div><button id="next" class="mt-4 border px-4 py-2 rounded-lg">Next question →</button>';document.getElementById('next').onclick=function(){qi++;draw();practice();};draw();}
+  function boss(){var avg=window.PHYSICS_MOTION_LAB.objectives.reduce(function(a,o){return a+m(o.id)},0)/8;if(avg<55){document.getElementById('mlcontent').innerHTML='<div class="text-center py-8"><div class="text-5xl">🔒</div><h3 class="text-2xl font-bold">Boss Locked</h3><p class="text-slate-500 mt-2">Reach 55% Motion mastery first.</p>'+bar(Math.round(avg))+'</div>';return;}document.getElementById('mlcontent').innerHTML='<div class="text-center py-8"><div class="text-6xl">👑</div><h3 class="text-2xl font-bold">Motion Boss Battle</h3><p class="text-slate-500 mt-2">Mixed challenge: calculation · graphs · acceleration · terminal velocity</p><button id="bossgo" class="mt-4 bg-amber-500 text-white px-5 py-3 rounded-xl font-bold">Enter Boss · +60 XP</button></div>';document.getElementById('bossgo').onclick=function(){window.addMotionXP(60);this.disabled=true;this.textContent='🏆 Boss Complete';draw();};}
+  document.querySelectorAll('.mltab').forEach(function(x){x.onclick=function(){document.querySelectorAll('.mltab').forEach(function(y){y.className='mltab bg-slate-100 px-3 py-2 rounded-lg'});x.className='mltab bg-indigo-600 text-white px-3 py-2 rounded-lg';if(x.dataset.t==='learn')learn();if(x.dataset.t==='english')english();if(x.dataset.t==='practice')practice();if(x.dataset.t==='boss')boss();};});
+  draw();learn();
+});
+</script><script src="data/igcse_language_pack.js"></script><script src="data/language_engine.js"></script>
+<script>
+(function(){
+  function languageBar(){
+    if(document.getElementById('igcse-language-bar')) return;
+    var bar=document.createElement('div');bar.id='igcse-language-bar';bar.className='fixed bottom-3 left-1/2 -translate-x-1/2 z-50 bg-white border shadow-lg rounded-full px-2 py-1 flex gap-1 text-xs';
+    bar.innerHTML='<span class="px-2 py-1 text-slate-500">学习语言</span><button data-lang-mode="learn" class="px-2 py-1 rounded-full">中英学习</button><button data-lang-mode="bilingual" class="px-2 py-1 rounded-full">中英对照</button><button data-lang-mode="exam" class="px-2 py-1 rounded-full">English Only</button>';
+    document.body.appendChild(bar);
+    bar.querySelectorAll('[data-lang-mode]').forEach(function(b){b.onclick=function(){window.setIGCSEGlobalLang(b.dataset.langMode);highlight();rerender();};});
+    function highlight(){var m=window.IGCSE_GLOBAL_LANG||'learn';bar.querySelectorAll('[data-lang-mode]').forEach(function(b){b.classList.toggle('bg-indigo-600',b.dataset.langMode===m);b.classList.toggle('text-white',b.dataset.langMode===m);});}
+    function rerender(){if(typeof renderTopicList==='function'&&document.getElementById('page-learn')&&document.getElementById('page-learn').classList.contains('active')){if(currentTopicId){var t=contentData.find(function(x){return x.topicId===currentTopicId});if(t&&typeof openTopic==='function')openTopic(t);}else renderTopicList();}if(typeof renderQuestion==='function'&&practiceSession&&document.getElementById('page-practice')&&document.getElementById('page-practice').classList.contains('active'))renderQuestion();if(typeof renderVocabPage==='function'&&document.getElementById('page-vocab')&&document.getElementById('page-vocab').classList.contains('active'))renderVocabPage();}
+    highlight();
+  }
+  window.addEventListener('DOMContentLoaded',languageBar);
+  window.addEventListener('igcse-language-change',function(){});
+})();
+</script></body>
 </html>
