@@ -54,6 +54,40 @@
     const unanswered=qs.filter(q=>!(topicStats()[t.topicId]?.answered)).length;
     return (100-n)*0.7+Math.min(20,unanswered*2);
   }
+  function examProfile(sub){
+    const profiles={
+      physics:[['calculation','Calculation'],['graph','Graph / Data'],['practical','Practical'],['command','Exam English'],['explanation','Explanation']],
+      chemistry:[['calculation','Calculation'],['practical','Practical'],['data','Data Analysis'],['command','Exam English'],['explanation','Explanation']],
+      math:[['calculation','Calculation'],['problem','Problem Solving'],['graph','Graph / Data'],['command','Exam English']],
+      computer_science:[['algorithm','Algorithm'],['programming','Programming'],['trace','Trace Table / Testing'],['logic','Boolean Logic'],['command','Exam English']],
+      english:[['reading','Reading'],['writing','Writing'],['listening','Listening'],['speaking','Speaking'],['language','Language / Grammar']],
+      business:[['knowledge','Business Knowledge'],['application','Application'],['analysis','Analysis'],['evaluation','Evaluation'],['command','Exam English']],
+      dt:[['design','Design Thinking'],['technical','Technical Knowledge'],['analysis','Analysis'],['evaluation','Evaluation'],['command','Exam English']]
+    }; return profiles[sub]||[['knowledge','Knowledge'],['application','Application'],['command','Exam English']];
+  }
+  function skillScoreFor(sub,id){
+    const qs=questions(sub).filter(q=>{
+      const s=String(q.skill||'').toLowerCase(), c=String(q.commandWord||q.command||'').toLowerCase(), k=String(q.knowledgePoint||'').toLowerCase(), t=String(q.topicId||'').toLowerCase();
+      if(id==='calculation')return s.includes('calculation')||c==='calculate';
+      if(id==='graph')return s.includes('graph')||s.includes('data')||/graph|gradient|图像|数据/.test(String(q.question||''));
+      if(id==='practical')return s.includes('practical')||q.type==='practical';
+      if(id==='command')return !!(q.commandWord||q.command);
+      if(id==='explanation')return c==='explain'||s.includes('explain');
+      if(id==='algorithm')return /algorithm|伪代码|pseudocode/.test(s+' '+k+' '+t);
+      if(id==='programming')return /program|python|code/.test(s+' '+k+' '+t);
+      if(id==='trace')return /trace|test|debug/.test(s+' '+k+' '+t);
+      if(id==='logic')return /boolean|logic|truth/.test(s+' '+k+' '+t);
+      if(id==='reading')return /read/.test(s+' '+t);
+      if(id==='writing')return /writ/.test(s+' '+t);
+      if(id==='listening')return /listen/.test(s+' '+t);
+      if(id==='speaking')return /speak/.test(s+' '+t);
+      if(id==='language')return /grammar|vocab|language/.test(s+' '+t);
+      return s.includes(id)||k.includes(id)||t.includes(id);
+    });
+    if(!qs.length)return null;
+    const st=topicStats(), vals=qs.map(q=>{const x=st[q.topicId];return x&&x.answered?Math.min(100,(x.correct||0)/x.answered*100):0});
+    return Math.round(vals.reduce((a,b)=>a+b,0)/vals.length);
+  }
   function globalWeaknesses(){
     const out=[];
     allSubjects().forEach(sub=>topics(sub).forEach(t=>{
@@ -64,8 +98,10 @@
   }
   function adaptivePlan(){
     const weak=globalWeaknesses().slice(0,6);
+    const readinessWeak=examReadiness(currentSubject()).gaps.slice(0,2);
     const mistakes=(getState().mistakes||[]).filter(m=>m.nextReviewAt&&new Date(m.nextReviewAt)<=new Date()).slice(0,6);
     const tasks=[];
+    readinessWeak.forEach((g,i)=>tasks.push({id:'skill_'+currentSubject()+'_'+g.id,type:'skill',icon:'🧠',title:subjName(currentSubject())+' · '+g.cn+'强化',text:'针对考试能力弱项训练 · 当前 '+g.score+'%',minutes:10,priority:96-i*3,subject:currentSubject()}));
     mistakes.slice(0,2).forEach((m,i)=>tasks.push({id:'srs_'+(m.qid||i),type:'srs',icon:'🔁',title:'SRS 错题复习',text:'复习到期错题并重新作答',minutes:5,priority:100-i*2,qid:m.qid}));
     weak.slice(0,5).forEach((x,i)=>{
       const type=x.n===0?'learn':x.n<50?'practice':x.n<70?'repair':'reinforce';
@@ -181,4 +217,4 @@
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',build);else setTimeout(build,0);
 })(
-})();
+})()
