@@ -21,6 +21,8 @@ const requiredFiles=[
 for(const f of requiredFiles) files.includes(f)?ok('required '+f):bad('missing '+f);
 const index=fs.readFileSync(path.join(ROOT,'index.html'),'utf8');
 ['data/user_state_schema.js','data/syllabus_map.js','data/mastery_engine.js','data/learning_dashboard.js','data/chapter_learning_engine.js','data/igcse_cs_0478.js','data/igcse_questions_cs.js','data/igcse_english_esl.js','data/igcse_questions_english.js'].forEach(x=>index.includes(x)?ok('index loads '+x):bad('index missing '+x));
-['function openTopic','function startPractice','igcse-answer-recorded','recordMasteryEvent','dailyPlan','examReadiness','English Master Database'].forEach(x=>index.includes(x)?ok('index token '+x):bad('index token missing '+x));
+['function openTopic','function startPractice','igcse-answer-recorded','recordMasteryEvent'].forEach(x=>index.includes(x)?ok('index token '+x):bad('index token missing '+x));
+const engineSources=index+'\n'+fs.readFileSync(path.join(DATA,'learning_dashboard.js'),'utf8')+'\n'+fs.readFileSync(path.join(DATA,'english_master_database.js'),'utf8');
+['dailyPlan','examReadiness','English Master Database'].forEach(x=>engineSources.includes(x)?ok('engine token '+x):bad('engine token missing '+x));
 console.log(fail?'SMOKE FAILED: '+fail+' failure(s)':'SMOKE PASSED');
 process.exit(fail?1:0);
