@@ -130,11 +130,8 @@
       return '<section class="bg-white rounded-2xl shadow p-5"><div><h3 class="text-xl font-bold">🩺 错题诊断</h3><p class="text-sm text-slate-500 mt-1">从“错了几道题”升级为“为什么错”。</p></div><div class="grid lg:grid-cols-2 gap-5 mt-4"><div><h4 class="font-semibold mb-2">Error Taxonomy</h4>'+(rows.length?rows.map(r=>'<div class="flex items-center gap-3 mb-2"><div class="w-36 text-sm truncate">'+esc(r[0])+'</div><div class="flex-1">'+bar(Math.min(100,r[1]*12))+'</div><b class="text-sm">'+r[1]+'</b></div>').join(''):'<p class="text-sm text-slate-400">暂无错题数据。</p>')+'</div><div><h4 class="font-semibold mb-2">Top Weak Knowledge Points</h4>'+(weak.length?weak.map(x=>'<div class="flex justify-between border-b py-2 text-sm"><span>'+esc(x.t.title)+'</span><b class="text-red-600">'+x.n+'%</b></div>').join(''):'<p class="text-sm text-slate-400">没有低于 70% 的主题，继续保持。</p>')+'</div></div></section>';
     }
     function readiness(){
-      if(sub==='physics'&&window.PHYSICS_MOTION_LAB?.getExamReadiness){
-        const r=window.PHYSICS_MOTION_LAB.getExamReadiness(window.IGCSE_MOTION_STATE||{});
-        return '<section class="bg-white rounded-2xl shadow p-5"><div class="flex justify-between"><div><h3 class="text-xl font-bold">🧠 Exam Readiness · Motion</h3><p class="text-sm text-slate-500 mt-1">考试能力不是一个分数，而是一组可训练的技能。</p></div><b class="text-2xl">'+r.overall+'%</b></div><div class="grid md:grid-cols-4 gap-3 mt-4">'+window.PHYSICS_MOTION_LAB.readinessSkills.map(k=>'<div class="border rounded-xl p-3"><div class="text-sm">'+esc(k)+'</div><div class="text-xl font-bold mt-1">'+(r[k]||0)+'%</div>'+bar(r[k]||0)+'</div>').join('')+'</div><div class="mt-4 p-3 rounded-xl bg-amber-50 text-amber-900 text-sm"><b>优先补强：</b> '+r.weak.join(' · ')+'</div></section>';
-      }
-      return '<section class="bg-white rounded-2xl shadow p-5"><h3 class="text-xl font-bold">🧠 Exam Readiness</h3><p class="text-sm text-slate-500 mt-1">完成更多带有 command word / skill / errorType 的题目后，这里会形成考试能力画像。</p></section>';
+      const r=examReadiness(sub);
+      return '<section class="bg-white rounded-2xl shadow p-5"><div class="flex flex-wrap justify-between gap-3 items-center"><div><h3 class="text-xl font-bold">🎓 Exam Readiness</h3><p class="text-sm text-slate-500 mt-1">'+esc(readinessGapText(r))+'</p></div><div class="text-right"><div class="text-3xl font-bold text-indigo-700">'+r.readiness+'%</div><div class="text-xs text-slate-500">目标 85% · '+esc(subjName(sub))+'</div></div></div><div class="grid md:grid-cols-3 gap-3 mt-4">'+r.dimensions.map(d=>'<div class="border rounded-xl p-3"><div class="flex justify-between text-sm"><span>'+esc(d.cn)+'</span><b>'+(d.score===null?'—':d.score+'%')+'</b></div>'+ (d.score===null?'<div class="text-xs text-slate-400 mt-2">数据不足</div>':bar(d.score))+'</div>').join('')+'</div><div class="mt-4 p-4 rounded-xl bg-indigo-50"><b>📌 考试准备诊断</b><div class="text-sm mt-1">已覆盖 '+r.coverage+'% 题库 · 已有 '+r.answered+' 个题目主题产生答题数据。</div></div></section>';
     }
     function bind(){
       document.querySelectorAll('#dbMission [data-topic]').forEach(x=>x.onclick=()=>{
@@ -152,4 +149,39 @@
     window.addEventListener('igcse-dashboard-refresh',render);
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',build);else setTimeout(build,0);
-})();
+})();function examReadiness(sub){
+    const qs=questions(sub), ts=topics(sub), st=topicStats();
+    const total=qs.length, answered=qs.reduce((n,q)=>n+(st[q.topicId]?.answered?1:0),0);
+    const accuracy=qs.reduce((a,q)=>{const x=st[q.topicId];return a+(x&&x.answered?(x.correct||0)/x.answered*100:0)},0)/(qs.filter(q=>st[q.topicId]?.answered).length||1);
+    const mastery=ts.map(masteryForTopic).filter(x=>x>0);
+    const knowledge=mastery.length?mastery.reduce((a,b)=>a+b,0)/mastery.length:0;
+    const coverage=total?Math.min(100,answered/total*100):0;
+    const practical=qs.filter(q=>q.skill==='practical'||q.type==='practical');
+    const calc=qs.filter(q=>q.skill==='calculation'||q.commandWord==='Calculate');
+    const graph=qs.filter(q=>q.skill==='graph'||/graph|图像|gradient|斜率/i.test((q.tags||[]).join(' ')+' '+(q.question||'')));
+    function skillScore(arr){
+      if(!arr.length)return null;
+      const vals=arr.map(q=>{const x=st[q.topicId];return x&&x.answered?Math.min(100,(x.correct||0)/x.answered*100):0});
+      return Math.round(vals.reduce((a,b)=>a+b,0)/vals.length);
+    }
+    const dimensions=[
+      {id:'knowledge',name:'Knowledge',cn:'知识掌握',score:Math.round(knowledge),weight:.35},
+      {id:'accuracy',name:'Question Accuracy',cn:'题目正确率',score:Math.round(accuracy),weight:.25},
+      {id:'coverage',name:'Syllabus Coverage',cn:'课程覆盖',score:Math.round(coverage),weight:.15},
+      {id:'calculation',name:'Calculation',cn:'计算能力',score:skillScore(calc),weight:.1},
+      {id:'graph',name:'Graph / Data',cn:'图像与数据',score:skillScore(graph),weight:.075},
+      {id:'practical',name:'Practical',cn:'实验技能',score:skillScore(practical),weight:.075}
+    ];
+    const usable=dimensions.filter(d=>d.score!==null);
+    const readiness=Math.round(usable.reduce((a,d)=>a+d.score*d.weight,0)/(usable.reduce((a,d)=>a+d.weight,0)||1));
+    const target=85;
+    const gaps=dimensions.filter(d=>d.score!==null&&d.score<target).sort((a,b)=>a.score-b.score);
+    return {readiness,target,dimensions,gaps,coverage,answered,total};
+  }
+  function readinessGapText(r){
+    if(r.readiness>=85)return '已达到 A* readiness 目标，建议转入整套模拟考试与限时训练。';
+    const g=r.gaps[0];
+    return g?'距离目标还差 '+(r.target-r.readiness)+' 分；最优先提升：'+g.cn+'（'+g.score+'%）。':'继续完成课程覆盖并积累答题数据。';
+  }
+
+
