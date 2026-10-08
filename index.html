@@ -933,7 +933,18 @@ function renderEnglishPage(tab){
     const active=tab||'learn';
     document.querySelectorAll('.eng-tab').forEach(b=>{b.classList.toggle('bg-indigo-600',b.dataset.engTab===active);b.classList.toggle('text-white',b.dataset.engTab===active);});
     if(active==='master'){
-      const db=window.getEnglishMasterData?window.getEnglishMasterData():{vocabulary:[],sentences:[],grammar:[],commandWords:[]};
+      const db=window.getEnglishMasterData?window.getEnglishMasterData():{vocabulary:[],sentences:[],grammar:[],commandWords:[],learningStages:[]};
+      const em=userState.englishMaster||{vocab:{},grammar:{},sentences:{},commandWords:{}};
+      const avg=function(b){const a=Object.values(b||{});return a.length?Math.round(a.reduce((n,x)=>n+(x.mastery||0),0)/a.length):0;};
+      const overall=Math.round((avg(em.vocab)+avg(em.grammar)+avg(em.sentences)+avg(em.commandWords))/4);
+      const stages=db.learningStages||[];
+      let stage=stages[0]||{id:'stage1',name:'基础学习',goal:'',threshold:0};
+      stages.forEach(function(x){if(overall>=x.threshold) stage=x;});
+      c.innerHTML='<div class="border rounded-xl p-4 mb-4 bg-indigo-50 border-indigo-200"><div class="text-xs text-indigo-600">CURRENT LEARNING STAGE</div><h3 class="text-xl font-bold mt-1">'+esc(stage.name)+'</h3><p class="text-sm text-gray-600 mt-1">'+esc(stage.goal)+'</p><div class="mt-3 h-2 bg-white rounded overflow-hidden"><div class="h-2 bg-indigo-600" style="width:'+Math.min(100,overall)+'%"></div></div><div class="text-xs text-gray-500 mt-1">English Mastery '+overall+'%</div></div>'+
+      '<div class="grid md:grid-cols-2 gap-3 mb-4">'+
+      [['Vocabulary',avg(em.vocab)],['Grammar',avg(em.grammar)],['Sentence',avg(em.sentences)],['Command Words',avg(em.commandWords)]].map(function(x){return '<div class="border rounded-xl p-4"><div class="flex justify-between"><b>'+x[0]+'</b><span>'+x[1]+'%</span></div><div class="h-2 bg-slate-100 rounded mt-2"><div class="h-2 bg-indigo-500 rounded" style="width:'+x[1]+'%"></div></div></div>';}).join('')+
+      '</div><div class="border rounded-xl p-4"><h3 class="font-bold mb-2">🧭 学习阶段路线</h3>'+stages.map(function(x){var done=overall>=x.threshold;return '<div class="flex items-center gap-3 py-2 border-b last:border-0"><span>'+ (done?'✅':'⬜') +'</span><b>'+esc(x.name)+'</b><span class="text-xs text-gray-500">Mastery ≥ '+x.threshold+'%</span></div>';}).join('')+'</div>';
+    } else       const db=window.getEnglishMasterData?window.getEnglishMasterData():{vocabulary:[],sentences:[],grammar:[],commandWords:[]};
       const vocabCount=db.vocabulary.length, sentCount=db.sentences.length, grammarCount=db.grammar.length;
       c.innerHTML='<div class="grid md:grid-cols-3 gap-3 mb-4">'+
         '<div class="border rounded-xl p-4 bg-indigo-50"><div class="text-2xl">🔤</div><b>统一词汇库</b><div class="text-2xl font-bold mt-1">'+vocabCount+'</div><div class="text-xs text-gray-500">保留原有学科词汇 + ESL</div></div>'+
