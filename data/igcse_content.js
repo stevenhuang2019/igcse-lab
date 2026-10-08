@@ -96,22 +96,54 @@ window.IGCSE_CONTENT = [
     "commonMistake": "把硬度当强度；不考虑加工成本与环保回收；韧性（吸收冲击）与脆性混为一谈。"
   },
 
-  /* ============ 商业研究 Business ============ */
+  /* ============ 商业研究 Business（CAIE 0450 六主题） ============ */
   {
-    "exam_board": "CIE", "subject": "business", "chapter": "Marketing", "topicId": "bus_market_01",
-    "title": "市场与营销 Marketing mix",
-    "knowledge": "营销组合 4P：产品（Product）、价格（Price）、渠道（Place）、促销（Promotion）。营销前先做市场细分（segmentation），确定目标市场（target market）与定位（positioning）。",
+    "exam_board": "CIE", "subject": "business", "chapter": "Understanding", "topicId": "bus_understanding",
+    "title": "商业活动与企业组织 Business activity & organization",
+    "knowledge": "商业活动的根本目的是把有限的资源（土地、劳动、资本、企业才能）转化为满足人们需要和欲望的商品与服务，在资源稀缺（scarcity）的条件下做出选择、创造利润。企业要回答为谁生产、生产什么，并比竞争对手更有效率地满足需求。企业目标随发展阶段变化：初创期以生存（survival）为首要目标，成长期追求销售增长或市场份额，成熟期更看重利润最大化、股东回报与企业社会责任；越来越多企业把可持续发展、员工福祉和环保（经济、社会、环境三重底线）纳入目标。按法律组织形式主要有三类：个体企业（sole trader）由一人拥有经营，决策自由、利润独享但责任无限；合伙企业（partnership）由两人以上共同出资、共担风险，资源更多但合伙人之间易生分歧；有限公司（limited company）是独立法人，股东以出资额为限承担有限责任，可发行股票募集资金，但须披露财报、受监管。利益相关者（stakeholders）是受企业决策影响或能影响企业的个人与群体，包括股东、员工、顾客、供应商、债权人、政府、社区和环境，不同群体目标常相互冲突，管理者需权衡协调。",
     "formulas": [],
     "imageUrls": [],
-    "commonMistake": "把促销（promotion）当营销全部；混淆目标市场与市场细分；忽略定价策略（撇脂/渗透）与成本的关系。"
+    "commonMistake": "把企业目的等同于『只为老板赚钱』而忽视满足顾客需要与应对资源稀缺；混淆个体/合伙的无限责任与有限公司的有限责任；把利益相关者仅理解为股东，漏掉员工、顾客、政府、社区等。"
   },
   {
-    "exam_board": "CIE", "subject": "business", "chapter": "Finance", "topicId": "bus_finance_01",
-    "title": "财务基础 Business finance",
-    "knowledge": "核心财务概念：收入（revenue）、成本（固定/变动）、利润 = 收入 - 成本、盈亏平衡点 = 固定成本 ÷（单价 - 单位变动成本）。现金流与利润不同，关注营运资本。",
-    "formulas": ["$$Profit = Revenue - Total\\,Costs$$", "$$BEP = \\frac{Fixed\\,Costs}{Price - Variable\\,Cost\\,per\\,unit}$$"],
+    "exam_board": "CIE", "subject": "business", "chapter": "People", "topicId": "bus_people",
+    "title": "人力资源与员工激励 People in business",
+    "knowledge": "员工（人力资源）是企业最重要的资产之一。招聘前先做工作分析、写岗位说明书，再选择内部招聘（晋升、调岗）或外部招聘（广告、猎头、校园招聘）：内部招聘成本低、激励士气但缺新鲜血液，外部招聘带来新技能但适应期长。入职后通过在职培训（OJT，边干边学、成本低）或脱产培训（Off-the-job，系统但占用工时）提升能力，并用绩效考核评估产出。激励理论解释人为何努力：马斯洛把需求从低到高分为生理、安全、社交、尊重、自我实现，低层次满足后才追求高层次；赫茨伯格认为工资、工作条件等『保健因素』只能消除不满，真正带来满意的是成就、认可、责任与晋升等『激励因素』。金钱激励包括计时工资、计件工资、佣金、奖金、利润分享；非金钱激励包括工作丰富化、授权、团队合作、公开认可与良好工作环境。组织架构规定谁向谁汇报：高耸（层级式）结构层级多、管理幅度窄、控制严密但沟通慢；扁平结构层级少、幅度宽、授权多、反应快。企业沟通分自上而下、自下而上、横向与正式/非正式渠道，有效沟通能减少误解、提高协作。",
+    "formulas": [],
     "imageUrls": [],
-    "commonMistake": "把利润当现金流；盈亏平衡点公式分子分母颠倒；变动成本按总量而不是按单位计算。"
+    "commonMistake": "把在职培训与脱产培训的定义写反；以为加薪是唯一激励手段、忽视赫茨伯格的非金钱激励因素；混淆高耸（层级）结构与扁平结构的管理幅度（span of control）。"
+  },
+  {
+    "exam_board": "CIE", "subject": "business", "chapter": "Marketing", "topicId": "bus_marketing",
+    "title": "市场调研与营销组合 Marketing",
+    "knowledge": "营销是识别并满足顾客需要、实现企业目标的管理过程，核心是先找对顾客再设计产品。市场调研分一手数据（primary，问卷、访谈、焦点小组，为本次目的直接收集）与二手数据（secondary，政府报告、行业统计等现成资料）；从总体中抽一部分代表调查即为样本。调研后进行市场细分（segmentation）——按人口、地理、心理、行为变量把大市场拆开，再选择目标市场（target market）并在顾客心中定位（positioning），可在大众营销与利基（niche）营销间权衡。营销组合 4P：产品（Product，功能、质量、品牌、包装、售后）、价格（Price，撇脂 skimming 高价收早期顾客、渗透 penetration 低价抢份额、成本加成、竞争性定价）、渠道（Place，直接/间接分销、批发零售）、促销（Promotion，广告、公共关系、销售促进、人员推销、直销，分推动 push 与拉动 pull 策略）。还要结合产品生命周期（引入、成长、成熟、衰退）调整策略，并经营品牌资产（brand equity）以赢得顾客忠诚和溢价。",
+    "formulas": [],
+    "imageUrls": [],
+    "commonMistake": "把促销（promotion）当成营销的全部；混淆市场细分、目标市场与定位三个概念；把撇脂与渗透定价的适用情形记反；把『Place』误解为货架摆放位置。"
+  },
+  {
+    "exam_board": "CIE", "subject": "business", "chapter": "Operations", "topicId": "bus_operations",
+    "title": "运营与生产管理 Operations management",
+    "knowledge": "运营管理负责把投入（材料、劳动、设备）高效转化为产出（商品与服务）。生产方式按产量与标准化程度分三类：单件/订制生产（job production，按客户独特要求做，如定制建筑、婚纱，单位成本高）、批量生产（batch production，成组轮流生产不同规格，灵活但有换产成本）、流水线/大量生产（flow/mass production，标准化连续出产，单位成本低但不灵活、投资大）。生产率＝产出÷投入，是衡量效率的核心指标；规模经济使产量扩大后单位平均成本下降。成本分为固定成本（不随产量变，如租金、折旧）与变动成本（随产量变，如材料、计件工资）。质量管理上，质量控制（QC）侧重事后检验挑次品，质量保证（QA）侧重在流程中预防缺陷；准时制（JIT）与精益生产按需进货、减少库存，但要求供应链极可靠。选址要权衡靠近市场还是原料、劳动力成本、交通与基础设施；企业还要管理库存，保留少量安全库存以防供应中断。",
+    "formulas": [],
+    "imageUrls": [],
+    "commonMistake": "把质量控制 QC 与质量保证 QA 混为一谈；把规模经济与规模不经济用反；以为 JIT 零库存没有供应链中断导致停工的风险。"
+  },
+  {
+    "exam_board": "CIE", "subject": "business", "chapter": "Finance", "topicId": "bus_finance",
+    "title": "财务信息与决策 Finance",
+    "knowledge": "财务管理解决两个问题：企业需要多少钱、从哪里来，以及赚没赚钱、现金够不够。资金来源分短期（银行透支、短期贷款、应付账款）与长期（长期银行贷款、股权融资 share capital、留存利润 retained profit、租赁、众筹）；股权融资不还本但稀释控制权，债务融资要还本付息但不稀释股权。成本分为固定成本与变动成本，总成本＝固定＋变动。损益表（利润表）：销售收入－销售成本＝毛利（gross profit），再减费用、利息、税＝净利润（net profit）。资产负债表反映某一时点资产＝负债＋所有者权益：资产分流动资产（现金、应收账款、存货）与固定资产（厂房设备，逐年折旧 depreciation），负债分流动与长期。现金流与利润不同——很多盈利企业因现金被存货和应收账款占死而倒闭，故要做现金流预测、管理营运资本（＝流动资产－流动负债）。盈亏平衡分析：单位贡献毛益＝单价－单位变动成本，盈亏平衡销量＝固定成本÷单位贡献毛益，安全边际＝实际销量－盈亏平衡销量。财务比率（毛利率、净利润率、流动比率）用于比较和判断企业盈利与偿债能力。",
+    "formulas": ["$$Profit = Revenue - Total\\,Costs$$", "$$Contribution\\,per\\,unit = Price - Variable\\,Cost\\,per\\,unit$$", "$$BEP = \\frac{Fixed\\,Costs}{Price - Variable\\,Cost\\,per\\,unit}$$", "$$Margin\\,of\\,safety = Actual\\,sales - BEP\\,sales$$", "$$Working\\,capital = Current\\,assets - Current\\,liabilities$$"],
+    "imageUrls": [],
+    "commonMistake": "把利润当现金流；盈亏平衡公式分子分母颠倒、变动成本按总量而非按单位算；混淆毛利与净利润、流动资产与固定资产。"
+  },
+  {
+    "exam_board": "CIE", "subject": "business", "chapter": "External", "topicId": "bus_external",
+    "title": "外部影响与全球化 External influences",
+    "knowledge": "企业经营处在外部环境中，这些因素管理者难以控制却必须应对。政府政策通过税收（对利润/收入征税抬高成本）、补贴（鼓励某类生产或投资）、法规（劳动、环保、消费者保护）和利率（影响借贷成本）直接影响企业；扶持某产业带来机会，加税或收紧管制构成压力。环境与伦理议题日益重要：消费者和政府要求企业减少污染、可持续采购、承担企业社会责任（CSR），短期增加成本，但能提升品牌形象与长期竞争力。国际贸易与全球化使企业能进入更大市场、利用低成本产地，但也带来汇率波动、关税与配额、文化法规差异、政治不稳定等风险；企业可通过出口、外包（outsourcing，把非核心环节交给外部以降本）、特许经营、合资（joint venture）或直接投资设厂走向国际。外部增长方面，横向一体化是收购同行减少竞争，纵向一体化是收购上下游供应商或分销商，混合/多元化一体化进入不相关业务以分散风险；这些扩张快但整合难、负债压力大。企业须持续扫描外部环境，把威胁转化为机会。",
+    "formulas": [],
+    "imageUrls": [],
+    "commonMistake": "把横向一体化（收购同行）与纵向一体化（收购上下游）混淆；以为外包只有好处、没有质量失控风险；忽视汇率、关税和政府政策对跨国经营的外部约束。"
   },
 
   /* ============ 新增：数学补充 ============ */
@@ -210,29 +242,5 @@ window.IGCSE_CONTENT = [
     "commonMistake": "把承受压力当成承受拉力；以为增加质量就能提高稳定性。"
   },
 
-  /* ============ 新增：商业研究补充 ============ */
-  {
-    "exam_board": "CIE", "subject": "business", "chapter": "Operations", "topicId": "bus_operations_01",
-    "title": "运营管理 Operations",
-    "knowledge": "生产方法分为批量生产、流水线（大量）生产和订制生产；生产率 = 产出 ÷ 投入。质量控制（QC）关注成品检验，质量保证（QA）关注流程预防。精益生产与 JIT（准时制）减少库存，但要求供应链稳定，规模经济可降低单位成本。",
-    "formulas": ["$$Productivity=\\frac{Output}{Input}$$"],
-    "imageUrls": [],
-    "commonMistake": "把质量控制 QC 与质量保证 QA 混为一谈；以为 JIT 零库存没有风险。"
-  },
-  {
-    "exam_board": "CIE", "subject": "business", "chapter": "HR", "topicId": "bus_hr_01",
-    "title": "人力资源管理 Human resources",
-    "knowledge": "招聘分内部招聘（升职、调岗）与外部招聘（广告、猎头）；培训分在职培训（OJT）与脱产培训。激励包括金钱手段（工资、奖金）与非金钱手段（认可、晋升、工作丰富化）；组织结构有层级式与扁平式，并通过绩效考核评估员工。",
-    "formulas": [],
-    "imageUrls": [],
-    "commonMistake": "把在职培训与脱产培训定义写反；以为加薪是唯一的激励手段。"
-  },
-  {
-    "exam_board": "CIE", "subject": "business", "chapter": "Growth", "topicId": "bus_growth_01",
-    "title": "增长战略 Business growth",
-    "knowledge": "内部增长靠自身扩大产能与市场，外部增长通过合并或收购实现。横向一体化是收购同行，纵向一体化是收购供应链上下游，多元化则进入新业务领域。国际化可通过出口、外包、特许经营或合资进行，收益与风险并存。",
-    "formulas": [],
-    "imageUrls": [],
-    "commonMistake": "把横向一体化（同行合并）与纵向一体化（供应链上下游）混淆。"
-  }
+  /* ============ 商业研究六主题已在上方统一维护 ============ */
 ];

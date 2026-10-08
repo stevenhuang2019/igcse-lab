@@ -25,34 +25,34 @@ window.IGCSE_ASSESSMENT = {
       { "subject": "physics", "topicId": "phy_mechanics_01", "note": "熟记匀加速直线运动三个基本公式。" },
       { "subject": "chemistry", "topicId": "chem_bonding_01", "note": "会区分离子键、共价键与金属键。" },
       { "subject": "dt", "topicId": "dt_process_01", "note": "熟悉从识别问题到测试迭代的设计流程。" },
-      { "subject": "business", "topicId": "bus_market_01", "note": "认识营销组合 4P 的四个要素。" }
+      { "subject": "business", "topicId": "bus_understanding", "note": "认识商业活动目的与个体/合伙/有限公司的区别。" }
     ] },
     { "level": 2, "goal": "在入门之上，掌握各科核心计算工具与基本概念。", "topics": [
       { "subject": "math", "topicId": "math_algebra_02", "note": "学会用因式分解解简单二次方程。" },
       { "subject": "physics", "topicId": "phy_mechanics_02", "note": "理解 F=ma，先画受力图再列合力。" },
       { "subject": "chemistry", "topicId": "chem_moles_01", "note": "会用 n=m/M 做质量与摩尔换算。" },
       { "subject": "dt", "topicId": "dt_materials_01", "note": "分清硬度、强度、韧性三个概念。" },
-      { "subject": "business", "topicId": "bus_finance_01", "note": "理解固定成本与变动成本的区别。" }
+      { "subject": "business", "topicId": "bus_finance", "note": "理解固定成本与变动成本的区别。" }
     ] },
     { "level": 3, "goal": "进入图像、电路与反应规律，练习直接应用类题目。", "topics": [
       { "subject": "math", "topicId": "math_graphs_01", "note": "读懂 y=mx+c 的斜率与截距含义。" },
       { "subject": "physics", "topicId": "phy_electricity_01", "note": "会用欧姆定律 V=IR 分析串并联。" },
       { "subject": "chemistry", "topicId": "chem_acids_01", "note": "掌握 pH 判断与酸碱中和反应。" },
       { "subject": "dt", "topicId": "dt_manufacture_01", "note": "了解注射、吹塑、真空成型等工艺。" },
-      { "subject": "business", "topicId": "bus_operations_01", "note": "区分批量、流水线与单件生产方式。" }
+      { "subject": "business", "topicId": "bus_operations", "note": "区分批量、流水线与单件生产方式。" }
     ] },
     { "level": 4, "goal": "巩固已学内容并拓展到几何、能量、结构等新主题。", "topics": [
       { "subject": "math", "topicId": "math_geometry_01", "note": "会用勾股定理与多边形内角和公式。" },
       { "subject": "physics", "topicId": "phy_energy_01", "note": "理解功、功率与能量守恒关系。" },
       { "subject": "chemistry", "topicId": "chem_redox_01", "note": "会判断氧化还原与金属置换顺序。" },
       { "subject": "dt", "topicId": "dt_structures_01", "note": "认识三角形桁架与拉压弯剪受力。" },
-      { "subject": "business", "topicId": "bus_hr_01", "note": "了解招聘、培训与金钱和非金钱激励。" }
+      { "subject": "business", "topicId": "bus_people", "note": "了解招聘、培训与金钱和非金钱激励。" }
     ] },
     { "level": 5, "goal": "稳步推进，接触三角函数、波动与周期表等进阶主题。", "topics": [
       { "subject": "math", "topicId": "math_trig_01", "note": "熟记 SOHCAHTOA 与 30/45/60 特殊角。" },
       { "subject": "physics", "topicId": "phy_waves_01", "note": "掌握波速、频率、波长关系 v=fλ。" },
       { "subject": "chemistry", "topicId": "chem_periodic_01", "note": "理解族与周期的递变规律及同位素。" },
-      { "subject": "business", "topicId": "bus_growth_01", "note": "区分内部增长与合并收购等外部增长。" }
+      { "subject": "business", "topicId": "bus_marketing", "note": "掌握市场调研、市场细分与营销组合 4P。" }
     ] },
     { "level": 6, "goal": "完成大纲剩余主题，具备跨章节综合解题能力。", "topics": [
       { "subject": "math", "topicId": "math_stats_01", "note": "会算均值、中位数、众数与简单概率。" },
@@ -64,7 +64,7 @@ window.IGCSE_ASSESSMENT = {
       { "subject": "math", "topicId": "math_algebra_02", "note": "复习判别式与求根公式，注意负号。" },
       { "subject": "physics", "topicId": "phy_electricity_01", "note": "复习串并联电阻与电压电流分配。" },
       { "subject": "chemistry", "topicId": "chem_moles_01", "note": "复习化学计量比与限量试剂判断。" },
-      { "subject": "business", "topicId": "bus_finance_01", "note": "复习盈亏平衡销量与安全边际计算。" }
+      { "subject": "business", "topicId": "bus_finance", "note": "复习盈亏平衡销量与安全边际计算。" }
     ] },
     { "level": 8, "goal": "攻克进阶与综合题，向 A 档冲刺。", "topics": [
       { "subject": "math", "topicId": "math_trig_01", "note": "复习仰角俯角的实际应用题。" },
@@ -76,14 +76,14 @@ window.IGCSE_ASSESSMENT = {
       { "subject": "math", "topicId": "math_stats_01", "note": "复习概率互斥事件与相对频率。" },
       { "subject": "physics", "topicId": "phy_electromag_01", "note": "复习变压器电压匝数比与左手法则。" },
       { "subject": "chemistry", "topicId": "chem_organic_01", "note": "复习发酵制乙醇与聚合物单体。" },
-      { "subject": "business", "topicId": "bus_growth_01", "note": "复习横向纵向一体化与国际化风险。" }
+      { "subject": "business", "topicId": "bus_external", "note": "复习政府政策、一体化与全球化风险。" }
     ] },
     { "level": 10, "goal": "考前冲刺，回归错题与教材细节，打磨答题规范。", "topics": [
       { "subject": "math", "topicId": "math_algebra_01", "note": "错题复盘括号展开与完全平方中间项。" },
       { "subject": "physics", "topicId": "phy_mechanics_01", "note": "错题复盘匀加速公式与单位换算。" },
       { "subject": "chemistry", "topicId": "chem_bonding_01", "note": "错题复盘三种化学键的判断依据。" },
       { "subject": "dt", "topicId": "dt_process_01", "note": "梳理设计流程的迭代与用户测试环节。" },
-      { "subject": "business", "topicId": "bus_market_01", "note": "复盘撇脂渗透定价与产品生命周期。" }
+      { "subject": "business", "topicId": "bus_marketing", "note": "复盘撇脂渗透定价与产品生命周期。" }
     ] }
   ]
 };
