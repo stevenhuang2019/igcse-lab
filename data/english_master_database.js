@@ -3,7 +3,7 @@
  * Sources are tagged so future CET-4/CET-6 imports can be merged without replacing IGCSE data.
  */
 window.ENGLISH_MASTER_DB = {
-  version:"1.0.0",
+  version:"1.1.0",
   schemaVersion:1,
   sources:{
     igcse_esl:{label:"IGCSE ESL 0510/0511",level:"IGCSE"},
@@ -13,6 +13,7 @@ window.ENGLISH_MASTER_DB = {
   },
   vocabulary:[],
   subjectLinks:[],
+  learningStages:[{id:"stage1",name:"基础词汇与句型",goal:"Vocabulary + Core Grammar",threshold:40},{id:"stage2",name:"理解与表达",goal:"Reading + Writing + Sentence Building",threshold:60},{id:"stage3",name:"考试技能",goal:"Command Words + Exam English",threshold:75},{id:"stage4",name:"学科英语",goal:"Physics / Chemistry / CS / Business English",threshold:85},{id:"stage5",name:"考试准备",goal:"Past Paper + SRS Retention + Exam Readiness",threshold:90}],
   sentences:[
     {id:"sent_academic_001",level:"academic",category:"cause_effect",en:"This change may lead to a significant improvement in efficiency.",zh:"这一变化可能带来效率的显著提升。",pattern:"may lead to + noun",tags:["cause_effect","academic"]},
     {id:"sent_academic_002",level:"academic",category:"evidence",en:"The evidence suggests that the new method is more effective.",zh:"证据表明这种新方法更加有效。",pattern:"evidence suggests that...",tags:["evidence","academic"]},
