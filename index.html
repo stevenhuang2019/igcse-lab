@@ -35,7 +35,7 @@
         <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
             <div>
                 <h1 class="text-xl font-bold">IGCSE自习实验室 IGCSE LAB</h1>
-                <p class="text-indigo-200 text-xs mt-0.5">CIE · 数学 / 物理 / 化学 / 设计DT / 商业研究</p>
+                <p class="text-indigo-200 text-xs mt-0.5">CIE · 数学 / 物理 / 化学 / 设计DT / 商业研究 / 计算机科学</p>
             </div>
             <div class="flex gap-4 items-center">
                 <select id="subjectSelect" class="text-slate-800 rounded px-2 py-1 border border-slate-300 bg-white">
@@ -44,6 +44,7 @@
                     <option value="chemistry">化学 Chemistry</option>
                     <option value="dt">设计 DT</option>
                     <option value="business">商业研究 Business</option>
+                    <option value="computer_science">计算机科学 Computer Science</option>
                     <option value="english">英语 English（English Lab）</option>
                 </select>
                 <button id="langToggle" class="text-xs bg-indigo-700 hover:bg-indigo-800 px-3 py-1.5 rounded-lg font-semibold whitespace-nowrap" title="切换学习模式（中英对照题干）/ 考试模式（纯英文题干，答案解析保持中文）">🌐 学习模式·中英</button>
@@ -91,6 +92,7 @@
                     <button data-subject="chemistry" class="border rounded-xl p-4 text-left hover:bg-indigo-50 hover:border-indigo-300 transition"><div class="text-2xl">🧪</div><div class="font-semibold mt-1">化学</div><div class="text-xs text-gray-500">Chemistry</div></button>
                     <button data-subject="dt" class="border rounded-xl p-4 text-left hover:bg-indigo-50 hover:border-indigo-300 transition"><div class="text-2xl">🛠️</div><div class="font-semibold mt-1">设计 DT</div><div class="text-xs text-gray-500">Design &amp; Technology</div></button>
                     <button data-subject="business" class="border rounded-xl p-4 text-left hover:bg-indigo-50 hover:border-indigo-300 transition"><div class="text-2xl">💼</div><div class="font-semibold mt-1">商业研究</div><div class="text-xs text-gray-500">Business Studies</div></button>
+                    <button data-subject="computer_science" class="border rounded-xl p-4 text-left hover:bg-indigo-50 hover:border-indigo-300 transition"><div class="text-2xl">💻</div><div class="font-semibold mt-1">计算机科学</div><div class="text-xs text-gray-500">Computer Science · 0478</div></button>
                     <button data-subject="english" class="border rounded-xl p-4 text-left hover:bg-indigo-50 hover:border-indigo-300 transition"><div class="text-2xl">🇬🇧</div><div class="font-semibold mt-1">英语</div><div class="text-xs text-gray-500">English Lab</div></button>
                 </div>
             </div>
@@ -252,6 +254,8 @@
 <script src="data/igcse_questions_chemistry.js"></script>
 <script src="data/igcse_questions_dt.js"></script>
 <script src="data/igcse_questions_business.js"></script>
+<script src="data/igcse_cs_0478.js"></script>
+<script src="data/igcse_questions_cs.js"></script>
 <script src="data/igcse_assessment.js"></script>
 <script src="data/igcse_quickref.js"></script>
 <script src="data/igcse_mockpapers.js"></script>
@@ -263,12 +267,12 @@
 const DEFAULT_USER_STATE = {
     level: 1, xp: 0, xpNextLevel: 100, badges: [],
     globalStats: { totalAnswered:0, totalCorrect:0 },
-    subjectStats: { math:{answered:0,correct:0}, physics:{answered:0,correct:0}, chemistry:{answered:0,correct:0}, dt:{answered:0,correct:0}, business:{answered:0,correct:0} },
+    subjectStats: { math:{answered:0,correct:0}, physics:{answered:0,correct:0}, chemistry:{answered:0,correct:0}, dt:{answered:0,correct:0}, business:{answered:0,correct:0}, computer_science:{answered:0,correct:0} },
     learnedTopics: [], mistakes: [], assessmentRecords: [], homeworkRecords: [],
     topicStats: {}, lastSciSubject: 'math',
     vocabMistakes: []
 };
-const SUBJECT_NAMES = { math:'数学', physics:'物理', chemistry:'化学', dt:'设计DT', business:'商业研究' };
+const SUBJECT_NAMES = { math:'数学', physics:'物理', chemistry:'化学', dt:'设计DT', business:'商业研究', computer_science:'计算机科学' };
 
 function deepMerge(base, override){
     if(Array.isArray(base)){ return (override === undefined || override === null) ? base.slice() : override; }
@@ -364,8 +368,8 @@ function switchPage(id){
 navBtns.forEach(btn => { btn.onclick = () => { switchPage(btn.dataset.page); const pg = btn.dataset.page; if(pg === 'page-mistake') renderMistakePage(); else if(pg === 'page-homework') renderHomeworkRecords(); else if(pg === 'page-profile') renderProfile(); else if(pg === 'page-assessment') renderAssessmentPage(); else if(pg === 'page-quickref') renderQuickrefPage(); else if(pg === 'page-vocab') renderVocabPage(); else if(pg === 'page-resources') renderMyResources(); else if(pg === 'page-home') renderTodayCards(); else if(pg === 'page-practice'){ practiceSession = null; stopMockTimer(); renderPracticeTopicSelect(); renderMockEntry(); } else { stopMockTimer(); } }; });
 
 /* ===================== 全局变量 ===================== */
-let contentData = window.IGCSE_CONTENT || [];
-let questionData = window.IGCSE_QUESTIONS || [];
+let contentData = (window.IGCSE_CONTENT || []).concat(window.IGCSE_CS_CONTENT || []);
+let questionData = (window.IGCSE_QUESTIONS || []).concat(window.IGCSE_CS_QUESTIONS || []);
 let currentSubject = 'math';
 let currentTopicId = null;
 let practiceSession = null; // { topicId, order[], idx, combo, correct, total }
@@ -787,7 +791,7 @@ function renderProfile(){
         + '<div class="bg-slate-50 border border-slate-200 rounded-xl p-4 text-center"><div class="text-3xl font-bold text-slate-700">' + userState.xp + '</div><div class="text-xs text-gray-600 mt-1">XP（下一级 ' + userState.xpNextLevel + '）</div></div>'
         + '<div class="bg-green-50 border border-green-200 rounded-xl p-4 text-center"><div class="text-3xl font-bold text-green-700">' + rate + '%</div><div class="text-xs text-gray-600 mt-1">答题正确率（' + g.totalCorrect + '/' + g.totalAnswered + '）</div></div>'
         + '</div>';
-    html += '<h3 class="font-semibold mb-2">各科目统计</h3><div class="grid md:grid-cols-5 gap-3 mb-6">';
+    html += '<h3 class="font-semibold mb-2">各科目统计</h3><div class="grid md:grid-cols-2 lg:grid-cols-6 gap-3 mb-6">';
     for(const key in userState.subjectStats){
         const s = userState.subjectStats[key];
         const r = s.answered ? Math.round(s.correct / s.answered * 100) : 0;
