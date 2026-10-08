@@ -96,9 +96,9 @@
     }
     function record(q,ok){
       userState.topicStats=userState.topicStats||{};
-      const st=userState.topicStats[q.topicId]||{answered:0,correct:0,lastWrongAt:null};
+      const key=window.masteryTopicKey?window.masteryTopicKey(q.topicId,q.subject||sub):q.topicId; const st=userState.topicStats[key]||userState.topicStats[q.topicId]||{subject:q.subject||sub,topicId:q.topicId,answered:0,correct:0,lastWrongAt:null};
       st.answered++; if(ok)st.correct++; else st.lastWrongAt=new Date().toISOString();
-      userState.topicStats[q.topicId]=st;
+      userState.topicStats[key]=st;
       userState.globalStats=userState.globalStats||{totalAnswered:0,totalCorrect:0};
       userState.globalStats.totalAnswered=(userState.globalStats.totalAnswered||0)+1;
       if(ok) userState.globalStats.totalCorrect=(userState.globalStats.totalCorrect||0)+1;
@@ -108,7 +108,7 @@
         if(old){old.wrongCount=(old.wrongCount||0)+1;old.lastResult='fail';}
         else userState.mistakes.push({questionId:q.id,subject:q.subject,topicId:q.topicId,time:new Date().toISOString(),wrongCount:1,srsStage:0,nextReviewAt:new Date(Date.now()+864e5).toISOString(),mastered:false,reviewedCount:0,lastResult:'fail'});
       }
-      addXp(ok?(q.xpReward||10):2);
+      addXp(ok?(q.xpReward||10):2); if(window.dispatchEvent)window.dispatchEvent(new CustomEvent('igcse-answer-recorded',{detail:{topicId:q.topicId,qid:q.id,subject:q.subject||sub,correct:ok,srs:false,pastPaper:!!q.pastPaper,mode:'chapter'}}));
       saveUserState(userState);
     }
     function answer(q,i){
