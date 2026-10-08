@@ -137,7 +137,7 @@
       const target=candidates[0];
       tasks.push({id:'skill_'+currentSubject()+'_'+g.id,type:'skill',icon:'🧠',title:subjName(currentSubject())+' · '+g.cn+'强化',text:'针对考试能力弱项训练 · 当前 '+g.score+'%'+(target?' · 推荐主题 '+(target.topicId||'') :''),minutes:10,priority:96-i*3,subject:currentSubject(),topic:target&&target.topicId||'' ,qid:target&&target.id||''});
     });
-    mistakes.slice(0,2).forEach((m,i)=>tasks.push({id:'srs_'+(m.qid||i),type:'srs',icon:'🔁',title:'SRS 错题复习',text:'复习到期错题并重新作答',minutes:5,priority:100-i*2,qid:m.qid}));
+    mistakes.slice(0,2).forEach((m,i)=>tasks.push({id:'srs_'+(m.qid||m.key||i),type:'srs',icon:'🔁',title:'SRS 错题复习',text:'复习到期错题并重新作答',minutes:5,priority:100-i*2,qid:m.qid||'',topic:m.topicId||'',subject:m.subject||currentSubject()}));
     weak.slice(0,5).forEach((x,i)=>{
       const type=x.n===0?'learn':x.n<50?'practice':x.n<70?'repair':'reinforce';
       const meta={learn:['📘','知识学习','先建立核心知识框架',8],practice:['🎯','针对练习','集中训练薄弱知识点',10],repair:['🛠️','错因修复','针对常见错误进行强化',10],reinforce:['⚡','巩固练习','保持已建立的掌握度',8]}[type];
