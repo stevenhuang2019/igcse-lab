@@ -1121,6 +1121,26 @@ function submitAssessment(){
     const pct = total ? Math.round(s.right / total * 100) : 0;
     const level = assessLevelFor(pct);
     userState.assessmentRecords.push({ subject: s.subject, score: s.right, total: total, level: level, time: new Date().toISOString() });
+    // Feed the baseline assessment into the unified Mastery Engine once per topic.
+    if(window.recordMasteryEvent){
+        const byTopic={};
+        s.order.forEach(qid=>{
+            const q=findQuestion(qid); if(!q) return;
+            const picked=(q.options||[])[s.answers[qid]];
+            const ok=picked===q.answer;
+            if(!byTopic[q.topicId])byTopic[q.topicId]={correct:0,total:0};
+            byTopic[q.topicId].total++;
+            if(ok)byTopic[q.topicId].correct++;
+        });
+        Object.keys(byTopic).forEach(topicId=>{
+            const x=byTopic[topicId], score=x.total?x.correct/x.total*100:0;
+            const meta={subject:s.subject,initialAssessment:true,assessment:true,assessmentScore:score};
+            window.recordMasteryEvent(topicId,score>=50,meta);
+            const key=window.masteryTopicKey?window.masteryTopicKey(topicId,s.subject):topicId;
+            const st=userState.topicStats&&userState.topicStats[key];
+            if(st)st.initialAssessment=Math.round(score);
+        });
+    }
     saveUserState(userState);
     addXp(30);
     grantBadge('assess_first');
