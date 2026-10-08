@@ -7,6 +7,7 @@ A static learning application with seven subject catalogues, topic practice, a s
 - 980 questions across 86 local topics and seven subjects.
 - 62 new original questions: 50 Physics questions spanning 25 course-map sections, plus two each for Math, Chemistry, D&T, Business, CS and English.
 - Every local topic has linked questions. This is **local catalogue coverage**, not proof of full official syllabus coverage, exam readiness or a predicted grade. CS and English still have comparatively shallow banks.
+- The legacy `phy0625_4_6` ID is retained for saved progress, while its display/reference uses official 4.5 subdivisions (induction 4.5.1, generator 4.5.2, transformer 4.5.6), not a nonexistent official 4.6.
 - Physics includes the Solar System and stars/universe sections. Question IDs link topic, chapter and objective metadata without changing legacy learner keys.
 - Dashboard averages include unstarted topics. Unique-question practice coverage is based on explicit per-question records; historical topic aggregates remain preserved and are not fabricated into per-question history.
 - Daily tasks complete after a matching answer event, not when a card is clicked. Learning state remains in this browser's local storage.

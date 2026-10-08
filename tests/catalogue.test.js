@@ -65,6 +65,9 @@ test('source-linked audit distinguishes samples, preparation and gaps without cr
  assert.equal(audit('math').sections.find(s=>s.ref==='7').status,'gap');
  const cs=audit('computer_science');assert.equal(cs.sectionCount,24);assert.equal(cs.invalidReferences.length,0);
  assert.equal(cs.sections.find(s=>s.ref==='8.3').status,'content-linked');
+ const phy=audit('physics');assert.equal(phy.invalidReferences.length,0);assert.ok(!phy.sections.some(s=>s.ref==='4.6'));
+ assert.equal(phy.sections.find(s=>s.ref==='4.5.6').questionIds.length,2);
+ assert.match(window.IGCSE_CATALOG.topic('physics','phy0625_4_6').title,/^4.5 /);
  const en=audit('english');assert.equal(en.sectionCount,16);
  assert.equal(en.sections.find(s=>s.ref==='L1').status,'preparation-only');
  assert.equal(en.sections.find(s=>s.ref==='S4').practiceCount,0);

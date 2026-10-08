@@ -210,15 +210,43 @@ window.IGCSE_SYLLABUS_REGISTRY = {
         ]
       },
       {
-        "ref": "4.5",
-        "label": "电磁作用",
+        "ref": "4.5.1",
+        "label": "电磁感应",
+        "topicIds": [
+          "phy0625_4_6"
+        ]
+      },
+      {
+        "ref": "4.5.2",
+        "label": "交流发电机",
+        "topicIds": [
+          "phy0625_4_6"
+        ]
+      },
+      {
+        "ref": "4.5.3",
+        "label": "电流的磁效应",
         "topicIds": [
           "phy0625_4_5"
         ]
       },
       {
-        "ref": "4.6",
-        "label": "电磁感应",
+        "ref": "4.5.4",
+        "label": "载流导体受力",
+        "topicIds": [
+          "phy0625_4_5"
+        ]
+      },
+      {
+        "ref": "4.5.5",
+        "label": "直流电动机",
+        "topicIds": [
+          "phy0625_4_5"
+        ]
+      },
+      {
+        "ref": "4.5.6",
+        "label": "变压器",
         "topicIds": [
           "phy0625_4_6"
         ]

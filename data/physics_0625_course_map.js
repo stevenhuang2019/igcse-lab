@@ -29,8 +29,9 @@ window.PHYSICS_0625_COURSE_MAP = [
 ["6.1","Earth and the Solar System",["orbital motion","gravitational attraction","planets and satellites"],["Describe","Explain","Calculate"],"Explanation"],
 ["6.2","Stars and the Universe",["stellar evolution","galaxies","redshift","expansion of the universe"],["Describe","Explain"],"Explanation"]
 ].map(x=>({
-  syllabus:"0625",syllabusYear:"2026-2028",subject:"physics",chapter:x[0]+" "+x[1],
-  topicId:"phy0625_"+x[0].replace(".","_"),title:x[0]+" "+x[1],
+  syllabus:"0625",syllabusYear:"2026-2028",subject:"physics",chapter:(x[0]==="4.6"?"4.5":x[0])+" "+x[1],
+  topicId:"phy0625_"+x[0].replace(".","_"),title:(x[0]==="4.6"?"4.5":x[0])+" "+x[1],
+  syllabusRefs:x[0]==="4.6"?["4.5.1","4.5.2","4.5.6"]:[x[0]],
   objectives:x[2],commandWords:x[3],examSkill:x[4],
   knowledge:"本主题学习目标： "+x[2].join("、")+"。建议学习顺序：概念理解 → 关键词汇 → 例题 → 实验/图像技能 → 考试题。",
   formulas:[],commonMistake:"先确认 command word，再选择知识点、公式或实验方法；最后检查单位、有效数字与答案表达。",
