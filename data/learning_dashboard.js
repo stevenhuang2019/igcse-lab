@@ -88,6 +88,14 @@
       bind();
     }
     function overall(){
+      const subjects=allSubjects().map(sub=>{const ts=topics(sub),vals=ts.map(masteryForTopic).filter(x=>x>0);return {sub,avg:vals.length?Math.round(vals.reduce((a,b)=>a+b,0)/vals.length):0,started:vals.length,total:ts.length};});
+      const active=subjects.find(x=>x.sub===sub)||{avg:0};
+      const started=subjects.filter(x=>x.started>0);
+      const global=started.length?Math.round(started.reduce((a,x)=>a+x.avg,0)/started.length):0;
+      const weakest=subjects.filter(x=>x.started>0).sort((a,b)=>a.avg-b.avg)[0];
+      const qs=questions(sub),st=getState(),gs=st.globalStats||{},acc=gs.totalAnswered?Math.round(gs.totalCorrect/gs.totalAnswered*100):0;
+      return '<div class="text-3xl font-bold">'+active.avg+'%</div><div class="text-xs text-indigo-200">当前科目掌握度 · '+esc(subjName(sub))+'</div><div class="text-xs text-indigo-200 mt-1">全科学习指数 '+global+'% · '+(weakest?'最需关注：'+esc(subjName(weakest.sub)):'尚未形成全科数据')+'</div><div class="text-xs text-indigo-200 mt-1">'+qs.length+' 道题 · '+(gs.totalAnswered||0)+' 次答题 · 总正确率 '+acc+'%</div>';
+    }
       const ts=topics(sub),qs=questions(sub), vals=ts.map(masteryForTopic).filter(x=>x>0);
       const avg=vals.length?Math.round(vals.reduce((a,b)=>a+b,0)/vals.length):0;
       const st=getState(),gs=st.globalStats||{};
