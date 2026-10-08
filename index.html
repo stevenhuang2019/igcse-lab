@@ -604,7 +604,9 @@ function markAnswered(q, isCorrect, area){
         }
     }
     saveUserState(userState);
-    window.dispatchEvent(new CustomEvent('igcse-answer-recorded',{detail:{topicId:q.topicId,qid:q.id,subject:subj,correct:isCorrect,srs:s.mode==='srs',pastPaper:!!q.pastPaper}}));
+    const paperMode = !!q.pastPaper || s.mode === 'mock' || s.mode === 'paper';
+    const sessionAccuracy = s.idx ? Math.round((s.correct / s.idx) * 100) : (isCorrect ? 100 : 0);
+    window.dispatchEvent(new CustomEvent('igcse-answer-recorded',{detail:{topicId:q.topicId,qid:q.id,subject:subj,correct:isCorrect,srs:s.mode==='srs',pastPaper:paperMode,accuracy:sessionAccuracy,mode:s.mode}}));
     checkBadges();
     const fb = area.querySelector('.q-feedback');
     if(fb){
