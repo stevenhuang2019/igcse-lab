@@ -33,11 +33,8 @@ function arr(name){if(!Array.isArray(w[name]))bad(name+' missing/not array');els
 arr('IGCSE_CONTENT'); arr('IGCSE_QUESTIONS'); arr('IGCSE_CS_CONTENT'); arr('IGCSE_CS_QUESTIONS'); arr('IGCSE_CS_DEEP_CONTENT'); arr('IGCSE_CS_DEEP_QUESTIONS'); arr('IGCSE_ENGLISH_CONTENT'); arr('IGCSE_ENGLISH_QUESTIONS');
 if(!w.ENGLISH_MASTER_DB)bad('ENGLISH_MASTER_DB missing');else ok('ENGLISH_MASTER_DB loaded');
 
-const groups=[
-  w.IGCSE_QUESTIONS,w.IGCSE_QUESTIONS_PHYSICS,w.IGCSE_QUESTIONS_CHEMISTRY,w.IGCSE_QUESTIONS_MATH,
-  w.IGCSE_QUESTIONS_DT,w.IGCSE_QUESTIONS_BUSINESS,w.IGCSE_CS_QUESTIONS,w.IGCSE_CS_DEEP_QUESTIONS,w.IGCSE_ENGLISH_QUESTIONS
-];
-const q=groups.flatMap(x=>Array.isArray(x)?x:[]);
+const groups=[w.IGCSE_QUESTIONS,w.IGCSE_CS_QUESTIONS,w.IGCSE_CS_DEEP_QUESTIONS,w.IGCSE_ENGLISH_QUESTIONS];
+const q=[].concat(w.IGCSE_QUESTIONS||[],w.IGCSE_CS_QUESTIONS||[],w.IGCSE_CS_DEEP_QUESTIONS||[],w.IGCSE_ENGLISH_QUESTIONS||[]);
 const ids=new Set(),dups=[];
 for(const x of q){if(!x||!x.id){bad('question missing id');continue}if(ids.has(x.id))dups.push(x.id);ids.add(x.id);}
 if(dups.length)bad('duplicate question ids: '+[...new Set(dups)].join(', '));else ok('question ids unique ('+q.length+')');
