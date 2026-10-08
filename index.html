@@ -550,7 +550,8 @@ function markAnswered(q, isCorrect, area){
     userState.subjectStats[subj].answered++;
     /* 薄弱主题统计：每次判分（选择 + 作文自评）累计 */
     userState.topicStats = userState.topicStats || {};
-    const tstat = userState.topicStats[q.topicId] = userState.topicStats[q.topicId] || { answered:0, correct:0, lastWrongAt:null };
+    const statKey = (window.masteryTopicKey ? window.masteryTopicKey(q.topicId, subj) : q.topicId);
+    const tstat = userState.topicStats[statKey] = userState.topicStats[statKey] || { subject:subj, topicId:q.topicId, answered:0, correct:0, wrong:0, lastWrongAt:null };
     tstat.answered++;
     if(isCorrect){
         s.correct++; s.combo++;
