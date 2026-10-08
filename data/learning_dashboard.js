@@ -216,5 +216,4 @@
     window.addEventListener('igcse-dashboard-refresh',render);
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',build);else setTimeout(build,0);
-})(
-})()
+})();
