@@ -255,7 +255,9 @@
 <script src="data/igcse_questions_dt.js"></script>
 <script src="data/igcse_questions_business.js"></script>
 <script src="data/igcse_cs_0478.js"></script>
-<script src="data/igcse_questions_cs.js"></script>\n<script src="data/igcse_english_esl.js"></script>\n<script src="data/igcse_questions_english.js"></script>
+<script src="data/igcse_questions_cs.js"></script>
+<script src="data/igcse_english_esl.js"></script>
+<script src="data/igcse_questions_english.js"></script>
 <script src="data/igcse_assessment.js"></script>
 <script src="data/igcse_quickref.js"></script>
 <script src="data/igcse_mockpapers.js"></script>
@@ -267,12 +269,12 @@
 const DEFAULT_USER_STATE = {
     level: 1, xp: 0, xpNextLevel: 100, badges: [],
     globalStats: { totalAnswered:0, totalCorrect:0 },
-    subjectStats: { math:{answered:0,correct:0}, physics:{answered:0,correct:0}, chemistry:{answered:0,correct:0}, dt:{answered:0,correct:0}, business:{answered:0,correct:0}, computer_science:{answered:0,correct:0} },
+    subjectStats: { math:{answered:0,correct:0}, physics:{answered:0,correct:0}, chemistry:{answered:0,correct:0}, dt:{answered:0,correct:0}, business:{answered:0,correct:0}, computer_science:{answered:0,correct:0}, english:{answered:0,correct:0} },
     learnedTopics: [], mistakes: [], assessmentRecords: [], homeworkRecords: [],
     topicStats: {}, lastSciSubject: 'math',
     vocabMistakes: []
 };
-const SUBJECT_NAMES = { math:'数学', physics:'物理', chemistry:'化学', dt:'设计DT', business:'商业研究', computer_science:'计算机科学' };
+const SUBJECT_NAMES = { math:'数学', physics:'物理', chemistry:'化学', dt:'设计DT', business:'商业研究', computer_science:'计算机科学', english:'英语 ESL' };
 
 function deepMerge(base, override){
     if(Array.isArray(base)){ return (override === undefined || override === null) ? base.slice() : override; }
