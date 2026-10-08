@@ -1371,6 +1371,8 @@ function renderMockEntry(){
         });
     }
     html += mockExamsEntryHtml();
+    const records=(window.userState&&userState.mockExams&&userState.mockExams.records)||[];
+    if(records.length){ const last=records[0]; const rep=window.IGCSE_MOCK_ENGINE&&window.IGCSE_MOCK_ENGINE.report(last); if(rep) html += '<div class="w-full text-xs text-gray-600 mt-2">上次模拟考：<b>'+rep.accuracy+'%</b> · 薄弱项 '+rep.weakTopics.slice(0,2).map(x=>x.topic).join('、')+'</div>'; }
     html += '</div>';
     el.innerHTML = html;
     el.querySelectorAll('[data-mock]').forEach(b => { b.onclick = () => startMock(b.dataset.mock); });
