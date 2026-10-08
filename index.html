@@ -287,6 +287,7 @@ const DEFAULT_USER_STATE = {
     subjectStats: { math:{answered:0,correct:0}, physics:{answered:0,correct:0}, chemistry:{answered:0,correct:0}, dt:{answered:0,correct:0}, business:{answered:0,correct:0}, computer_science:{answered:0,correct:0}, english:{answered:0,correct:0} },
     learnedTopics: [], mistakes: [], assessmentRecords: [], homeworkRecords: [],
     topicStats: {}, lastSciSubject: 'math',
+    englishMaster: { vocab:{}, grammar:{}, sentences:{}, commandWords:{} },
     vocabMistakes: []
 };
 const SUBJECT_NAMES = { math:'数学', physics:'物理', chemistry:'化学', dt:'设计DT', business:'商业研究', computer_science:'计算机科学', english:'英语 ESL' };
@@ -305,8 +306,9 @@ function loadUserState(){
     try{ const raw = localStorage.getItem('igcseUserState'); if(raw){ const st = JSON.parse(raw); return deepMerge(JSON.parse(JSON.stringify(DEFAULT_USER_STATE)), st); } }catch(e){}
     return JSON.parse(JSON.stringify(DEFAULT_USER_STATE));
 }
-function saveUserState(state){ try{ localStorage.setItem('igcseUserState', JSON.stringify(state)); }catch(e){} }
+function saveUserState(state){ try{ localStorage.setItem('igcseUserState', JSON.stringify(state)); }catch(e){} window.__IGCSE_USER_STATE__ = state; }
 let userState = loadUserState();
+window.__IGCSE_USER_STATE__ = userState;
 
 /* ===================== XP & 等级 & 徽章 ===================== */
 function addXp(amount){
@@ -959,6 +961,7 @@ function openEnglishTopic(t){
 }
 function answerEnglish(q,idx){
     const picked=(q.options||[])[idx], correct=picked===q.answer;
+    if(window.recordEnglishMasterEvent) window.recordEnglishMasterEvent('commandWords', q.commandWord || q.knowledgePoint || q.id, correct, {commandWord:q.commandWord||''});
     if(!userState.subjectStats.english) userState.subjectStats.english={answered:0,correct:0};
     userState.subjectStats.english.answered++; if(correct) userState.subjectStats.english.correct++;
     userState.globalStats.totalAnswered++; if(correct) userState.globalStats.totalCorrect++;
@@ -1508,6 +1511,7 @@ function answerVocab(i, btn){
     g._answered = true;
     const chosen = g._opts[i];
     const correct = chosen === g._answer;
+    if(window.recordEnglishMasterEvent){ window.recordEnglishMasterEvent('vocab', (g._answer.subject||'english')+'::'+g._answer.en, correct, {subject:g._answer.subject||currentSubject, en:g._answer.en, zh:g._answer.zh}); }
     const ga = document.getElementById('vocabGameArea');
     const fb = ga.querySelector('.vfb');
     ga.querySelectorAll('[data-vopt]').forEach(b => b.classList.add('disabled'));
