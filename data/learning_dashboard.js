@@ -203,7 +203,9 @@
     function bind(){
       document.querySelectorAll('#dbMission [data-topic]').forEach(x=>x.onclick=()=>{
         const t=x.dataset.topic, targetSub=x.dataset.subject, qid=x.dataset.qid;
-        markDailyTask(qid||('topic_'+targetSub+'_'+t));
+        const taskId=qid||('topic_'+targetSub+'_'+t);
+        const d=dailyState(); d.pendingTask={id:taskId,topic:t,qid:qid||'',subject:targetSub||currentSubject()};
+        if(window.saveUserState)window.saveUserState(getState());
         if(targetSub && window.subjectSelect){ window.subjectSelect.value=targetSub; window.subjectSelect.dispatchEvent(new Event('change')); }
         const btn=document.querySelector('#chapter-engine-nav'); if(btn)btn.click();
         setTimeout(()=>{const sel=document.getElementById('ceTopic');if(sel&&t){sel.value=t;sel.dispatchEvent(new Event('change'));}},100);
@@ -213,6 +215,13 @@
     b.onclick=()=>{if(window.switchPage)window.switchPage('page-dashboard');b.classList.add('active');render();};
     document.getElementById('subjectSelect')?.addEventListener('change',()=>{sub=currentSubject();if(document.getElementById('page-dashboard')?.classList.contains('active'))render();});
     window.addEventListener('igcse-subject-change',()=>{sub=currentSubject();if(document.getElementById('page-dashboard')?.classList.contains('active'))render();});
+    window.addEventListener('igcse-answer-recorded',e=>{
+      const d=e.detail||{}, p=dailyState().pendingTask;
+      if(!p)return;
+      if((p.qid&&p.qid===d.qid)||(p.topic&&p.topic===d.topicId)){
+        markDailyTask(p.id); delete dailyState().pendingTask; render();
+      }
+    });
     window.addEventListener('igcse-dashboard-refresh',render);
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',build);else setTimeout(build,0);
