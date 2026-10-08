@@ -991,7 +991,9 @@ function answerEnglish(q,idx){
     if(!userState.subjectStats.english) userState.subjectStats.english={answered:0,correct:0};
     userState.subjectStats.english.answered++; if(correct) userState.subjectStats.english.correct++;
     userState.globalStats.totalAnswered++; if(correct) userState.globalStats.totalCorrect++;
-    saveUserState(userState); addXp(correct?10:3);
+    saveUserState(userState);
+    window.dispatchEvent(new CustomEvent('igcse-answer-recorded',{detail:{topicId:q.topicId,qid:q.id,subject:'english',correct:correct,srs:false,pastPaper:!!q.pastPaper}}));
+    addXp(correct?10:3);
     const fb=document.getElementById('engFeedback');
     fb.innerHTML=correct?'<div class="bg-green-50 border border-green-200 rounded p-3 text-green-700">✓ Correct · '+esc(q.explain||'')+'</div>':'<div class="bg-red-50 border border-red-200 rounded p-3 text-red-700">✗ 正确答案：'+esc(q.answer)+'<div class="mt-1">'+esc(q.explain||'')+'</div></div>';
     englishPracticeIndex++; setTimeout(()=>renderEnglishPage('practice'),250);
