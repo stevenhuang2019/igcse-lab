@@ -255,7 +255,7 @@
 <script src="data/igcse_questions_dt.js"></script>
 <script src="data/igcse_questions_business.js"></script>
 <script src="data/igcse_cs_0478.js"></script>
-<script src="data/igcse_questions_cs.js"></script>
+<script src="data/igcse_questions_cs.js"></script>\n<script src="data/igcse_english_esl.js"></script>\n<script src="data/igcse_questions_english.js"></script>
 <script src="data/igcse_assessment.js"></script>
 <script src="data/igcse_quickref.js"></script>
 <script src="data/igcse_mockpapers.js"></script>
@@ -334,7 +334,7 @@ function checkBadges(){
     if(g.totalCorrect >= 10) grantBadge('sharp_10');
     if(g.totalCorrect >= 50) grantBadge('sharp_50');
     const practiced = Object.values(userState.subjectStats).filter(s => s.answered > 0).length;
-    if(practiced >= 6) grantBadge('all_subjects');
+    if(practiced >= 7) grantBadge('all_subjects');
     if(userState.level >= 5) grantBadge('level_5');
     // 主题达人：任一科目全部主题已学
     const bySubject = {};
@@ -368,8 +368,8 @@ function switchPage(id){
 navBtns.forEach(btn => { btn.onclick = () => { switchPage(btn.dataset.page); const pg = btn.dataset.page; if(pg === 'page-mistake') renderMistakePage(); else if(pg === 'page-homework') renderHomeworkRecords(); else if(pg === 'page-profile') renderProfile(); else if(pg === 'page-assessment') renderAssessmentPage(); else if(pg === 'page-quickref') renderQuickrefPage(); else if(pg === 'page-vocab') renderVocabPage(); else if(pg === 'page-resources') renderMyResources(); else if(pg === 'page-home') renderTodayCards(); else if(pg === 'page-practice'){ practiceSession = null; stopMockTimer(); renderPracticeTopicSelect(); renderMockEntry(); } else { stopMockTimer(); } }; });
 
 /* ===================== 全局变量 ===================== */
-let contentData = (window.IGCSE_CONTENT || []).concat(window.IGCSE_CS_CONTENT || []);
-let questionData = (window.IGCSE_QUESTIONS || []).concat(window.IGCSE_CS_QUESTIONS || []);
+let contentData = (window.IGCSE_CONTENT || []).concat(window.IGCSE_CS_CONTENT || [], window.IGCSE_ENGLISH_CONTENT || []);
+let questionData = (window.IGCSE_QUESTIONS || []).concat(window.IGCSE_CS_QUESTIONS || [], window.IGCSE_ENGLISH_QUESTIONS || []);
 let currentSubject = 'math';
 let currentTopicId = null;
 let practiceSession = null; // { topicId, order[], idx, combo, correct, total }
@@ -848,7 +848,11 @@ function setEnglishMode(on){
 }
 document.getElementById('subjectSelect').onchange = function(){
     if(this.value === 'english'){
-        setEnglishMode(true);
+        setEnglishMode(false);
+        currentSubject = 'english';
+        userState.lastSciSubject = 'english';
+        saveUserState(userState);
+        renderEnglishPage();
         switchPage('page-english');
         return;
     }
@@ -870,7 +874,11 @@ document.getElementById('subjectOverview').addEventListener('click', function(e)
     const sel = document.getElementById('subjectSelect');
     if(sub === 'english'){
         sel.value = 'english';
-        setEnglishMode(true);
+        setEnglishMode(false);
+        currentSubject = 'english';
+        userState.lastSciSubject = 'english';
+        saveUserState(userState);
+        renderEnglishPage();
         switchPage('page-english');
     } else {
         sel.value = sub;
@@ -881,10 +889,67 @@ document.getElementById('subjectOverview').addEventListener('click', function(e)
     }
 });
 
+/* ===================== English ESL first-class engine ===================== */
+let englishPracticeIndex = 0;
+function renderEnglishPage(tab){
+    const dash=document.getElementById('englishDashboard'), c=document.getElementById('englishCenterContent');
+    if(!dash||!c) return;
+    const topics=window.IGCSE_ENGLISH_CONTENT||[];
+    const qs=questionData.filter(q=>q.subject==='english');
+    const st=userState.subjectStats.english||{answered:0,correct:0};
+    const rate=st.answered?Math.round(st.correct/st.answered*100):0;
+    dash.innerHTML=[
+      ['📚','课程主题',topics.length+' 个学习模块'],
+      ['🎯','英语正确率',st.answered?rate+'%':'尚未开始'],
+      ['🧠','学习路径','Reading → Writing → Listening → Speaking'],
+      ['🔤','考试词汇','学术词汇 + Command Words + SRS'],
+      ['📝','题库',qs.length+' 道基础诊断题'],
+      ['🚀','下一步',rate<70?'优先完成基础诊断':'进入考试技能训练']
+    ].map(x=>'<div class="border rounded-xl p-4 bg-slate-50"><div class="text-2xl">'+x[0]+'</div><div class="font-semibold mt-1">'+x[1]+'</div><div class="text-sm text-gray-600 mt-1">'+x[2]+'</div></div>').join('');
+    const active=tab||'learn';
+    document.querySelectorAll('.eng-tab').forEach(b=>{b.classList.toggle('bg-indigo-600',b.dataset.engTab===active);b.classList.toggle('text-white',b.dataset.engTab===active);});
+    if(active==='learn'){
+      c.innerHTML='<div class="grid md:grid-cols-2 gap-3">'+topics.map(t=>'<div class="border rounded-xl p-4"><div class="text-xs text-indigo-600">'+esc(t.chapter)+'</div><h3 class="font-bold mt-1">'+esc(t.title)+'</h3><p class="text-sm text-gray-600 mt-2">'+esc(t.knowledge)+'</p><div class="text-xs text-gray-500 mt-2">Exam skill：'+esc(t.examSkill)+'</div><button data-eng-topic="'+esc(t.topicId)+'" class="mt-3 text-sm bg-indigo-600 text-white px-3 py-1.5 rounded">开始学习 →</button></div>').join('')+'</div>';
+    } else if(active==='vocab'){
+      const vocab=[].concat(...topics.map(t=>t.vocabulary||[]));
+      c.innerHTML='<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-2">'+vocab.map(v=>'<div class="border rounded-lg p-3"><b>'+esc(v.en)+'</b><span class="text-gray-500 ml-2">'+esc(v.zh)+'</span><button data-tts="'+esc(v.en)+'" class="float-right text-xs border px-2 py-1 rounded">🔊</button></div>').join('')+'</div>';
+    } else if(active==='commands'){
+      const cmds=window.IGCSE_ENGLISH_COMMANDS||[];
+      c.innerHTML='<div class="grid md:grid-cols-2 gap-3">'+cmds.map(x=>'<div class="border rounded-xl p-4"><div class="font-bold">'+esc(x.en)+' <span class="font-normal text-gray-500">· '+esc(x.zh)+'</span></div><p class="text-sm mt-2">'+esc(x.action)+'</p></div>').join('')+'</div>';
+    } else {
+      const q=qs[englishPracticeIndex%Math.max(1,qs.length)];
+      if(!q){c.innerHTML='<p class="text-gray-500">题库准备中。</p>';return;}
+      c.innerHTML='<div class="border rounded-xl p-5"><div class="text-xs text-gray-500">'+esc(q.chapter)+' · '+esc(q.knowledgePoint)+' · Command: '+esc(q.commandWord)+'</div><h3 class="font-semibold mt-2">'+esc(q.question)+'</h3><div class="grid gap-2 mt-4">'+(q.options||[]).map((o,i)=>'<button data-eng-opt="'+i+'" class="text-left border rounded-lg px-3 py-2 hover:bg-indigo-50">'+esc(o)+'</button>').join('')+'</div><div id="engFeedback" class="mt-4"></div></div>';
+      c.querySelectorAll('[data-eng-opt]').forEach(b=>b.onclick=()=>answerEnglish(q,Number(b.dataset.engOpt)));
+    }
+    c.querySelectorAll('[data-eng-topic]').forEach(b=>b.onclick=()=>{const t=topics.find(x=>x.topicId===b.dataset.engTopic); if(t) openEnglishTopic(t);});
+    c.querySelectorAll('[data-tts]').forEach(b=>b.onclick=()=>{if(window.speechSynthesis){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(b.dataset.tts);u.lang='en-US';speechSynthesis.speak(u);}});
+}
+function openEnglishTopic(t){
+    const c=document.getElementById('englishCenterContent');
+    c.innerHTML='<div class="border rounded-xl p-5"><button id="engBackLearn" class="text-sm text-indigo-600 mb-3">← 返回英语课程</button><h3 class="text-xl font-bold">'+esc(t.title)+'</h3><p class="mt-3 text-gray-700">'+esc(t.knowledge)+'</p><h4 class="font-semibold mt-5 mb-2">Learning Objectives</h4><ul class="list-disc ml-5 text-sm">'+(t.objectives||[]).map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul><h4 class="font-semibold mt-5 mb-2">Common Mistake</h4><div class="bg-amber-50 border border-amber-200 rounded p-3 text-sm">'+esc(t.commonMistake)+'</div><button id="engTopicPractice" class="mt-4 bg-indigo-600 text-white px-4 py-2 rounded">练习本模块</button></div>';
+    document.getElementById('engBackLearn').onclick=()=>renderEnglishPage('learn');
+    document.getElementById('engTopicPractice').onclick=()=>{const qids=questionData.filter(q=>q.subject==='english'&&q.topicId===t.topicId).map(q=>q.id);if(qids.length)startSessionFromIds(qids,'normal',{topicId:t.topicId,label:'English · '+t.title});else showToast('该模块题库准备中');};
+}
+function answerEnglish(q,idx){
+    const picked=(q.options||[])[idx], correct=picked===q.answer;
+    if(!userState.subjectStats.english) userState.subjectStats.english={answered:0,correct:0};
+    userState.subjectStats.english.answered++; if(correct) userState.subjectStats.english.correct++;
+    userState.globalStats.totalAnswered++; if(correct) userState.globalStats.totalCorrect++;
+    saveUserState(userState); addXp(correct?10:3);
+    const fb=document.getElementById('engFeedback');
+    fb.innerHTML=correct?'<div class="bg-green-50 border border-green-200 rounded p-3 text-green-700">✓ Correct · '+esc(q.explain||'')+'</div>':'<div class="bg-red-50 border border-red-200 rounded p-3 text-red-700">✗ 正确答案：'+esc(q.answer)+'<div class="mt-1">'+esc(q.explain||'')+'</div></div>';
+    englishPracticeIndex++; setTimeout(()=>renderEnglishPage('practice'),250);
+}
+document.querySelectorAll('.eng-tab').forEach(b=>b.onclick=()=>renderEnglishPage(b.dataset.engTab));
+document.getElementById('englishPracticeBtn').onclick=()=>renderEnglishPage('practice');
+document.getElementById('englishBackBtn').onclick=()=>{const sel=document.getElementById('subjectSelect');sel.value=userState.lastSciSubject&&userState.lastSciSubject!=='english'?userState.lastSciSubject:'math';currentSubject=sel.value;renderTopicList();switchPage('page-home');renderTodayCards();};
+renderEnglishPage('learn');
+
 /* ===================== 测评分级模块 ===================== */
 let assessmentSession = null; // { subject, order:[qid], idx, answers:{qid:选项下标}, right, done, pct, level }
 const ASSESS_DATA = window.IGCSE_ASSESSMENT || { papers:{}, levels:[], paths:[] };
-const ASSESS_SUBJECTS = ['math','physics','chemistry','dt','business','computer_science'];
+const ASSESS_SUBJECTS = ['math','physics','chemistry','dt','business','computer_science','english'];
 const ASSESS_DELIMS = [{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}];
 function assessLevelFor(pct){ return Math.max(1, Math.min(10, Math.ceil(pct / 10))); }
 function lastAssessmentRecord(sub){
@@ -1001,7 +1066,7 @@ function submitAssessment(){
     grantBadge('assess_first');
     const covered = {};
     userState.assessmentRecords.forEach(r => { covered[r.subject] = true; });
-    if(Object.keys(covered).length >= 5) grantBadge('assess_all');
+    if(Object.keys(covered).length >= 7) grantBadge('assess_all');
     if(userState.assessmentRecords.some(r => r.level >= 10)) grantBadge('assess_top');
     s.done = true;
     s.pct = pct;
@@ -1201,7 +1266,7 @@ function renderMockEntry(){
     if(!el) return;
     let html = '<div class="bg-slate-50 border border-slate-200 rounded-lg p-3 flex flex-wrap gap-2 items-center">'
         + '<span class="text-sm font-semibold text-gray-700">🧪 模拟考：</span>';
-    ['math','physics','chemistry','dt','business'].forEach(sub => {
+    ['math','physics','chemistry','dt','business','computer_science','english'].forEach(sub => {
         html += '<button data-mock="' + sub + '" class="px-2 py-1 rounded border text-xs bg-white hover:border-indigo-400">' + (SUBJECT_NAMES[sub]||sub) + ' 30题/30分钟</button>';
     });
     html += '<button data-mock="mixed" class="px-2 py-1 rounded border text-xs bg-white hover:border-indigo-400">🌐 全科混合 30题/30分钟</button>';
