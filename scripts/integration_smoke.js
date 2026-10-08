@@ -23,7 +23,7 @@ const index=fs.readFileSync(path.join(ROOT,'index.html'),'utf8');
 ['data/user_state_schema.js','data/syllabus_map.js','data/mastery_engine.js','data/learning_dashboard.js','data/chapter_learning_engine.js','data/igcse_cs_0478.js','data/igcse_questions_cs.js','data/igcse_english_esl.js','data/igcse_questions_english.js'].forEach(x=>index.includes(x)?ok('index loads '+x):bad('index missing '+x));
 ['function openTopic','function startPractice','igcse-answer-recorded','recordMasteryEvent'].forEach(x=>index.includes(x)?ok('index token '+x):bad('index token missing '+x));
 const engineSources=index+'\n'+fs.readFileSync(path.join(DATA,'learning_dashboard.js'),'utf8')+'\n'+fs.readFileSync(path.join(DATA,'english_master_database.js'),'utf8')+'\n'+fs.readFileSync(path.join(DATA,'srs_engine.js'),'utf8');
-['dailyPlan','examReadiness','English Master Database','IGCSE_SRS','dueCards' ,'IGCSE_ERROR_DIAGNOSIS'].forEach(x=>engineSources.includes(x)?ok('engine token '+x):bad('engine token missing '+x));
+['dailyPlan','examReadiness','English Master Database','IGCSE_SRS','dueCards' ,'IGCSE_ERROR_DIAGNOSIS','IGCSE_MOCK_ENGINE','mockExamRecordId'].forEach(x=>engineSources.includes(x)?ok('engine token '+x):bad('engine token missing '+x));
 
 const mobileChecks=[
   '#mainNav{display:flex',
