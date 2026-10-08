@@ -122,7 +122,7 @@
   function adaptivePlan(){
     const weak=globalWeaknesses().slice(0,6);
     const readinessWeak=examReadiness(currentSubject()).gaps.slice(0,2);
-    const mistakes=(getState().mistakes||[]).filter(m=>m.nextReviewAt&&new Date(m.nextReviewAt)<=new Date()).slice(0,6);
+    const mistakes=(window.IGCSE_SRS&&window.IGCSE_SRS.dueCards)?window.IGCSE_SRS.dueCards(6):[];
     const tasks=[];
     readinessWeak.forEach((g,i)=>{
       const candidates=questions(currentSubject()).filter(q=>{
