@@ -12,6 +12,18 @@
     window.userState=window.userState||{};
     return window.userState;
   }
+  function todayKey(){return new Date().toISOString().slice(0,10);}
+  function dailyState(){
+    const st=getState(); st.dailyPlan=st.dailyPlan||{}; const k=todayKey();
+    if(!st.dailyPlan[k])st.dailyPlan[k]={completed:[],startedAt:null};
+    return st.dailyPlan[k];
+  }
+  function markDailyTask(id){
+    const d=dailyState(); if(!d.completed.includes(id))d.completed.push(id);
+    if(!d.startedAt)d.startedAt=new Date().toISOString();
+    if(window.saveUserState)window.saveUserState(getState());
+  }
+
   function topics(sub){
     const base=(window.contentData||[]).filter(x=>x.subject===sub);
     if(sub==='physics'&&window.PHYSICS_0625_COURSE_MAP){
@@ -90,8 +102,8 @@
       return '<div class="text-3xl font-bold">'+avg+'%</div><div class="text-xs text-indigo-200">当前科目掌握度 · '+esc(subjName(sub))+'</div><div class="text-xs text-indigo-200 mt-1">'+qs.length+' 道题 · '+(gs.totalAnswered||0)+' 次答题 · 总正确率 '+acc+'%</div>';
     }
     function mission(){
-      const plan=adaptivePlan(), cards=plan.tasks.slice(0,3);
-      return '<section class="bg-white rounded-2xl shadow p-5"><div class="flex flex-wrap justify-between gap-3 items-center"><div><h3 class="text-xl font-bold">🎯 今日学习计划</h3><p class="text-sm text-slate-500 mt-1">系统按 SRS、薄弱知识点与掌握阶段自动安排下一步。</p></div><div class="text-right"><div class="text-lg font-bold text-indigo-700">'+plan.totalMinutes+' min</div><div class="text-xs text-slate-500">预计学习时间</div></div></div><div class="grid md:grid-cols-3 gap-3 mt-4">'+(cards.length?cards.map((c,i)=>'<button data-topic="'+esc(c.topic||'')+'" data-subject="'+esc(c.subject||'')+'" data-qid="'+esc(c.qid||'')+'" class="text-left border rounded-xl p-4 hover:bg-indigo-50"><div class="flex justify-between"><span class="text-2xl">'+c.icon+'</span><span class="text-xs px-2 py-1 rounded-full bg-slate-100">'+c.minutes+' min</span></div><div class="font-bold mt-2">'+esc(c.title)+'</div><div class="text-sm text-slate-600 mt-1">'+esc(c.text)+'</div><div class="text-xs text-indigo-600 mt-3">优先级 '+c.priority+'</div></button>').join(''):'<div class="col-span-full p-4 rounded-xl bg-green-50 text-green-700">🏆 今日没有明显弱项，可以进入 Boss Challenge。</div>')+'</div></section>';
+      const plan=adaptivePlan(), cards=plan.tasks.slice(0,3), daily=dailyState();
+      return '<section class="bg-white rounded-2xl shadow p-5"><div class="flex flex-wrap justify-between gap-3 items-center"><div><h3 class="text-xl font-bold">🎯 今日学习计划</h3><p class="text-sm text-slate-500 mt-1">系统按 SRS、薄弱知识点与掌握阶段自动安排下一步。</p></div><div class="text-right"><div class="text-lg font-bold text-indigo-700">'+plan.totalMinutes+' min</div><div class="text-xs text-slate-500">预计学习时间</div></div></div><div class="grid md:grid-cols-3 gap-3 mt-4">'+(cards.length?cards.map((c,i)=>'<button data-topic="'+esc(c.topic||'')+'" data-subject="'+esc(c.subject||'')+'" data-qid="'+esc(c.qid||'')+'" class="text-left border rounded-xl p-4 hover:bg-indigo-50"><div class="flex justify-between"><span class="text-2xl">'+c.icon+'</span><span class="text-xs px-2 py-1 rounded-full bg-slate-100">'+c.minutes+' min</span></div><div class="font-bold mt-2">'+esc(c.title)+'</div><div class="text-sm text-slate-600 mt-1">'+esc(c.text)+'</div><div class="text-xs text-indigo-600 mt-3">优先级 '+c.priority+(daily.completed.includes(c.id)?' · ✅ 已完成':'')+'</div></button>').join(''):'<div class="col-span-full p-4 rounded-xl bg-green-50 text-green-700">🏆 今日没有明显弱项，可以进入 Boss Challenge。</div>')+'</div></section>';
     }
     function courseMap(){
       const cs=chapters(sub);
@@ -113,7 +125,8 @@
     }
     function bind(){
       document.querySelectorAll('#dbMission [data-topic]').forEach(x=>x.onclick=()=>{
-        const t=x.dataset.topic, targetSub=x.dataset.subject;
+        const t=x.dataset.topic, targetSub=x.dataset.subject, qid=x.dataset.qid;
+        markDailyTask(qid||('topic_'+targetSub+'_'+t));
         if(targetSub && window.subjectSelect){ window.subjectSelect.value=targetSub; window.subjectSelect.dispatchEvent(new Event('change')); }
         const btn=document.querySelector('#chapter-engine-nav'); if(btn)btn.click();
         setTimeout(()=>{const sel=document.getElementById('ceTopic');if(sel&&t){sel.value=t;sel.dispatchEvent(new Event('change'));}},100);
