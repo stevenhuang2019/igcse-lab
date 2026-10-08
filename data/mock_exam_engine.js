@@ -19,7 +19,7 @@ function start(subject,paperIndex){
 function score(session,qs){
  let correct=0,total=qs.length,byTopic={},bySkill={};
  qs.forEach(q=>{
-  const ok=session.answers[q.id]!==undefined && String(session.answers[q.id])===String(q.answer);
+  const raw=session.answers[q.id]; const picked=q.options&&raw!==undefined?q.options[raw]:raw; const ok=raw!==undefined && String(picked)===String(q.answer);
   if(ok)correct++;
   const t=q.topicId||q.chapter||'unmapped';byTopic[t]=byTopic[t]||{correct:0,total:0};byTopic[t].total++;if(ok)byTopic[t].correct++;
   const sk=q.skill||q.commandWord||'general';bySkill[sk]=bySkill[sk]||{correct:0,total:0};bySkill[sk].total++;if(ok)bySkill[sk].correct++;
@@ -39,5 +39,5 @@ function report(record){
  const skills=Object.entries(record.result.bySkill||{}).map(([skill,x])=>({skill,accuracy:clamp(x.correct/x.total*100)})).sort((a,b)=>a.accuracy-b.accuracy);
  return {accuracy:record.result.accuracy,correct:record.result.correct,total:record.result.total,weakTopics:gaps.slice(0,5),weakSkills:skills.slice(0,5),recommendation:record.result.accuracy>=85?'Maintain with SRS + official past papers':record.result.accuracy>=70?'Target weak topics and error types':record.result.accuracy>=50?'Repair fundamentals before another mock':'Return to learning content and rebuild weak knowledge points'};
 }
-window.IGCSE_MOCK_ENGINE={ensure,getQuestions,start,score,finish,report};
+function recordPracticeSession(session,qs){ const result=score(session,qs); const rec={id:'practice_'+Date.now(),subject:session.subject||'mixed',paperIndex:0,mode:session.mode,startedAt:new Date(session.startedAt||Date.now()).toISOString(),finishedAt:new Date().toISOString(),result,questionIds:session.order||qs.map(q=>q.id)}; const s=ensure(); s.records.unshift(rec); if(window.saveUserState)window.saveUserState(state()); return rec; }\nwindow.IGCSE_MOCK_ENGINE={ensure,getQuestions,start,score,finish,report,recordPracticeSession};
 })();
