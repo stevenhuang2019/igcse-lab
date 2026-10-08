@@ -24,5 +24,15 @@ const index=fs.readFileSync(path.join(ROOT,'index.html'),'utf8');
 ['function openTopic','function startPractice','igcse-answer-recorded','recordMasteryEvent'].forEach(x=>index.includes(x)?ok('index token '+x):bad('index token missing '+x));
 const engineSources=index+'\n'+fs.readFileSync(path.join(DATA,'learning_dashboard.js'),'utf8')+'\n'+fs.readFileSync(path.join(DATA,'english_master_database.js'),'utf8')+'\n'+fs.readFileSync(path.join(DATA,'srs_engine.js'),'utf8');
 ['dailyPlan','examReadiness','English Master Database','IGCSE_SRS','dueCards','IGCSE_ERROR_DIAGNOSIS','errorDiagnosis'.forEach(x=>engineSources.includes(x)?ok('engine token '+x):bad('engine token missing '+x));
+
+const mobileChecks=[
+  '#mainNav{display:flex',
+  'min-height:44px',
+  'touch-action:manipulation',
+  'font-size:16px',
+  '@media (max-width:768px)',
+  '@media (max-width:430px)'
+];
+mobileChecks.forEach(x=>index.includes(x)?ok('mobile rule '+x):bad('mobile rule missing '+x));
 console.log(fail?'SMOKE FAILED: '+fail+' failure(s)':'SMOKE PASSED');
 process.exit(fail?1:0);
