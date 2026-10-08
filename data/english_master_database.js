@@ -61,4 +61,17 @@ window.ENGLISH_MASTER_DB = {
     });
   };
   window.getEnglishMasterData=function(){return db;};
+  window.recordEnglishMasterEvent=function(type,key,correct,meta){
+    try{
+      var state=window.__IGCSE_USER_STATE__;
+      if(!state) return;
+      state.englishMaster=state.englishMaster||{vocab:{},grammar:{},sentences:{},commandWords:{}};
+      var bucket=state.englishMaster[type]||(state.englishMaster[type]={});
+      var x=bucket[key]||(bucket[key]={attempts:0,correct:0,wrong:0,mastery:0,lastStudied:null});
+      x.attempts++; correct?x.correct++:x.wrong++; x.lastStudied=new Date().toISOString();
+      x.mastery=Math.round((x.correct/Math.max(1,x.attempts))*100);
+      if(meta) Object.assign(x,meta);
+      if(window.saveUserState) window.saveUserState(state);
+    }catch(e){}
+  };
 })();
