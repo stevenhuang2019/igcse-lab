@@ -976,7 +976,12 @@ function renderEnglishPage(tab){
       c.innerHTML='<div class="border rounded-xl p-5"><div class="text-xs text-gray-500">'+esc(q.chapter)+' · '+esc(q.knowledgePoint)+' · Command: '+esc(q.commandWord)+'</div><h3 class="font-semibold mt-2">'+esc(q.question)+'</h3><div class="grid gap-2 mt-4">'+(q.options||[]).map((o,i)=>'<button data-eng-opt="'+i+'" class="text-left border rounded-lg px-3 py-2 hover:bg-indigo-50">'+esc(o)+'</button>').join('')+'</div><div id="engFeedback" class="mt-4"></div></div>';
       c.querySelectorAll('[data-eng-opt]').forEach(b=>b.onclick=()=>answerEnglish(q,Number(b.dataset.engOpt)));
     }
-    c.querySelectorAll('[data-eng-topic]').forEach(b=>b.onclick=()=>{const t=topics.find(x=>x.topicId===b.dataset.engTopic); if(t) openEnglishTopic(t);});
+    c.querySelectorAll('[data-eng-topic]').forEach(b=>{
+      const open=()=>{const t=topics.find(x=>x.topicId===b.dataset.engTopic); if(t) openEnglishTopic(t);};
+      b.onclick=open;
+      b.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open();}};
+      b.setAttribute('tabindex','0');
+    });
     c.querySelectorAll('[data-tts]').forEach(b=>b.onclick=()=>{if(window.speechSynthesis){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(b.dataset.tts);u.lang='en-US';speechSynthesis.speak(u);}});
 }
 function openEnglishTopic(t){
