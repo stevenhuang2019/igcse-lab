@@ -971,7 +971,11 @@ function openEnglishTopic(t){
 }
 function answerEnglish(q,idx){
     const picked=(q.options||[])[idx], correct=picked===q.answer;
-    if(window.recordEnglishMasterEvent) window.recordEnglishMasterEvent('commandWords', q.commandWord || q.knowledgePoint || q.id, correct, {commandWord:q.commandWord||''});
+    if(window.recordEnglishMasterEvent){
+        window.recordEnglishMasterEvent('commandWords', q.commandWord || q.knowledgePoint || q.id, correct, {commandWord:q.commandWord||''});
+        if(q.knowledgePoint) window.recordEnglishMasterEvent('grammar', q.knowledgePoint, correct, {topicId:q.topicId});
+        if(q.vocabulary && Array.isArray(q.vocabulary)) q.vocabulary.forEach(function(v){ window.recordEnglishMasterEvent('vocab', 'english::'+v, correct, {subject:'english',en:v}); });
+    }
     if(!userState.subjectStats.english) userState.subjectStats.english={answered:0,correct:0};
     userState.subjectStats.english.answered++; if(correct) userState.subjectStats.english.correct++;
     userState.globalStats.totalAnswered++; if(correct) userState.globalStats.totalCorrect++;
