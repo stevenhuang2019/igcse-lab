@@ -6,7 +6,8 @@ window.IGCSE_ASSESSMENT = {
     chemistry: ["chem_q001", "chem_q002", "chem_q012", "chem_q015", "chem_q004", "chem_q005", "chem_q007", "chem_q008", "chem_q121", "chem_q125", "chem_q131", "chem_q141"],
     dt: ["dt_q001", "dt_q002", "dt_q006", "dt_q010", "dt_q004", "dt_q005", "dt_q043", "dt_q053", "dt_q081", "dt_q083", "dt_q091", "dt_q094"],
     business: ["bus_q001", "bus_q002", "bus_q007", "bus_q013", "bus_q004", "bus_q005", "bus_q044", "bus_q048", "bus_q081", "bus_q087", "bus_q095", "bus_q103"],
-    computer_science: ["cs1_q1","cs1_q2","cs2_q1","cs3_q1","cs4_q1","cs5_q1","cs6_q1","cs7_q1","cs8_q1","cs8_q2","cs9_q1","cs9_q2"]
+    computer_science: ["cs1_q1","cs1_q2","cs2_q1","cs3_q1","cs4_q1","cs5_q1","cs6_q1","cs7_q1","cs8_q1","cs8_q2","cs9_q1","cs9_q2"],
+    english: ["eng_r1","eng_r2","eng_w1","eng_w2","eng_l1","eng_s1","eng_g1","eng_g2","eng_e1","eng_e2","eng_v1","eng_w3"]
   },
   levels: [
     { "level": 1, "title": "初识入门", "comment": "你刚接触 IGCSE 内容，对各科基础概念还在建立印象。", "advice": "先从每科第一个主题看起，把最基本的定义和公式弄懂，不急于做难题。" },
@@ -26,14 +27,16 @@ window.IGCSE_ASSESSMENT = {
       { "subject": "physics", "topicId": "phy_mechanics_01", "note": "熟记匀加速直线运动三个基本公式。" },
       { "subject": "chemistry", "topicId": "chem_bonding_01", "note": "会区分离子键、共价键与金属键。" },
       { "subject": "dt", "topicId": "dt_process_01", "note": "熟悉从识别问题到测试迭代的设计流程。" },
-      { "subject": "business", "topicId": "bus_understanding", "note": "认识商业活动目的与个体/合伙/有限公司的区别。" }
+      { "subject": "business", "topicId": "bus_understanding", "note": "认识商业活动目的与个体/合伙/有限公司的区别。" },
+      { "subject": "english", "topicId": "eng_esl_reading", "note": "训练阅读定位、推断和上下文词义。" }
     ] },
     { "level": 2, "goal": "在入门之上，掌握各科核心计算工具与基本概念。", "topics": [
       { "subject": "math", "topicId": "math_algebra_02", "note": "学会用因式分解解简单二次方程。" },
       { "subject": "physics", "topicId": "phy_mechanics_02", "note": "理解 F=ma，先画受力图再列合力。" },
       { "subject": "chemistry", "topicId": "chem_moles_01", "note": "会用 n=m/M 做质量与摩尔换算。" },
       { "subject": "dt", "topicId": "dt_materials_01", "note": "分清硬度、强度、韧性三个概念。" },
-      { "subject": "business", "topicId": "bus_finance", "note": "理解固定成本与变动成本的区别。" }
+      { "subject": "business", "topicId": "bus_finance", "note": "理解固定成本与变动成本的区别。" },
+      { "subject": "english", "topicId": "eng_esl_writing", "note": "掌握 purpose、audience、register 与 paragraph organisation。" }
     ] },
     { "level": 3, "goal": "进入图像、电路与反应规律，练习直接应用类题目。", "topics": [
       { "subject": "math", "topicId": "math_graphs_01", "note": "读懂 y=mx+c 的斜率与截距含义。" },
