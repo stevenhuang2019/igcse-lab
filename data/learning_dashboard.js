@@ -5,7 +5,7 @@
 (function(){
   'use strict';
   const esc=x=>String(x??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-  const subjName=s=>({math:'数学 Math',physics:'物理 Physics',chemistry:'化学 Chemistry',dt:'设计 DT',business:'商业 Business',english:'英语 English'})[s]||s;
+  const subjName=s=>({math:'数学 Math',physics:'物理 Physics',chemistry:'化学 Chemistry',dt:'设计 DT',business:'商业 Business',computer_science:'计算机科学 CS',english:'英语 English'})[s]||s;
   const key='igcse_dashboard_v1';
 
   function getState(){
@@ -22,6 +22,26 @@
     return base;
   }
   function questions(sub){return (window.questionData||[]).filter(x=>x.subject===sub);}
+  function allSubjects(){return ['math','physics','chemistry','dt','business','computer_science','english'];}
+  function topicPriority(t){
+    const n=masteryForTopic(t);
+    const qs=questions(t.subject||currentSubject()).filter(q=>q.topicId===t.topicId);
+    const unanswered=qs.filter(q=>!(topicStats()[t.topicId]?.answered)).length;
+    return (100-n)*0.7+Math.min(20,unanswered*2);
+  }
+  function globalWeaknesses(){
+    const out=[];
+    allSubjects().forEach(sub=>topics(sub).forEach(t=>{
+      const n=masteryForTopic(t);
+      if(n<85) out.push({subject:sub,t,n,priority:topicPriority(Object.assign({},t,{subject:sub}))});
+    }));
+    return out.sort((a,b)=>b.priority-a.priority);
+  }
+  function adaptivePlan(){
+    const weak=globalWeaknesses().slice(0,5);
+    const mistakes=(getState().mistakes||[]).filter(m=>m.nextReviewAt&&new Date(m.nextReviewAt)<=new Date()).slice(0,5);
+    return {weak, mistakes};
+  }
   function chapters(sub){return [...new Set(topics(sub).map(x=>x.chapter).filter(Boolean))];}
   function topicStats(){
     const s=getState(); return s.topicStats||{};
@@ -75,6 +95,13 @@
       return '<div class="text-3xl font-bold">'+avg+'%</div><div class="text-xs text-indigo-200">当前科目掌握度 · '+esc(subjName(sub))+'</div><div class="text-xs text-indigo-200 mt-1">'+qs.length+' 道题 · '+(gs.totalAnswered||0)+' 次答题 · 总正确率 '+acc+'%</div>';
     }
     function mission(){
+      const plan=adaptivePlan(), st=topicStats();
+      const cards=[];
+      plan.mistakes.slice(0,1).forEach((m)=>cards.push({icon:'🔁',title:'SRS 到期复习',text:'优先处理到期错题，强化长期记忆。'}));
+      plan.weak.slice(0,3).forEach((x,i)=>cards.push({icon:i===0?'🔥':'🎯',title:subjName(x.subject)+' · '+x.t.title,text:x.n?('掌握度 '+x.n+'%，建议进行 5 题针对练习。'):'尚未开始，先完成知识学习。',topic:x.t.topicId,subject:x.subject}));
+      if(!cards.length)cards.push({icon:'🏆',title:'进入综合挑战',text:'当前学习数据没有明显弱项，建议进行章节测试或模拟考试。'});
+      return '<section class="bg-white rounded-2xl shadow p-5"><div class="flex justify-between items-center"><div><h3 class="text-xl font-bold">🎯 今日自适应任务</h3><p class="text-sm text-slate-500 mt-1">全科弱项 + SRS 到期项共同决定任务优先级。</p></div><span class="text-xs px-3 py-1 rounded-full bg-indigo-50 text-indigo-700">Adaptive OS</span></div><div class="grid md:grid-cols-3 gap-3 mt-4">'+cards.slice(0,3).map((c,i)=>'<button data-topic="'+esc(c.topic||'')+'" data-subject="'+esc(c.subject||'')+'" class="text-left border rounded-xl p-4 hover:bg-indigo-50"><div class="text-2xl">'+c.icon+'</div><div class="font-bold mt-2">'+esc(c.title)+'</div><div class="text-sm text-slate-600 mt-1">'+esc(c.text)+'</div><div class="text-xs text-indigo-600 mt-3">任务 '+(i+1)+'</div></button>').join('')+'</div></section>';
+    }
       const ts=topics(sub), st=topicStats(), mistakes=getState().mistakes||[];
       const ranked=ts.map(t=>({t,n:masteryForTopic(t),wrong:st[t.topicId]?.lastWrongAt})).sort((a,b)=>a.n-b.n);
       const weak=ranked.filter(x=>x.n<85).slice(0,3);
