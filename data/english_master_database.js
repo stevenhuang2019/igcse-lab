@@ -12,6 +12,7 @@ window.ENGLISH_MASTER_DB = {
     cet6:{label:"CET-6",level:"CET",status:"import-ready"}
   },
   vocabulary:[],
+  subjectLinks:[],
   sentences:[
     {id:"sent_academic_001",level:"academic",category:"cause_effect",en:"This change may lead to a significant improvement in efficiency.",zh:"这一变化可能带来效率的显著提升。",pattern:"may lead to + noun",tags:["cause_effect","academic"]},
     {id:"sent_academic_002",level:"academic",category:"evidence",en:"The evidence suggests that the new method is more effective.",zh:"证据表明这种新方法更加有效。",pattern:"evidence suggests that...",tags:["evidence","academic"]},
@@ -60,7 +61,22 @@ window.ENGLISH_MASTER_DB = {
       return (!filter.source||v.source===filter.source)&&(!filter.subject||v.subject===filter.subject)&&(!filter.query||((v.en+" "+v.zh).toLowerCase().indexOf(String(filter.query).toLowerCase())>=0));
     });
   };
+  db.subjectLinks=[
+    {subject:"physics",tags:["physics","science","graphs","data","practical"],path:"Physics English"},
+    {subject:"chemistry",tags:["chemistry","science","reaction","experiment"],path:"Chemistry English"},
+    {subject:"computer_science",tags:["computer_science","programming","data","security"],path:"Computer Science English"},
+    {subject:"business",tags:["business","evaluation","cause_effect","finance"],path:"Business English"},
+    {subject:"math",tags:["math","calculation","data","graphs"],path:"Mathematics English"},
+    {subject:"dt",tags:["design","materials","evaluation","manufacturing"],path:"Design & Technology English"}
+  ];
   window.getEnglishMasterData=function(){return db;};
+  window.getEnglishMasterForSubject=function(subject){
+    if(!subject) return db;
+    var link=db.subjectLinks.find(function(x){return x.subject===subject;});
+    if(!link) return {vocabulary:[],sentences:[],grammar:db.grammar,commandWords:db.commandWords};
+    var hit=function(x){var tags=x.tags||[];return tags.indexOf(subject)>=0||link.tags.some(function(t){return tags.indexOf(t)>=0;});};
+    return {vocabulary:db.vocabulary.filter(hit),sentences:db.sentences.filter(hit),grammar:db.grammar,commandWords:db.commandWords};
+  };
   window.recordEnglishMasterEvent=function(type,key,correct,meta){
     try{
       var state=window.__IGCSE_USER_STATE__;
