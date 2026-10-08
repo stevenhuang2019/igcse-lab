@@ -1625,5 +1625,21 @@ document.addEventListener('DOMContentLoaded',function(){
   document.querySelectorAll('.mltab').forEach(function(x){x.onclick=function(){document.querySelectorAll('.mltab').forEach(function(y){y.className='mltab bg-slate-100 px-3 py-2 rounded-lg'});x.className='mltab bg-indigo-600 text-white px-3 py-2 rounded-lg';if(x.dataset.t==='learn')learn();if(x.dataset.t==='english')english();if(x.dataset.t==='practice')practice();if(x.dataset.t==='boss')boss();};});
   draw();learn();
 });
+</script><script src="data/language_engine.js"></script>
+<script>
+(function(){
+  function languageBar(){
+    if(document.getElementById('igcse-language-bar')) return;
+    var bar=document.createElement('div');bar.id='igcse-language-bar';bar.className='fixed bottom-3 left-1/2 -translate-x-1/2 z-50 bg-white border shadow-lg rounded-full px-2 py-1 flex gap-1 text-xs';
+    bar.innerHTML='<span class="px-2 py-1 text-slate-500">学习语言</span><button data-lang-mode="learn" class="px-2 py-1 rounded-full">中英学习</button><button data-lang-mode="bilingual" class="px-2 py-1 rounded-full">中英对照</button><button data-lang-mode="exam" class="px-2 py-1 rounded-full">English Only</button>';
+    document.body.appendChild(bar);
+    bar.querySelectorAll('[data-lang-mode]').forEach(function(b){b.onclick=function(){window.setIGCSEGlobalLang(b.dataset.langMode);highlight();rerender();};});
+    function highlight(){var m=window.IGCSE_GLOBAL_LANG||'learn';bar.querySelectorAll('[data-lang-mode]').forEach(function(b){b.classList.toggle('bg-indigo-600',b.dataset.langMode===m);b.classList.toggle('text-white',b.dataset.langMode===m);});}
+    function rerender(){if(typeof renderTopicList==='function'&&document.getElementById('page-learn')&&document.getElementById('page-learn').classList.contains('active')){if(currentTopicId){var t=contentData.find(function(x){return x.topicId===currentTopicId});if(t&&typeof openTopic==='function')openTopic(t);}else renderTopicList();}if(typeof renderQuestion==='function'&&practiceSession&&document.getElementById('page-practice')&&document.getElementById('page-practice').classList.contains('active'))renderQuestion();if(typeof renderVocabPage==='function'&&document.getElementById('page-vocab')&&document.getElementById('page-vocab').classList.contains('active'))renderVocabPage();}
+    highlight();
+  }
+  window.addEventListener('DOMContentLoaded',languageBar);
+  window.addEventListener('igcse-language-change',function(){});
+})();
 </script></body>
 </html>
