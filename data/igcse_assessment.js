@@ -5,7 +5,8 @@ window.IGCSE_ASSESSMENT = {
     physics: ["phy_q001", "phy_q002", "phy_q009", "phy_q013", "phy_q004", "phy_q005", "phy_q006", "phy_q007", "phy_q121", "phy_q132", "phy_q144", "phy_q148"],
     chemistry: ["chem_q001", "chem_q002", "chem_q012", "chem_q015", "chem_q004", "chem_q005", "chem_q007", "chem_q008", "chem_q121", "chem_q125", "chem_q131", "chem_q141"],
     dt: ["dt_q001", "dt_q002", "dt_q006", "dt_q010", "dt_q004", "dt_q005", "dt_q043", "dt_q053", "dt_q081", "dt_q083", "dt_q091", "dt_q094"],
-    business: ["bus_q001", "bus_q002", "bus_q007", "bus_q013", "bus_q004", "bus_q005", "bus_q044", "bus_q048", "bus_q081", "bus_q087", "bus_q095", "bus_q103"]
+    business: ["bus_q001", "bus_q002", "bus_q007", "bus_q013", "bus_q004", "bus_q005", "bus_q044", "bus_q048", "bus_q081", "bus_q087", "bus_q095", "bus_q103"],
+    computer_science: ["cs1_q1","cs1_q2","cs2_q1","cs3_q1","cs4_q1","cs5_q1","cs6_q1","cs7_q1","cs8_q1","cs8_q2","cs9_q1","cs9_q2"]
   },
   levels: [
     { "level": 1, "title": "初识入门", "comment": "你刚接触 IGCSE 内容，对各科基础概念还在建立印象。", "advice": "先从每科第一个主题看起，把最基本的定义和公式弄懂，不急于做难题。" },
