@@ -121,9 +121,11 @@
   }
   function adaptivePlan(){
     const weak=globalWeaknesses().slice(0,6);
-    const readinessWeak=examReadiness(currentSubject()).gaps.slice(0,2);\n    const diag=(window.IGCSE_ERROR_DIAGNOSIS&&window.IGCSE_ERROR_DIAGNOSIS.top)?window.IGCSE_ERROR_DIAGNOSIS.top(currentSubject()).slice(0,2):[];
+    const readinessWeak=examReadiness(currentSubject()).gaps.slice(0,2);
+    const diag=(window.IGCSE_ERROR_DIAGNOSIS&&window.IGCSE_ERROR_DIAGNOSIS.top)?window.IGCSE_ERROR_DIAGNOSIS.top(currentSubject()).slice(0,2):[];
     const mistakes=(window.IGCSE_SRS&&window.IGCSE_SRS.dueCards)?window.IGCSE_SRS.dueCards(6):[];
-    const tasks=[];\n    diag.forEach((g,i)=>tasks.push({id:'diag_'+currentSubject()+'_'+g.type,type:'repair',icon:'🧩',title:subjName(currentSubject())+' · '+g.type+' 修复',text:'针对近期高频错误类型进行专项修复 · '+g.count+' 次',minutes:8,priority:102-i*3,subject:currentSubject()}));
+    const tasks=[];
+    diag.forEach((g,i)=>tasks.push({id:'diag_'+currentSubject()+'_'+g.type,type:'repair',icon:'🧩',title:subjName(currentSubject())+' · '+g.type+' 修复',text:'针对近期高频错误类型进行专项修复 · '+g.count+' 次',minutes:8,priority:102-i*3,subject:currentSubject()}));
     readinessWeak.forEach((g,i)=>{
       const candidates=questions(currentSubject()).filter(q=>{
         const s=String(q.skill||'').toLowerCase(), id=g.id;
