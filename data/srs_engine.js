@@ -5,20 +5,20 @@
   'use strict';
   const state=()=>window.userState||(window.userState={});
   const clamp=n=>Math.max(0,Math.min(100,Number(n)||0));
-  const keyOf=(topicId,subject)=>subject&&topicId?String(subject)+'::'+String(topicId):String(topicId||'');
+  const keyOf=(topicId,subject,qid)=>qid?'q::'+String(qid):(subject&&topicId?String(subject)+'::'+String(topicId):String(topicId||''));
   function ensure(){
     const s=state(); s.srs=s.srs||{cards:{},reviews:0}; s.srs.cards=s.srs.cards||{}; return s.srs;
   }
   function today(){return new Date().toISOString().slice(0,10);}
   function addDays(d,n){const x=new Date(d||Date.now());x.setDate(x.getDate()+n);return x.toISOString();}
-  function getCard(topicId,subject){
-    const srs=ensure(),key=keyOf(topicId,subject);
-    srs.cards[key]=srs.cards[key]||{key,topicId,subject,box:1,interval:1,ease:2.5,dueAt:new Date().toISOString(),reviews:0,correct:0,wrong:0};
+  function getCard(topicId,subject,qid){
+    const srs=ensure(),key=keyOf(topicId,subject,qid);
+    srs.cards[key]=srs.cards[key]||{key,topicId,subject,qid:qid||'',box:1,interval:1,ease:2.5,dueAt:new Date().toISOString(),reviews:0,correct:0,wrong:0};
     return srs.cards[key];
   }
   function schedule(topicId,subject,correct,meta){
     if(!topicId)return null;
-    const c=getCard(topicId,subject);
+    const c=getCard(topicId,subject,meta&&meta.qid);
     c.reviews++;
     if(correct){
       c.correct++;
@@ -46,7 +46,7 @@
   }
   function upsertFromAnswer(d){
     if(!d||!d.topicId)return;
-    const card=schedule(d.topicId,d.subject,!!d.correct,{source:d.pastPaper?'past-paper':(d.mode||'practice')});
+    const card=schedule(d.topicId,d.subject,!!d.correct,{source:d.pastPaper?'past-paper':(d.mode||'practice'),qid:d.qid});
     if(card&&window.getTopicMasteryStats){
       const st=window.getTopicMasteryStats(d.topicId,d.subject); st.srsRetention=card.retention;
       if(window.calculateMasteryV2)window.calculateMasteryV2(d.topicId,d.subject);
@@ -56,7 +56,7 @@
     const s=state(), mistakes=Array.isArray(s.mistakes)?s.mistakes:[],out=[];
     for(const m of mistakes.slice(0,limit||20)){
       const qid=typeof m==='string'?m:m.qid, q=(window.questionData||[]).find(x=>x.id===qid);
-      if(q){getCard(q.topicId,q.subject).source='mistake';out.push(getCard(q.topicId,q.subject));}
+      if(q){getCard(q.topicId,q.subject,q.id).source='mistake';out.push(getCard(q.topicId,q.subject,q.id));}
     }
     if(window.saveUserState)window.saveUserState(s);
     return out;
