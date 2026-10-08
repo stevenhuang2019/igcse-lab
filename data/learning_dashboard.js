@@ -38,31 +38,18 @@
     return out.sort((a,b)=>b.priority-a.priority);
   }
   function adaptivePlan(){
-    const weak=globalWeaknesses().slice(0,5);
-    const mistakes=(getState().mistakes||[]).filter(m=>m.nextReviewAt&&new Date(m.nextReviewAt)<=new Date()).slice(0,5);
-    return {weak, mistakes};
+    const weak=globalWeaknesses().slice(0,6);
+    const mistakes=(getState().mistakes||[]).filter(m=>m.nextReviewAt&&new Date(m.nextReviewAt)<=new Date()).slice(0,6);
+    const tasks=[];
+    mistakes.slice(0,2).forEach((m,i)=>tasks.push({id:'srs_'+(m.qid||i),type:'srs',icon:'🔁',title:'SRS 错题复习',text:'复习到期错题并重新作答',minutes:5,priority:100-i*2,qid:m.qid}));
+    weak.slice(0,5).forEach((x,i)=>{
+      const type=x.n===0?'learn':x.n<50?'practice':x.n<70?'repair':'reinforce';
+      const meta={learn:['📘','知识学习','先建立核心知识框架',8],practice:['🎯','针对练习','集中训练薄弱知识点',10],repair:['🛠️','错因修复','针对常见错误进行强化',10],reinforce:['⚡','巩固练习','保持已建立的掌握度',8]}[type];
+      tasks.push({id:'topic_'+x.subject+'_'+x.t.topicId,type,icon:meta[0],title:subjName(x.subject)+' · '+meta[1],text:meta[2]+' · 当前掌握度 '+x.n+'%',minutes:meta[3],priority:Math.round(x.priority),subject:x.subject,topic:x.t.topicId});
+    });
+    tasks.sort((a,b)=>b.priority-a.priority);
+    return {tasks:tasks.slice(0,5),totalMinutes:tasks.slice(0,5).reduce((a,x)=>a+x.minutes,0)};
   }
-  function chapters(sub){return [...new Set(topics(sub).map(x=>x.chapter).filter(Boolean))];}
-  function topicStats(){
-    const s=getState(); return s.topicStats||{};
-  }
-  function masteryForTopic(t){
-    const st=topicStats()[t.topicId];
-    if(!st||!st.answered)return 0;
-    const acc=Math.round((st.correct||0)/st.answered*100);
-    const recency=st.lastWrongAt?Math.max(0,100-Math.floor((Date.now()-new Date(st.lastWrongAt).getTime())/86400000)*8):100;
-    return Math.max(0,Math.min(100,Math.round(acc*.75+recency*.25)));
-  }
-  function band(n){
-    return n>=85?['Mastered','text-green-700 bg-green-50']:n>=70?['Good','text-blue-700 bg-blue-50']:n>=50?['Learning','text-amber-700 bg-amber-50']:n>0?['Weak','text-red-700 bg-red-50']:['Not started','text-slate-500 bg-slate-100'];
-  }
-  function bar(n){
-    return '<div class="h-2 bg-slate-200 rounded-full overflow-hidden"><div class="h-full bg-indigo-500" style="width:'+n+'%"></div></div>';
-  }
-  function currentSubject(){
-    return window.currentSubject || document.getElementById('subjectSelect')?.value || 'physics';
-  }
-
   function build(){
     if(document.getElementById('page-dashboard'))return;
     const nav=document.getElementById('mainNav'),main=document.querySelector('main');
@@ -103,22 +90,8 @@
       return '<div class="text-3xl font-bold">'+avg+'%</div><div class="text-xs text-indigo-200">当前科目掌握度 · '+esc(subjName(sub))+'</div><div class="text-xs text-indigo-200 mt-1">'+qs.length+' 道题 · '+(gs.totalAnswered||0)+' 次答题 · 总正确率 '+acc+'%</div>';
     }
     function mission(){
-      const plan=adaptivePlan(), st=topicStats();
-      const cards=[];
-      plan.mistakes.slice(0,1).forEach((m)=>cards.push({icon:'🔁',title:'SRS 到期复习',text:'优先处理到期错题，强化长期记忆。'}));
-      plan.weak.slice(0,3).forEach((x,i)=>cards.push({icon:i===0?'🔥':'🎯',title:subjName(x.subject)+' · '+x.t.title,text:x.n?('掌握度 '+x.n+'%，建议进行 5 题针对练习。'):'尚未开始，先完成知识学习。',topic:x.t.topicId,subject:x.subject}));
-      if(!cards.length)cards.push({icon:'🏆',title:'进入综合挑战',text:'当前学习数据没有明显弱项，建议进行章节测试或模拟考试。'});
-      return '<section class="bg-white rounded-2xl shadow p-5"><div class="flex justify-between items-center"><div><h3 class="text-xl font-bold">🎯 今日自适应任务</h3><p class="text-sm text-slate-500 mt-1">全科弱项 + SRS 到期项共同决定任务优先级。</p></div><span class="text-xs px-3 py-1 rounded-full bg-indigo-50 text-indigo-700">Adaptive OS</span></div><div class="grid md:grid-cols-3 gap-3 mt-4">'+cards.slice(0,3).map((c,i)=>'<button data-topic="'+esc(c.topic||'')+'" data-subject="'+esc(c.subject||'')+'" class="text-left border rounded-xl p-4 hover:bg-indigo-50"><div class="text-2xl">'+c.icon+'</div><div class="font-bold mt-2">'+esc(c.title)+'</div><div class="text-sm text-slate-600 mt-1">'+esc(c.text)+'</div><div class="text-xs text-indigo-600 mt-3">任务 '+(i+1)+'</div></button>').join('')+'</div></section>';
-    }
-      const ts=topics(sub), st=topicStats(), mistakes=getState().mistakes||[];
-      const ranked=ts.map(t=>({t,n:masteryForTopic(t),wrong:st[t.topicId]?.lastWrongAt})).sort((a,b)=>a.n-b.n);
-      const weak=ranked.filter(x=>x.n<85).slice(0,3);
-      const due=mistakes.filter(m=>m.nextReviewAt&&new Date(m.nextReviewAt)<=new Date()).slice(0,3);
-      const cards=[];
-      weak.forEach((x,i)=>cards.push({icon:i===0?'🔥':'🎯',title:'攻克 '+x.t.title,text:x.n?('当前掌握度 '+x.n+'%，优先做 5 题并复习知识点。'):'尚未开始，先完成知识学习。',topic:x.t.topicId}));
-      if(due.length)cards.push({icon:'🔁',title:'SRS 错题复习',text:'有 '+due.length+' 道错题到期，先处理再学新内容。'});
-      if(!cards.length)cards.push({icon:'🏆',title:'挑战 Boss',text:'当前科目没有明显弱项，可以进入章节测试或综合挑战。'});
-      return '<section class="bg-white rounded-2xl shadow p-5"><div class="flex justify-between items-center"><div><h3 class="text-xl font-bold">🎯 今日学习任务</h3><p class="text-sm text-slate-500 mt-1">系统按弱项 → 错题 → SRS → 新内容排序。</p></div><span class="text-xs px-3 py-1 rounded-full bg-indigo-50 text-indigo-700">Adaptive</span></div><div class="grid md:grid-cols-3 gap-3 mt-4">'+cards.slice(0,3).map((c,i)=>'<button data-topic="'+esc(c.topic||'')+'" class="text-left border rounded-xl p-4 hover:bg-indigo-50"><div class="text-2xl">'+c.icon+'</div><div class="font-bold mt-2">'+esc(c.title)+'</div><div class="text-sm text-slate-600 mt-1">'+esc(c.text)+'</div><div class="text-xs text-indigo-600 mt-3">任务 '+(i+1)+'</div></button>').join('')+'</div></section>';
+      const plan=adaptivePlan(), cards=plan.tasks.slice(0,3);
+      return '<section class="bg-white rounded-2xl shadow p-5"><div class="flex flex-wrap justify-between gap-3 items-center"><div><h3 class="text-xl font-bold">🎯 今日学习计划</h3><p class="text-sm text-slate-500 mt-1">系统按 SRS、薄弱知识点与掌握阶段自动安排下一步。</p></div><div class="text-right"><div class="text-lg font-bold text-indigo-700">'+plan.totalMinutes+' min</div><div class="text-xs text-slate-500">预计学习时间</div></div></div><div class="grid md:grid-cols-3 gap-3 mt-4">'+(cards.length?cards.map((c,i)=>'<button data-topic="'+esc(c.topic||'')+'" data-subject="'+esc(c.subject||'')+'" data-qid="'+esc(c.qid||'')+'" class="text-left border rounded-xl p-4 hover:bg-indigo-50"><div class="flex justify-between"><span class="text-2xl">'+c.icon+'</span><span class="text-xs px-2 py-1 rounded-full bg-slate-100">'+c.minutes+' min</span></div><div class="font-bold mt-2">'+esc(c.title)+'</div><div class="text-sm text-slate-600 mt-1">'+esc(c.text)+'</div><div class="text-xs text-indigo-600 mt-3">优先级 '+c.priority+'</div></button>').join(''):'<div class="col-span-full p-4 rounded-xl bg-green-50 text-green-700">🏆 今日没有明显弱项，可以进入 Boss Challenge。</div>')+'</div></section>';
     }
     function courseMap(){
       const cs=chapters(sub);
