@@ -603,7 +603,7 @@ function markAnswered(q, isCorrect, area){
         }
     }
     saveUserState(userState);
-    window.dispatchEvent(new CustomEvent('igcse-answer-recorded',{detail:{topicId:q.topicId,subject:subj,correct:isCorrect,srs:s.mode==='srs'}}));
+    window.dispatchEvent(new CustomEvent('igcse-answer-recorded',{detail:{topicId:q.topicId,qid:q.id,subject:subj,correct:isCorrect,srs:s.mode==='srs',pastPaper:!!q.pastPaper}}));
     checkBadges();
     const fb = area.querySelector('.q-feedback');
     if(fb){
