@@ -197,7 +197,7 @@
                     <div class="flex flex-wrap gap-2 items-center">
                         <span class="font-semibold text-indigo-800">🎮 词汇小游戏（当前科目）：</span>
                         <button id="vocabGameEn2Zh" class="bg-indigo-600 text-white px-3 py-1.5 rounded text-sm hover:bg-indigo-700">英 → 选中释义</button>
-                        <button id="vocabGameZh2En" class="bg-indigo-600 text-white px-3 py-1.5 rounded text-sm hover:bg-indigo-700">中 → 选英文</button>
+                        <button id="vocabGameZh2En" class="bg-indigo-600 text-white px-3 py-1.5 rounded text-sm hover:bg-indigo-700">中 → 选英文</button><button id="vocabGameListenZh" class="bg-indigo-600 text-white px-3 py-1.5 rounded text-sm hover:bg-indigo-700">🔊 听音 → 选中文</button><button id="vocabGameListenEn" class="bg-indigo-600 text-white px-3 py-1.5 rounded text-sm hover:bg-indigo-700">🔊 听音 → 选英文</button>
                         <span id="vocabGameMeta" class="text-xs text-gray-500 ml-2"></span>
                     </div>
                     <div id="vocabGameArea" class="mt-3"></div>
@@ -1391,16 +1391,18 @@ function nextVocabQuestion(){
     const others = shuffle(g.pool.filter(v => v !== answer).slice()).slice(0, 3);
     const opts = shuffle(others.concat([answer]));
     g._opts = opts; g._answer = answer;
-    const prompt = g.mode === 'en2zh' ? answer.en : answer.zh;
-    const askLabel = g.mode === 'en2zh' ? '这个英文的中文释义是？' : '这个中文对应的英文是？';
+    const isListen = g.mode === 'listen2zh' || g.mode === 'listen2en';
+    const prompt = isListen ? '🔊 听发音，选择正确释义' : (g.mode === 'en2zh' ? answer.en : answer.zh);
+    const askLabel = g.mode === 'en2zh' ? '这个英文的中文释义是？' : (g.mode === 'zh2en' ? '这个中文对应的英文是？' : (g.mode === 'listen2zh' ? '听音后选择中文释义' : '听音后选择英文术语'));
     let html = '<div class="border rounded-lg p-3 bg-white"><div class="text-xs text-gray-500 mb-1">' + askLabel + ' · 第 ' + (g.idx + 1) + '/' + g.pool.length + ' · 连对 ' + g.combo + '</div>';
     html += '<div class="text-lg font-semibold mb-3">' + esc(prompt) + '</div><div class="grid gap-2">';
     opts.forEach((o, i) => {
-        const label = g.mode === 'en2zh' ? o.zh : o.en;
+        const label = (g.mode === 'en2zh' || g.mode === 'listen2zh') ? o.zh : o.en;
         html += '<button data-vopt="' + i + '" class="opt-btn text-left border border-slate-300 rounded-lg px-3 py-2 text-sm">' + esc(label) + '</button>';
     });
     html += '</div><div class="vfb mt-2 text-sm"></div></div>';
     ga.innerHTML = html;
+    if(isListen && window.speakIGCSE){ setTimeout(function(){ window.speakIGCSE(answer.en); },120); var sp=document.createElement('button'); sp.className='mt-2 border rounded px-3 py-1 text-sm'; sp.textContent='🔊 再听一次'; sp.onclick=function(){window.speakIGCSE(answer.en);}; ga.querySelector('.border.rounded-lg.p-3.bg-white').appendChild(sp); }
     ga.querySelectorAll('[data-vopt]').forEach(b => {
         b.onclick = () => answerVocab(parseInt(b.dataset.vopt, 10), b);
     });
