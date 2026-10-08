@@ -19,7 +19,7 @@ function start(subject,paperIndex){
 function score(session,qs){
  let correct=0,total=qs.length,byTopic={},bySkill={};
  qs.forEach(q=>{
-  const raw=session.answers[q.id]; const picked=q.options&&raw!==undefined?q.options[raw]:raw; const ok=raw!==undefined && String(picked)===String(q.answer);
+  const raw=(session.answers||{})[q.id]; const picked=q.options&&raw!==undefined?q.options[raw]:raw; const ok=Object.prototype.hasOwnProperty.call(session.outcomes||{},q.id)?session.outcomes[q.id]===true:raw!==undefined && String(picked)===String(q.answer);
   if(ok)correct++;
   const t=q.topicId||q.chapter||'unmapped';byTopic[t]=byTopic[t]||{correct:0,total:0};byTopic[t].total++;if(ok)byTopic[t].correct++;
   const sk=q.skill||q.commandWord||'general';bySkill[sk]=bySkill[sk]||{correct:0,total:0};bySkill[sk].total++;if(ok)bySkill[sk].correct++;

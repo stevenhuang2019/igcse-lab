@@ -574,6 +574,8 @@ function renderQuestion(){
 }
 function markAnswered(q, isCorrect, area){
     const s = practiceSession;
+    s.outcomes = s.outcomes || {};
+    s.outcomes[q.id] = !!isCorrect;
     s.idx++;
     userState.globalStats.totalAnswered++;
     const subj = (q.subject && userState.subjectStats[q.subject]) ? q.subject : currentSubject;

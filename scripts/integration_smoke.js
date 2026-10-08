@@ -7,8 +7,8 @@ const ROOT=path.join(__dirname,'..'),DATA=path.join(ROOT,'data');
 let fail=0;
 const ok=m=>console.log('[ok] '+m), bad=m=>{fail++;console.error('[FAIL] '+m)};
 const files=fs.readdirSync(DATA).filter(x=>x.endsWith('.js')).sort();
-// Legacy browser data assets contain template/data fragments and are validated by runtime/load checks.
-const browserDataAssets=new Set(['physics_motion_lab.js','vocab.js']);
+// Every JavaScript asset must compile, including browser data assets.
+const browserDataAssets=new Set();
 for(const f of files){
   if(browserDataAssets.has(f)){ok('browser asset '+f+' (runtime-loaded)');continue;}
   const src=fs.readFileSync(path.join(DATA,f),'utf8');
