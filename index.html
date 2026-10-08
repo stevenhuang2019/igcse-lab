@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IGCSE自习实验室 IGCSE LAB</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Precompiled styles: no runtime CSS compiler. -->
+    <link rel="stylesheet" href="data/tailwind.css">
     <!-- KaTeX 公式渲染 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
     <style>
         .page { display: none; }
         .page.active { display: block; }
@@ -44,6 +44,7 @@
     
 #mainNav{display:flex;flex-wrap:nowrap;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;white-space:nowrap;touch-action:pan-x}#mainNav::-webkit-scrollbar{display:none}.nav-btn{min-height:44px;flex:0 0 auto;touch-action:manipulation}.btn,button{min-height:44px;touch-action:manipulation;-webkit-tap-highlight-color:transparent}.btn:active,button:active{transform:translateY(1px)}input,select,textarea{font-size:16px;min-height:44px;max-width:100%;box-sizing:border-box}@media (max-width:768px){body{font-size:15px}.page{padding-left:10px;padding-right:10px}.grid,.cards,.stats-grid{grid-template-columns:1fr!important}.table-wrap,.overflow-x-auto{overflow-x:auto;-webkit-overflow-scrolling:touch}.opt-btn{text-align:left;min-height:52px;padding:12px}.modal,.dialog{width:calc(100vw - 20px)!important;max-width:none!important}.toast{max-width:calc(100vw - 24px)}}@media (max-width:430px){h1{font-size:1.55rem}h2{font-size:1.25rem}.nav-btn{font-size:14px;padding:8px 10px}.btn{width:100%;max-width:100%}.page section,.card{border-radius:12px}}button:focus-visible,a:focus-visible,select:focus-visible{outline:3px solid var(--ig-primary);outline-offset:3px}
 </style>
+<link rel="stylesheet" href="data/product.css">
 </head>
 <body class="bg-slate-100 min-h-screen">
 
@@ -53,8 +54,8 @@
                 <h1 class="text-xl font-bold">IGCSE自习实验室 IGCSE LAB</h1>
                 <p class="text-indigo-200 text-xs mt-0.5">CIE · 数学 / 物理 / 化学 / 设计DT / 商业研究 / 计算机科学</p>
             </div>
-            <div class="flex gap-4 items-center">
-                <select id="subjectSelect" class="text-slate-800 rounded px-2 py-1 border border-slate-300 bg-white">
+            <div class="header-tools flex gap-4 items-center">
+                <select aria-label="当前学习科目" id="subjectSelect" class="text-slate-800 rounded px-2 py-1 border border-slate-300 bg-white">
                     <option value="math">数学 Math</option>
                     <option value="physics">物理 Physics</option>
                     <option value="chemistry">化学 Chemistry</option>
@@ -296,6 +297,9 @@
 <script src="data/english_master_database.js"></script>
 <script src="data/mock-exams.js"></script>
 
+<script src="data/physics_0625_course_map.js"></script>
+<script src="data/igcse_questions_extension.js"></script>
+<script src="data/learning_catalog.js"></script>
 <script>
 /* ===================== 用户状态管理 ===================== */
 const DEFAULT_USER_STATE = {
@@ -325,6 +329,7 @@ function loadUserState(){
 }
 function saveUserState(state){ try{ localStorage.setItem('igcseUserState', JSON.stringify(state)); }catch(e){} window.__IGCSE_USER_STATE__ = state; }
 let userState = loadUserState();
+window.userState = userState;
 window.__IGCSE_USER_STATE__ = userState;
 
 /* ===================== XP & 等级 & 徽章 ===================== */
@@ -400,26 +405,30 @@ let restoringRoute = false;
 function switchPage(id){
     const target = document.getElementById(id);
     if(!target || !target.classList.contains('page')) return;
-    pages.forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     target.classList.add('active');
-    navBtns.forEach(b => {
+    document.querySelectorAll('#mainNav .nav-btn').forEach(b => {
         const active = b.dataset.page === id;
         b.classList.toggle('active', active);
         if(active) b.setAttribute('aria-current', 'page');
         else b.removeAttribute('aria-current');
     });
-    const selected = Array.from(navBtns).find(b => b.dataset.page === id);
+    const selected = Array.from(document.querySelectorAll('#mainNav .nav-btn')).find(b => b.dataset.page === id);
     const label = selected ? selected.textContent.trim() : '英语学习';
     document.getElementById('pageLocation').textContent = '学习工作台 / ' + label;
     document.title = label + ' · IGCSE Personal Learning OS';
+    window.dispatchEvent(new CustomEvent('igcse-page-change',{detail:{id}}));
     if(!restoringRoute && location.hash !== '#' + id) history.pushState(null, '', '#' + id);
 }
-navBtns.forEach(btn => { btn.onclick = () => { switchPage(btn.dataset.page); const pg = btn.dataset.page; if(pg === 'page-mistake') renderMistakePage(); else if(pg === 'page-homework') renderHomeworkRecords(); else if(pg === 'page-profile') renderProfile(); else if(pg === 'page-assessment') renderAssessmentPage(); else if(pg === 'page-quickref') renderQuickrefPage(); else if(pg === 'page-vocab') renderVocabPage(); else if(pg === 'page-resources') renderMyResources(); else if(pg === 'page-home') renderTodayCards(); else if(pg === 'page-practice'){ practiceSession = null; stopMockTimer(); renderPracticeTopicSelect(); renderMockEntry(); } else { stopMockTimer(); } }; });
+navBtns.forEach(btn => { btn.onclick = () => { switchPage(btn.dataset.page); const pg = btn.dataset.page; if(pg === 'page-mistake') renderMistakePage(); else if(pg === 'page-homework') renderHomeworkRecords(); else if(pg === 'page-profile') renderProfile(); else if(pg === 'page-assessment') renderAssessmentPage(); else if(pg === 'page-quickref') renderQuickrefPage(); else if(pg === 'page-vocab') renderVocabPage(); else if(pg === 'page-resources') renderMyResources(); else if(pg === 'page-home') renderTodayCards(); else if(pg === 'page-practice'){ if(practiceSession&&practiceSession.mode==='mock'){renderQuestion();startMockTimerIfNeeded();}else{renderPracticeTopicSelect();} renderMockEntry(); } else if(practiceSession?.mode!=='mock'){ stopMockTimer(); } }; });
 
 /* ===================== 全局变量 ===================== */
-let contentData = (window.IGCSE_CONTENT || []).concat(window.IGCSE_CS_CONTENT || [], window.IGCSE_ENGLISH_CONTENT || [], window.IGCSE_CS_DEEP_CONTENT || [], window.IGCSE_ENGLISH_DEEP_CONTENT || []);
-let questionData = (window.IGCSE_QUESTIONS || []).concat(window.IGCSE_CS_QUESTIONS || [], window.IGCSE_ENGLISH_QUESTIONS || [], window.IGCSE_CS_DEEP_QUESTIONS || [], window.IGCSE_ENGLISH_DEEP_QUESTIONS || []);
-let currentSubject = 'math';
+let contentData = window.IGCSE_CATALOG.topics;
+let questionData = window.IGCSE_CATALOG.questions;
+window.contentData = contentData;
+window.questionData = questionData;
+let currentSubject = SUBJECT_NAMES[userState.lastSciSubject]?userState.lastSciSubject:'math';
+document.getElementById('subjectSelect').value=currentSubject;
 let currentTopicId = null;
 let practiceSession = null; // { topicId, order[], idx, combo, correct, total }
 
@@ -492,6 +501,7 @@ function renderPracticeTopicSelect(){
     document.getElementById('practiceResult').classList.add('hidden');
 }
 function startPractice(topicId){
+    if(userState.mockExams?.activePractice){showToast('请先继续或交卷当前模拟考');renderMockEntry();return;}
     currentTopicId = topicId;
     const qs = questionData.filter(q => q.subject === currentSubject && q.topicId === topicId);
     if(!qs.length){ document.getElementById('questionArea').innerHTML = '<p class="text-gray-500 text-sm">该主题暂无习题。</p>'; return; }
@@ -501,7 +511,8 @@ function startPractice(topicId){
 }
 function startSessionFromIds(qids, mode, opts){
     opts = opts || {};
-    const valid = qids.filter(id => findQuestion(id));
+    if(userState.mockExams?.activePractice && mode !== 'resume'){ showToast('请先继续或交卷当前模拟考'); renderMockEntry(); return; }
+    const valid = [...new Set(qids)].filter(id => findQuestion(id));
     if(!valid.length){ showToast('暂无可用题目'); return; }
     document.getElementById('practiceResult').classList.add('hidden');
     practiceSession = {
@@ -509,12 +520,14 @@ function startSessionFromIds(qids, mode, opts){
         order: opts.noShuffle ? valid.slice() : shuffle(valid.slice()),
         idx: 0, combo: 0, correct: 0, total: valid.length,
         mode: mode || 'normal', label: opts.label || '',
-        startedAt: Date.now(), timeLimitSec: opts.timeLimitSec || 0, timedOut: false
+        id: 'session_'+Date.now()+'_'+Math.random().toString(36).slice(2),
+        startedAt: Date.now(), timeLimitSec: opts.timeLimitSec || 0, timedOut: false, subject: opts.subject || currentSubject
     };
     switchPage('page-practice');
     navBtns.forEach(b => b.classList.toggle('active', b.dataset.page === 'page-practice'));
     if(mode === 'normal' && opts.topicId){ renderPracticeTopicSelect(); }
     else { document.getElementById('practiceTopicSelect').innerHTML = '<div class="text-sm font-semibold text-indigo-700 mb-2">' + esc(opts.label || '') + '</div>'; }
+    if(mode==='mock')window.IGCSE_MOCK_ENGINE.saveActive(practiceSession);
     renderMockEntry();
     startMockTimerIfNeeded();
     renderQuestion();
@@ -528,12 +541,13 @@ function gotoTopicPractice(topicId){
     currentSubject = topic.subject;
     userState.lastSciSubject = topic.subject;
     renderTopicList();
+    switchPage('page-practice');
     startPractice(topicId);
 }
 function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
 const __EXTRA_Q = {}; // 模拟卷等动态注入题目池，findQuestion 兜底
 function findQuestion(id){
-    const hit = questionData.find(q => q.id === id);
+    const hit = window.IGCSE_CATALOG.question(id);
     if(hit) return hit;
     if(id && __EXTRA_Q[id]) return __EXTRA_Q[id];
     return undefined;
@@ -541,6 +555,7 @@ function findQuestion(id){
 function renderQuestion(){
     if(!practiceSession){ return; }
     const s = practiceSession;
+    if(s.mode==='mock'&&Date.now()-s.startedAt>=s.timeLimitSec*1000){s.timedOut=true;finishPractice();return;}
     const q = findQuestion(s.order[s.idx]);
     if(!q){ finishPractice(); return; }
     const area = document.getElementById('questionArea');
@@ -554,13 +569,17 @@ function renderQuestion(){
             html += '<button data-opt="' + i + '" class="opt-btn text-left border border-slate-300 rounded-lg px-3 py-2 text-sm">' + opt + '</button>';
         });
         html += '</div>';
+    } else if(q.type==='number'){
+        html += '<label for="numberInput">数值答案 '+esc(q.unit||'')+'</label><input id="numberInput" type="number" step="any" class="w-full border rounded p-3"><button data-act="number-check" class="mock-action">提交答案</button>';
     } else {
         html += '<textarea id="essayInput" class="w-full border rounded-lg p-2 h-28 text-sm" placeholder="写下你的回答（中英文均可），提交后对照 Mark Scheme 自查"></textarea>';
         html += '<div class="mt-2"><button data-act="essay-check" class="bg-indigo-600 text-white px-4 py-2 rounded text-sm hover:bg-indigo-700">提交并查看参考答案</button></div>';
     }
     html += '<div class="q-feedback mt-3"></div>';
     html += '</div>';
+    if(s.mode==='mock') html += '<div class="mock-controls"><button id="mockSubmitEarly">提前交卷</button></div>';
     area.innerHTML = html;
+    const early=document.getElementById('mockSubmitEarly');if(early)early.onclick=()=>{finishPractice();};
     if(window.renderMathInElement){
         renderMathInElement(area, { delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}] });
     }
@@ -568,15 +587,20 @@ function renderQuestion(){
         area.querySelectorAll('.opt-btn').forEach(btn => {
             btn.onclick = () => submitChoice(q, parseInt(btn.dataset.opt, 10), area);
         });
+    } else if(q.type==='number'){
+        area.querySelector('[data-act=number-check]').onclick=()=>{const raw=area.querySelector('#numberInput').value;if(!raw.trim()||!Number.isFinite(Number(raw))){showToast('请输入有效数字');return;}
+        const ok=Math.abs(Number(raw)-Number(q.answer))<=(q.tolerance??1e-9);markAnswered(q,ok,area);};
     } else {
         area.querySelector('[data-act=essay-check]').onclick = () => showEssaySelfCheck(q, area);
     }
 }
 function markAnswered(q, isCorrect, area){
     const s = practiceSession;
+    if(!s || Object.prototype.hasOwnProperty.call(s.outcomes||{},q.id)) return;
     s.outcomes = s.outcomes || {};
     s.outcomes[q.id] = !!isCorrect;
     s.idx++;
+    if(s.mode==='mock')window.IGCSE_MOCK_ENGINE.saveActive(s);
     userState.globalStats.totalAnswered++;
     const subj = (q.subject && userState.subjectStats[q.subject]) ? q.subject : currentSubject;
     userState.subjectStats[subj].answered++;
@@ -638,9 +662,14 @@ function markAnswered(q, isCorrect, area){
     saveUserState(userState);
     const paperMode = !!q.pastPaper || s.mode === 'mock' || s.mode === 'paper';
     const sessionAccuracy = s.idx ? Math.round((s.correct / s.idx) * 100) : (isCorrect ? 100 : 0);
-    window.dispatchEvent(new CustomEvent('igcse-answer-recorded',{detail:{topicId:q.topicId,qid:q.id,subject:subj,correct:isCorrect,srs:s.mode==='srs',pastPaper:paperMode,pastPaperType:(q.pastPaperType||((s.mode==='paper'&&q.pastPaper)?'official':'mock')),accuracy:sessionAccuracy,mode:s.mode}}));
+    window.dispatchEvent(new CustomEvent('igcse-answer-recorded',{detail:{topicId:q.topicId,qid:q.id,subject:subj,correct:isCorrect,srs:s.mode==='srs',pastPaper:paperMode,pastPaperType:(q.pastPaperType||((s.mode==='paper'&&q.pastPaper)?'official':'mock')),accuracy:sessionAccuracy,mode:s.mode,question:q}}));
     checkBadges();
     const fb = area.querySelector('.q-feedback');
+    if(s.mode==='mock'&&q.type==='choice'){
+        window.IGCSE_MOCK_ENGINE.saveActive(s);
+        if(fb)fb.textContent='答案已记录，交卷后查看结果。';
+        const next=document.createElement('button');next.textContent=s.idx>=s.total?'交卷并查看报告':'下一题';next.className='mock-action';next.dataset.act='next-q';next.onclick=nextQuestion;area.appendChild(next);return;
+    }
     if(fb){
         fb.innerHTML = (isCorrect
             ? '<div class="border border-green-200 bg-green-50 text-green-800 rounded-lg p-3 text-sm">回答正确！+'+ (q.xpReward||10) +' XP' + (q.explain ? '<div class="mt-1 text-green-700">' + q.explain + '</div>' : '') + '</div>'
@@ -648,7 +677,7 @@ function markAnswered(q, isCorrect, area){
         if(window.renderMathInElement) renderMathInElement(fb, { delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}] });
     }
     if(isCorrect){
-        setTimeout(nextQuestion, 850);
+        setTimeout(()=>{if(practiceSession===s)nextQuestion();},850);
     } else {
         const next = document.createElement('div');
         next.className = 'mt-3';
@@ -658,11 +687,13 @@ function markAnswered(q, isCorrect, area){
     }
 }
 function submitChoice(q, idx, area){
+    if(practiceSession?.mode==='mock' && Date.now()-practiceSession.startedAt>=practiceSession.timeLimitSec*1000){practiceSession.timedOut=true;finishPractice();return;}
     const picked = (q.options || [])[idx];
-    if(picked === undefined) return;
+    if(picked === undefined || !practiceSession || Object.hasOwn(practiceSession.outcomes||{},q.id)) return;
+    practiceSession.answers=practiceSession.answers||{};practiceSession.answers[q.id]=idx;
     area.querySelectorAll('.opt-btn').forEach(b => { b.classList.add('disabled'); if(b.dataset.opt === String(idx)) b.classList.add('picked'); });
     const isCorrect = picked === q.answer;
-    area.querySelectorAll('.opt-btn').forEach(b => {
+    if(practiceSession?.mode!=='mock') area.querySelectorAll('.opt-btn').forEach(b => {
         if(b.textContent === q.answer) b.classList.add('correct');
         if(b.dataset.opt === String(idx) && !isCorrect) b.classList.add('wrong');
     });
@@ -684,14 +715,17 @@ function showEssaySelfCheck(q, area){
 function nextQuestion(){ if(practiceSession){ renderQuestion(); } }
 function finishPractice(){
     const s = practiceSession;
+    if(!s || s.finished)return;
+    s.finished=true;
     const total = s.total, correct = s.correct;
     const rate = total ? Math.round(correct / total * 100) : 0;
     const stars = rate >= 90 ? 3 : rate >= 60 ? 2 : 1;
     const area = document.getElementById('questionArea');
-    if(s.mode === 'mock' && window.IGCSE_MOCK_ENGINE){
+    if((s.mode === 'mock'||s.mode==='paper') && window.IGCSE_MOCK_ENGINE){
         const qs=(s.order||[]).map(id=>findQuestion(id)).filter(Boolean);
         const rec=window.IGCSE_MOCK_ENGINE.recordPracticeSession(s,qs);
         s.mockExamRecordId=rec&&rec.id;
+        window.IGCSE_MOCK_ENGINE.clearActive();
     }
     stopMockTimer();
     document.getElementById('practiceResult').classList.remove('hidden');
@@ -725,7 +759,9 @@ function finishPractice(){
         else if(s.topicId){ startPractice(s.topicId); }
     };
     area.querySelector('[data-act=mistakes]').onclick = () => { switchPage('page-mistake'); navBtns.forEach(b => b.classList.toggle('active', b.dataset.page === 'page-mistake')); renderMistakePage(); };
+    if(s.mode==='mock'||s.mode==='paper') renderMockReport(s.mockExamRecordId,area);
     practiceSession = null;
+    renderMockEntry();
 }
 
 /* ===================== 错题模块 ===================== */
@@ -907,7 +943,7 @@ function setEnglishMode(on){
     });
 }
 document.getElementById('subjectSelect').onchange = function(){
-    if(this.value === 'english'){
+    if(this.value === 'english' && !document.getElementById('page-dashboard')?.classList.contains('active')){
         setEnglishMode(false);
         currentSubject = 'english';
         userState.lastSciSubject = 'english';
@@ -1034,7 +1070,7 @@ function answerEnglish(q,idx){
     englishPracticeIndex++; setTimeout(()=>renderEnglishPage('practice'),250);
 }
 document.querySelectorAll('.eng-tab').forEach(b=>b.onclick=()=>renderEnglishPage(b.dataset.engTab));
-document.getElementById('englishPracticeBtn').onclick=()=>renderEnglishPage('practice');
+if(document.getElementById('englishPracticeBtn')) document.getElementById('englishPracticeBtn').onclick=()=>renderEnglishPage('practice');
 document.getElementById('englishBackBtn').onclick=()=>{const sel=document.getElementById('subjectSelect');sel.value=userState.lastSciSubject&&userState.lastSciSubject!=='english'?userState.lastSciSubject:'math';currentSubject=sel.value;renderTopicList();switchPage('page-home');renderTodayCards();};
 renderEnglishPage('learn');
 
@@ -1354,7 +1390,7 @@ function startMockTimerIfNeeded(){
     const sess = practiceSession;
     if(!sess || sess.mode !== 'mock') return;
     mockTimerId = setInterval(() => {
-        if(!practiceSession || practiceSession.mode !== 'mock' || !document.getElementById('page-practice').classList.contains('active')){ stopMockTimer(); return; }
+        if(!practiceSession || practiceSession.mode !== 'mock'){ stopMockTimer(); return; }
         const s = practiceSession;
         const elapsed = Math.floor((Date.now() - s.startedAt) / 1000);
         const left = s.timeLimitSec - elapsed;
@@ -1363,7 +1399,7 @@ function startMockTimerIfNeeded(){
             s.timedOut = true;
             stopMockTimer();
             showToast('时间到，自动交卷');
-            finishPractice();
+            switchPage('page-practice');finishPractice();
             return;
         }
         const mm = String(Math.floor(left/60)).padStart(2, '0');
@@ -1376,10 +1412,12 @@ function startMockTimerIfNeeded(){
 function renderMockEntry(){
     const el = document.getElementById('mockEntry');
     if(!el) return;
+    const saved=userState.mockExams?.activePractice;
+    if(saved){el.innerHTML='<div class="mock-preflight"><h3>有一场模拟考尚未交卷</h3><p>已记录 '+Object.keys(saved.outcomes||{}).length+' / '+saved.total+' 题。刷新不会重置计时。</p><button id="resumeMock" class="mock-action">继续考试</button></div>';document.getElementById('resumeMock').onclick=resumeMock;return;}
     let html = '<div class="bg-slate-50 border border-slate-200 rounded-lg p-3 flex flex-wrap gap-2 items-center">'
         + '<span class="text-sm font-semibold text-gray-700">🧪 模拟考：</span>';
     ['math','physics','chemistry','dt','business','computer_science','english'].forEach(sub => {
-        html += '<button data-mock="' + sub + '" class="px-2 py-1 rounded border text-xs bg-white hover:border-indigo-400">' + (SUBJECT_NAMES[sub]||sub) + ' 30题/30分钟</button>';
+        html += '<button data-mock="' + sub + '" class="px-2 py-1 rounded border text-xs bg-white hover:border-indigo-400">' + (SUBJECT_NAMES[sub]||sub) + ' · 最多30题</button>';
     });
     html += '<button data-mock="mixed" class="px-2 py-1 rounded border text-xs bg-white hover:border-indigo-400">🌐 全科混合 30题/30分钟</button>';
     const MP = window.IGCSE_MOCKPAPERS || {};
@@ -1393,19 +1431,40 @@ function renderMockEntry(){
     }
     html += mockExamsEntryHtml();
     const records=(window.userState&&userState.mockExams&&userState.mockExams.records)||[];
-    if(records.length){ const last=records[0]; const rep=window.IGCSE_MOCK_ENGINE&&window.IGCSE_MOCK_ENGINE.report(last); if(rep) html += '<div class="w-full text-xs text-gray-600 mt-2">上次模拟考：<b>'+rep.accuracy+'%</b> · 薄弱项 '+rep.weakTopics.slice(0,2).map(x=>x.topic).join('、')+'</div>'; }
+    if(records.length){ const last=records[0]; const rep=window.IGCSE_MOCK_ENGINE&&window.IGCSE_MOCK_ENGINE.report(last); if(rep) html += '<div class="w-full text-xs text-gray-600 mt-2">上次模拟考：<b>'+rep.accuracy+'%</b> · 薄弱项 '+rep.weakTopics.slice(0,2).map(x=>esc(x.topic)).join('、')+'</div>'; }
+    html += records.slice(0,5).map(r=>'<button class="mock-action" data-view-report="'+esc(r.id)+'">查看报告 · '+esc(SUBJECT_NAMES[r.subject]||r.subject)+' · '+esc(String(r.finishedAt||'').slice(0,10))+'</button>').join('');
     html += '</div>';
     el.innerHTML = html;
-    el.querySelectorAll('[data-mock]').forEach(b => { b.onclick = () => startMock(b.dataset.mock); });
+    el.querySelectorAll('[data-view-report]').forEach(b=>b.onclick=()=>{practiceSession=null;stopMockTimer();document.getElementById('questionArea').innerHTML='';renderMockReport(b.dataset.viewReport,document.getElementById('questionArea'));});
+
+    el.querySelectorAll('[data-mock]').forEach(b => { b.onclick = () => prepareMock(b.dataset.mock); });
     el.querySelectorAll('[data-paper]').forEach(b => { b.onclick = () => startMockPaper(b.dataset.paper); });
     el.querySelectorAll('[data-mockexam]').forEach(b => { b.onclick = () => startMockExam(parseInt(b.dataset.mockexam, 10)); });
 }
-function startMock(subject){
-    const pool = questionData.filter(q => subject === 'mixed' ? true : q.subject === subject);
-    if(pool.length < 10){ showToast('该科目题库不足，暂无法组卷'); return; }
-    const qids = shuffle(pool.map(q => q.id)).slice(0, Math.min(30, pool.length));
-    startSessionFromIds(qids, 'mock', { label: '模拟考 · ' + (subject === 'mixed' ? '全科混合' : (SUBJECT_NAMES[subject]||subject)), timeLimitSec: 30 * 60 });
+function prepareMock(subject){
+    const qs=window.IGCSE_MOCK_ENGINE.selectQuestions(subject,30);
+    const el=document.getElementById('mockEntry');
+    el.innerHTML='<div class="mock-preflight"><h3>模拟考准备 · '+esc(SUBJECT_NAMES[subject]||'全科混合')+'</h3><p>'+qs.length+' 道客观题 · 30 分钟 · '+new Set(qs.map(q=>q.subject+'::'+q.topicId)).size+' 个主题</p><p>原创练习组卷，按题数计分。交卷后显示解析与薄弱主题；不作为官方成绩预测。刷新后可继续，计时仍从原开始时间计算。</p><div class="mock-controls"><button id="confirmMock" '+(!qs.length?'disabled':'')+'>开始计时</button><button id="cancelMock">返回选择</button></div></div>';
+    document.getElementById('confirmMock').onclick=()=>{if(subject!=='mixed')setCurrentSubjectSafe(subject);startSessionFromIds(qs.map(q=>q.id),'mock',{subject,label:'模拟考 · '+(SUBJECT_NAMES[subject]||'全科混合'),timeLimitSec:1800});};
+    document.getElementById('cancelMock').onclick=renderMockEntry;
 }
+function startMock(subject){prepareMock(subject);}
+function resumeMock(){
+    const saved=userState.mockExams?.activePractice;if(!saved)return;
+    (userState.mockExams.activeQuestions||[]).forEach(q=>{__EXTRA_Q[q.id]=q;});
+    practiceSession=JSON.parse(JSON.stringify(saved));
+    setCurrentSubjectSafe(saved.subject==='mixed'?'math':saved.subject);
+    switchPage('page-practice');renderMockEntry();startMockTimerIfNeeded();renderQuestion();
+}
+function renderMockReport(id,area){
+    const record=(userState.mockExams?.records||[]).find(r=>r.id===id);if(!record)return;
+    const report=window.IGCSE_MOCK_ENGINE.report(record);
+    const box=document.createElement('section');box.className='mock-report';box.id='mockDetailedReport';
+    box.innerHTML='<h3>模拟考诊断 · '+report.accuracy+'%</h3><p>'+report.correct+'/'+report.total+' 题正确 · '+report.unanswered+' 题未答</p><p>'+esc(report.recommendation)+'</p><h4>优先复习主题</h4><ul>'+report.weakTopics.filter(t=>t.accuracy<85).map(t=>{const topic=contentData.find(x=>x.topicId===t.topic);return '<li>'+esc(topic?.title||t.topic)+' · '+t.correct+'/'+t.total+(topic?' <button class="mock-action" data-report-topic="'+esc(t.topic)+'">针对练习</button>':'')+'</li>';}).join('')+'</ul>';
+    box.innerHTML+='<details><summary>查看逐题答案与解析</summary>'+record.questionIds.map(id=>{const q=findQuestion(id);if(!q)return '';const raw=record.answers?.[id],picked=raw===undefined?'未作答':q.options?.[raw]??raw;return '<article class="mt-4"><b>'+esc(q.question)+'</b><p>你的答案：'+esc(picked)+'</p><p>参考答案：'+esc(q.answer)+'</p><p>'+esc(q.explain||'')+'</p></article>';}).join('')+'</details>';
+    area.append(box);box.querySelectorAll('[data-report-topic]').forEach(b=>b.onclick=()=>gotoTopicPractice(b.dataset.reportTopic));
+}
+window.addEventListener('beforeunload',()=>{if(practiceSession?.mode==='mock')window.IGCSE_MOCK_ENGINE.saveActive(practiceSession);});
 function startMockPaper(key){
     const MP = window.IGCSE_MOCKPAPERS || {};
     const p = MP[key];
@@ -1438,7 +1497,7 @@ function renderQuickrefPage(){
 /* footer 版本号 */
 function renderFooter(){
     const f = document.getElementById('appFooter');
-    if(f) f.textContent = '题库 v1.2 · ' + (window.IGCSE_QUESTIONS ? window.IGCSE_QUESTIONS.length : 0) + ' 题 · ' + (window.SUBJECT_VOCAB ? window.SUBJECT_VOCAB.length : 0) + ' 词 · 更新于 2026-10-08';
+    if(f) f.textContent = '题库 v1.2 · ' + window.IGCSE_CATALOG.questions.length + ' 题 · ' + (window.SUBJECT_VOCAB ? window.SUBJECT_VOCAB.length : 0) + ' 词 · 更新于 2026-10-09';
 }
 /* 英语页返回 IGCSE */
 document.getElementById('englishBackBtn').onclick = () => {
@@ -1505,7 +1564,7 @@ function startMockExam(paperIdx){
     paper.questions.forEach((q, qi) => {
         const id = 'mx_' + paperIdx + '_' + qi;
         __EXTRA_Q[id] = {
-            id: id, subject: paper.subject, topicId: null,
+            id: id, subject: paper.subject, topicId: q.topicId || null,
             type: q.type || 'choice',
             question: q.en || '', en: q.en || '', zh: q.zh || '',
             options: q.options || [], answer: q.answer, explain: q.explain || q.zh || ''
@@ -1518,7 +1577,8 @@ function startMockExam(paperIdx){
 function setCurrentSubjectSafe(sub){
     if(sub && SUBJECT_NAMES[sub] && document.getElementById('subjectSelect')){
         document.getElementById('subjectSelect').value = sub;
-        currentSubject = sub;
+        currentSubject = sub;userState.lastSciSubject=sub;saveUserState(userState);
+        window.dispatchEvent(new CustomEvent('igcse-subject-change',{detail:{subject:sub}}));
     }
 }
 
@@ -1792,7 +1852,7 @@ init();
 document.addEventListener('DOMContentLoaded',function(){
   var nav=document.getElementById('mainNav'), main=document.querySelector('main');
   if(!nav||!main||document.getElementById('motion-lab-page')) return;
-  var b=document.createElement('button'); b.id='motion-lab-nav'; b.className='nav-btn px-3 py-1 rounded'; b.textContent='⚡ Motion Lab';
+  var b=document.createElement('button'); b.id='motion-lab-nav';b.dataset.page='motion-lab-page'; b.className='nav-btn px-3 py-1 rounded'; b.textContent='⚡ Motion Lab';
   b.onclick=function(){if(window.switchPage)window.switchPage('motion-lab-page');};
   nav.appendChild(b);
   var p=document.createElement('div'); p.id='motion-lab-page'; p.className='page';
@@ -1827,17 +1887,21 @@ document.addEventListener('DOMContentLoaded',function(){
   window.addEventListener('igcse-language-change',function(){});
 })();
 </script><script src="data/chapter_learning_engine.js"></script>
-<script src="data/learning_dashboard.js"></script>
-<script src="data/mastery_engine.js"></script>\n<script src="data/user_state_schema.js"></script>\n<script src="data/syllabus_map.js"></script>
+
+<script src="data/mastery_engine.js"></script>
+<script src="data/user_state_schema.js"></script>
+<script src="data/syllabus_map.js"></script>
 <script src="data/srs_engine.js"></script>
 <script src="data/error_diagnosis.js"></script>
 <script src="data/mock_exam_engine.js"></script>
-<script src="data/physics_0625_course_map.js"></script>
+<script src="data/learning_progress.js"></script>
+<script src="data/learning_dashboard.js"></script>
+
 <script>
 // Use existing navigation handlers so history restores page-specific views too.
 function restoreLearningRoute(){
     const id = location.hash.slice(1);
-    const button = Array.from(navBtns).find(b => b.dataset.page === id);
+    const button = Array.from(document.querySelectorAll('#mainNav .nav-btn')).find(b => b.dataset.page === id);
     const target = document.getElementById(id);
     if(target && target.classList.contains('active')) return;
     restoringRoute = true;
@@ -1848,7 +1912,7 @@ function restoreLearningRoute(){
 }
 window.addEventListener('popstate', restoreLearningRoute);
 window.addEventListener('hashchange', restoreLearningRoute);
-if(location.hash) restoreLearningRoute();
+window.addEventListener('DOMContentLoaded',()=>{if(location.hash) restoreLearningRoute();if(window.renderMathInElement)renderMathInElement(document.querySelector('.page.active'),{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});});
 </script>
 </body>
 </html>

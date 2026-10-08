@@ -18,8 +18,8 @@ test('navigation validates destinations, updates accessibility and preserves his
  function element(id){const classes=new Set(['page']);return {id,dataset:{page:id},textContent:id,attributes:{},classList:{contains:x=>classes.has(x),add:x=>classes.add(x),remove:x=>classes.delete(x),toggle:(x,on)=>on?classes.add(x):classes.delete(x)},setAttribute(k,v){this.attributes[k]=v},removeAttribute(k){delete this.attributes[k]}};}
  const pages=['page-home','page-practice'].map(element),navBtns=pages.map(p=>element(p.id));
  const location={hash:''},entries=[];
- const document={title:'',getElementById:id=>pages.find(p=>p.id===id)||(id==='pageLocation'?{}:null)};
- const context=vm.createContext({pages,navBtns,document,location,history:{pushState:(_,__,hash)=>{entries.push(hash);location.hash=hash}}});
+ const document={title:'',querySelectorAll:selector=>selector==='.page'?pages:navBtns,getElementById:id=>pages.find(p=>p.id===id)||(id==='pageLocation'?{}:null)};
+ const context=vm.createContext({pages,navBtns,document,location,window:{dispatchEvent(){}},CustomEvent:function(){},history:{pushState:(_,__,hash)=>{entries.push(hash);location.hash=hash}}});
  const source=html.slice(html.indexOf('let restoringRoute = false;'),html.indexOf('navBtns.forEach(btn =>'));
  vm.runInContext(source,context);
  vm.runInContext("switchPage('page-practice')",context);

@@ -25,7 +25,9 @@ window.PHYSICS_0625_COURSE_MAP = [
 ["4.5","Electromagnetic effects",["electromagnetic force","motor effect","electromagnetic relays","loudspeakers"],["Describe","Explain","Predict"],"Explanation"],
 ["4.6","Electromagnetic induction",["electromagnetic induction","generators","transformers","transformer equation","power transmission"],["Describe","Explain","Calculate"],"Calculation"],
 ["5.1","The nuclear model of the atom",["atomic structure","nucleus","protons neutrons electrons","isotopes","nuclear notation"],["Define","State","Describe"],"Knowledge"],
-["5.2","Radioactivity",["background radiation","alpha beta gamma","activity","half-life","penetration","ionisation","uses and safety"],["Identify","Describe","Explain","Calculate"],"Explanation"]
+["5.2","Radioactivity",["background radiation","alpha beta gamma","activity","half-life","penetration","ionisation","uses and safety"],["Identify","Describe","Explain","Calculate"],"Explanation"],
+["6.1","Earth and the Solar System",["orbital motion","gravitational attraction","planets and satellites"],["Describe","Explain","Calculate"],"Explanation"],
+["6.2","Stars and the Universe",["stellar evolution","galaxies","redshift","expansion of the universe"],["Describe","Explain"],"Explanation"]
 ].map(x=>({
   syllabus:"0625",syllabusYear:"2026-2028",subject:"physics",chapter:x[0]+" "+x[1],
   topicId:"phy0625_"+x[0].replace(".","_"),title:x[0]+" "+x[1],
