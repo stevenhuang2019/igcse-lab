@@ -6,8 +6,8 @@ window.IGCSE_ASSESSMENT = {
     chemistry: ["chem_q001", "chem_q002", "chem_q012", "chem_q015", "chem_q004", "chem_q005", "chem_q007", "chem_q008", "chem_q121", "chem_q125", "chem_q131", "chem_q141"],
     dt: ["dt_q001", "dt_q002", "dt_q006", "dt_q010", "dt_q004", "dt_q005", "dt_q043", "dt_q053", "dt_q081", "dt_q083", "dt_q091", "dt_q094"],
     business: ["bus_q001", "bus_q002", "bus_q007", "bus_q013", "bus_q004", "bus_q005", "bus_q044", "bus_q048", "bus_q081", "bus_q087", "bus_q095", "bus_q103"],
-    computer_science: ["cs1_q1","cs1_q2","cs2_q1","cs3_q1","cs4_q1","cs5_q1","cs6_q1","cs7_q1","cs8_q1","cs8_q2","cs9_q1","cs9_q2"],
-    english: ["eng_r1","eng_r2","eng_w1","eng_w2","eng_l1","eng_s1","eng_g1","eng_g2","eng_e1","eng_e2","eng_v1","eng_w3"]
+    computer_science: ["cs1_q1","cs1_q2","cs2_q1","cs3_q1","cs4_q1","cs5_q1","cs6_q1","cs7_q1","cs8_q1","cs8_q2","cs9_q1","cs9_q2","cs1d_q1","cs1d_q2","cs1d_q3","cs1d_q4","cs1d_q5","cs2d_q1","cs2d_q2","cs2d_q3","cs2d_q4","cs2d_q5","cs3d_q1","cs3d_q2","cs3d_q3","cs3d_q4"],
+    english: ["eng_r1","eng_r2","eng_w1","eng_w2","eng_l1","eng_s1","eng_g1","eng_g2","eng_e1","eng_e2","eng_v1","eng_w3","eng_r3","eng_r4","eng_w4","eng_w5","eng_l2","eng_s2","eng_g3","eng_g4","eng_e3","eng_e4"]
   },
   levels: [
     { "level": 1, "title": "初识入门", "comment": "你刚接触 IGCSE 内容，对各科基础概念还在建立印象。", "advice": "先从每科第一个主题看起，把最基本的定义和公式弄懂，不急于做难题。" },
