@@ -56,6 +56,14 @@
     return base;
   }
   function questions(sub){return (window.questionData||[]).filter(x=>x.subject===sub);}
+  function topicStats(){return getState().topicStats||{};}
+  function masteryForTopic(t){
+    const sub=t.subject||currentSubject();
+    if(window.calculateMasteryV2)return window.calculateMasteryV2(t.topicId,sub);
+    const key=window.masteryTopicKey?window.masteryTopicKey(t.topicId,sub):t.topicId;
+    const st=topicStats()[key]||topicStats()[t.topicId]||{};
+    return st.mastery||0;
+  }
   function allSubjects(){return ['math','physics','chemistry','dt','business','computer_science','english'];}
   function topicPriority(t){
     const n=masteryForTopic(t);
