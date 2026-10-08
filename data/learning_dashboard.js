@@ -100,7 +100,7 @@
       bind();
     }
     function overall(){
-      const subjects=allSubjects().map(sub=>{const ts=topics(sub),vals=ts.map(masteryForTopic).filter(x=>x>0);return {sub,avg:vals.length?Math.round(vals.reduce((a,b)=>a+b,0)/vals.length):0,started:vals.length,total:ts.length};});
+      const subjects=allSubjects().map(x=>{const ts=topics(x),vals=ts.map(masteryForTopic).filter(v=>v>0);return {sub:x,avg:vals.length?Math.round(vals.reduce((a,b)=>a+b,0)/vals.length):0,started:vals.length,total:ts.length};});
       const active=subjects.find(x=>x.sub===sub)||{avg:0};
       const started=subjects.filter(x=>x.started>0);
       const global=started.length?Math.round(started.reduce((a,x)=>a+x.avg,0)/started.length):0;
@@ -108,12 +108,43 @@
       const qs=questions(sub),st=getState(),gs=st.globalStats||{},acc=gs.totalAnswered?Math.round(gs.totalCorrect/gs.totalAnswered*100):0;
       return '<div class="text-3xl font-bold">'+active.avg+'%</div><div class="text-xs text-indigo-200">当前科目掌握度 · '+esc(subjName(sub))+'</div><div class="text-xs text-indigo-200 mt-1">全科学习指数 '+global+'% · '+(weakest?'最需关注：'+esc(subjName(weakest.sub)):'尚未形成全科数据')+'</div><div class="text-xs text-indigo-200 mt-1">'+qs.length+' 道题 · '+(gs.totalAnswered||0)+' 次答题 · 总正确率 '+acc+'%</div>';
     }
-      const ts=topics(sub),qs=questions(sub), vals=ts.map(masteryForTopic).filter(x=>x>0);
-      const avg=vals.length?Math.round(vals.reduce((a,b)=>a+b,0)/vals.length):0;
-      const st=getState(),gs=st.globalStats||{};
-      const acc=gs.totalAnswered?Math.round(gs.totalCorrect/gs.totalAnswered*100):0;
-      return '<div class="text-3xl font-bold">'+avg+'%</div><div class="text-xs text-indigo-200">当前科目掌握度 · '+esc(subjName(sub))+'</div><div class="text-xs text-indigo-200 mt-1">'+qs.length+' 道题 · '+(gs.totalAnswered||0)+' 次答题 · 总正确率 '+acc+'%</div>';
+  ;function examReadiness(sub){
+      const qs=questions(sub), ts=topics(sub), st=topicStats();
+      const total=qs.length, answered=qs.reduce((n,q)=>n+(st[q.topicId]?.answered?1:0),0);
+      const accuracy=qs.reduce((a,q)=>{const x=st[q.topicId];return a+(x&&x.answered?(x.correct||0)/x.answered*100:0)},0)/(qs.filter(q=>st[q.topicId]?.answered).length||1);
+      const mastery=ts.map(masteryForTopic).filter(x=>x>0);
+      const knowledge=mastery.length?mastery.reduce((a,b)=>a+b,0)/mastery.length:0;
+      const coverage=total?Math.min(100,answered/total*100):0;
+      const practical=qs.filter(q=>q.skill==='practical'||q.type==='practical');
+      const calc=qs.filter(q=>q.skill==='calculation'||q.commandWord==='Calculate');
+      const graph=qs.filter(q=>q.skill==='graph'||/graph|图像|gradient|斜率/i.test((q.tags||[]).join(' ')+' '+(q.question||'')));
+      function skillScore(arr){
+        if(!arr.length)return null;
+        const vals=arr.map(q=>{const x=st[q.topicId];return x&&x.answered?Math.min(100,(x.correct||0)/x.answered*100):0});
+        return Math.round(vals.reduce((a,b)=>a+b,0)/vals.length);
+      }
+      const dimensions=[
+        {id:'knowledge',name:'Knowledge',cn:'知识掌握',score:Math.round(knowledge),weight:.35},
+        {id:'accuracy',name:'Question Accuracy',cn:'题目正确率',score:Math.round(accuracy),weight:.25},
+        {id:'coverage',name:'Syllabus Coverage',cn:'课程覆盖',score:Math.round(coverage),weight:.15},
+        {id:'calculation',name:'Calculation',cn:'计算能力',score:skillScore(calc),weight:.1},
+        {id:'graph',name:'Graph / Data',cn:'图像与数据',score:skillScore(graph),weight:.075},
+        {id:'practical',name:'Practical',cn:'实验技能',score:skillScore(practical),weight:.075}
+      ];
+      const usable=dimensions.filter(d=>d.score!==null);
+      const readiness=Math.round(usable.reduce((a,d)=>a+d.score*d.weight,0)/(usable.reduce((a,d)=>a+d.weight,0)||1));
+      const target=85;
+      const gaps=dimensions.filter(d=>d.score!==null&&d.score<target).sort((a,b)=>a.score-b.score);
+      return {readiness,target,dimensions,gaps,coverage,answered,total};
     }
+    function readinessGapText(r){
+      if(r.readiness>=85)return '已达到 A* readiness 目标，建议转入整套模拟考试与限时训练。';
+      const g=r.gaps[0];
+      return g?'距离目标还差 '+(r.target-r.readiness)+' 分；最优先提升：'+g.cn+'（'+g.score+'%）。':'继续完成课程覆盖并积累答题数据。';
+    }
+  
+  
+  
     function mission(){
       const plan=adaptivePlan(), cards=plan.tasks.slice(0,3), daily=dailyState(), ds=dailyStats();
       return '<section class="bg-white rounded-2xl shadow p-5"><div class="flex flex-wrap justify-between gap-3 items-center"><div><h3 class="text-xl font-bold">🎯 今日学习计划</h3><p class="text-sm text-slate-500 mt-1">系统按 SRS、薄弱知识点与掌握阶段自动安排下一步。</p></div><div class="text-right"><div class="text-lg font-bold text-indigo-700">'+plan.totalMinutes+' min</div><div class="text-xs text-slate-500">预计学习时间</div><div class="text-xs text-slate-500 mt-1">今日完成 '+ds.completed+'/'+ds.total+' · '+ds.rate+'% · 🔥 '+streakDays()+' 天</div></div></div><div class="grid md:grid-cols-3 gap-3 mt-4">'+(cards.length?cards.map((c,i)=>'<button data-topic="'+esc(c.topic||'')+'" data-subject="'+esc(c.subject||'')+'" data-qid="'+esc(c.qid||'')+'" class="text-left border rounded-xl p-4 hover:bg-indigo-50"><div class="flex justify-between"><span class="text-2xl">'+c.icon+'</span><span class="text-xs px-2 py-1 rounded-full bg-slate-100">'+c.minutes+' min</span></div><div class="font-bold mt-2">'+esc(c.title)+'</div><div class="text-sm text-slate-600 mt-1">'+esc(c.text)+'</div><div class="text-xs text-indigo-600 mt-3">优先级 '+c.priority+(daily.completed.includes(c.id)?' · ✅ 已完成':'')+'</div></button>').join(''):'<div class="col-span-full p-4 rounded-xl bg-green-50 text-green-700">🏆 今日没有明显弱项，可以进入 Boss Challenge。</div>')+'</div></section>';
@@ -149,39 +180,4 @@
     window.addEventListener('igcse-dashboard-refresh',render);
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',build);else setTimeout(build,0);
-})();function examReadiness(sub){
-    const qs=questions(sub), ts=topics(sub), st=topicStats();
-    const total=qs.length, answered=qs.reduce((n,q)=>n+(st[q.topicId]?.answered?1:0),0);
-    const accuracy=qs.reduce((a,q)=>{const x=st[q.topicId];return a+(x&&x.answered?(x.correct||0)/x.answered*100:0)},0)/(qs.filter(q=>st[q.topicId]?.answered).length||1);
-    const mastery=ts.map(masteryForTopic).filter(x=>x>0);
-    const knowledge=mastery.length?mastery.reduce((a,b)=>a+b,0)/mastery.length:0;
-    const coverage=total?Math.min(100,answered/total*100):0;
-    const practical=qs.filter(q=>q.skill==='practical'||q.type==='practical');
-    const calc=qs.filter(q=>q.skill==='calculation'||q.commandWord==='Calculate');
-    const graph=qs.filter(q=>q.skill==='graph'||/graph|图像|gradient|斜率/i.test((q.tags||[]).join(' ')+' '+(q.question||'')));
-    function skillScore(arr){
-      if(!arr.length)return null;
-      const vals=arr.map(q=>{const x=st[q.topicId];return x&&x.answered?Math.min(100,(x.correct||0)/x.answered*100):0});
-      return Math.round(vals.reduce((a,b)=>a+b,0)/vals.length);
-    }
-    const dimensions=[
-      {id:'knowledge',name:'Knowledge',cn:'知识掌握',score:Math.round(knowledge),weight:.35},
-      {id:'accuracy',name:'Question Accuracy',cn:'题目正确率',score:Math.round(accuracy),weight:.25},
-      {id:'coverage',name:'Syllabus Coverage',cn:'课程覆盖',score:Math.round(coverage),weight:.15},
-      {id:'calculation',name:'Calculation',cn:'计算能力',score:skillScore(calc),weight:.1},
-      {id:'graph',name:'Graph / Data',cn:'图像与数据',score:skillScore(graph),weight:.075},
-      {id:'practical',name:'Practical',cn:'实验技能',score:skillScore(practical),weight:.075}
-    ];
-    const usable=dimensions.filter(d=>d.score!==null);
-    const readiness=Math.round(usable.reduce((a,d)=>a+d.score*d.weight,0)/(usable.reduce((a,d)=>a+d.weight,0)||1));
-    const target=85;
-    const gaps=dimensions.filter(d=>d.score!==null&&d.score<target).sort((a,b)=>a.score-b.score);
-    return {readiness,target,dimensions,gaps,coverage,answered,total};
-  }
-  function readinessGapText(r){
-    if(r.readiness>=85)return '已达到 A* readiness 目标，建议转入整套模拟考试与限时训练。';
-    const g=r.gaps[0];
-    return g?'距离目标还差 '+(r.target-r.readiness)+' 分；最优先提升：'+g.cn+'（'+g.score+'%）。':'继续完成课程覆盖并积累答题数据。';
-  }
-
-
+})(
