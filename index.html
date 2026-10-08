@@ -657,6 +657,11 @@ function finishPractice(){
     const rate = total ? Math.round(correct / total * 100) : 0;
     const stars = rate >= 90 ? 3 : rate >= 60 ? 2 : 1;
     const area = document.getElementById('questionArea');
+    if(s.mode === 'mock' && window.IGCSE_MOCK_ENGINE){
+        const qs=(s.order||[]).map(id=>findQuestion(id)).filter(Boolean);
+        const rec=window.IGCSE_MOCK_ENGINE.recordPracticeSession(s,qs);
+        s.mockExamRecordId=rec&&rec.id;
+    }
     stopMockTimer();
     document.getElementById('practiceResult').classList.remove('hidden');
     let headTitle = '练习完成';
