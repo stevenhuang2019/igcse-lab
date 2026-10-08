@@ -95,8 +95,21 @@
       return '<div class="p-4 rounded-xl '+(ok?'bg-green-50 text-green-800':'bg-red-50 text-red-800')+'"><b>'+(ok?'✓ 回答正确':'✗ 需要复习')+'</b><p class="mt-2"><b>答案 / Mark Scheme：</b> '+esc(q.answer||'')+'</p><p class="mt-2"><b>解析：</b> '+(q.explain||'暂无详细解析')+'</p><p class="mt-2"><b>关联知识点：</b> '+esc(t.title||q.topicId)+'</p><p class="mt-2"><b>知识要点：</b> '+esc(t.knowledge||'')+'</p><p class="mt-2"><b>常见错误：</b> '+esc(t.commonMistake||'暂无')+'</p></div><button id="ceNext" class="mt-3 bg-slate-900 text-white px-4 py-2 rounded-lg">下一题</button>';
     }
     function record(q,ok){
-      if(typeof markAnswered==='function'){markAnswered(q,ok,ceBody);}
-      else {userState.topicStats=userState.topicStats||{};const st=userState.topicStats[q.topicId]||{answered:0,correct:0};st.answered++;if(ok)st.correct++;userState.topicStats[q.topicId]=st;saveUserState(userState);}
+      userState.topicStats=userState.topicStats||{};
+      const st=userState.topicStats[q.topicId]||{answered:0,correct:0,lastWrongAt:null};
+      st.answered++; if(ok)st.correct++; else st.lastWrongAt=new Date().toISOString();
+      userState.topicStats[q.topicId]=st;
+      userState.globalStats=userState.globalStats||{totalAnswered:0,totalCorrect:0};
+      userState.globalStats.totalAnswered=(userState.globalStats.totalAnswered||0)+1;
+      if(ok) userState.globalStats.totalCorrect=(userState.globalStats.totalCorrect||0)+1;
+      if(!ok){
+        userState.mistakes=userState.mistakes||[];
+        const old=userState.mistakes.find(m=>mistakeQid(m)===q.id);
+        if(old){old.wrongCount=(old.wrongCount||0)+1;old.lastResult='fail';}
+        else userState.mistakes.push({questionId:q.id,subject:q.subject,topicId:q.topicId,time:new Date().toISOString(),wrongCount:1,srsStage:0,nextReviewAt:new Date(Date.now()+864e5).toISOString(),mastered:false,reviewedCount:0,lastResult:'fail'});
+      }
+      addXp(ok?(q.xpReward||10):2);
+      saveUserState(userState);
     }
     function answer(q,i){
       const ok=(q.options||[])[i]===q.answer; record(q,ok);
@@ -128,7 +141,9 @@
       const ct=document.getElementById('ceStartTest'); if(ct)ct.onclick=()=>{mode='chapterTest';render();};
     }
     function render(){renderControls();renderTabs();progress();renderBody();}
-    window.addEventListener('igcse-subject-change',e=>{if(e.detail?.subject){sub=e.detail.subject;ch='';topic='';mode='overview';}});
+    window.addEventListener('igcse-subject-change',e=>{if(e.detail?.subject){sub=e.detail.subject;ch='';topic='';mode='overview';render();}});
+    const ss=document.getElementById('subjectSelect');
+    if(ss) ss.addEventListener('change',()=>{sub=ss.value;ch='';topic='';mode='overview';render();});
     render();
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',build);else setTimeout(build,0);
