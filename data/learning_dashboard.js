@@ -181,27 +181,29 @@
     }
   ;function examReadiness(sub){
       const qs=questions(sub), ts=topics(sub), st=topicStats();
-      const total=qs.length, answered=qs.reduce((n,q)=>n+(st[q.topicId]?.answered?1:0),0);
-      const accuracy=qs.reduce((a,q)=>{const x=st[q.topicId];return a+(x&&x.answered?(x.correct||0)/x.answered*100:0)},0)/(qs.filter(q=>st[q.topicId]?.answered).length||1);
-      const mastery=ts.map(masteryForTopic).filter(x=>x>0);
-      const knowledge=mastery.length?mastery.reduce((a,b)=>a+b,0)/mastery.length:0;
-      const coverage=total?Math.min(100,answered/total*100):0;
-      const practical=qs.filter(q=>q.skill==='practical'||q.type==='practical');
-      const calc=qs.filter(q=>q.skill==='calculation'||q.commandWord==='Calculate');
-      const graph=qs.filter(q=>q.skill==='graph'||/graph|图像|gradient|斜率/i.test((q.tags||[]).join(' ')+' '+(q.question||'')));
-      function skillScore(arr){
-        if(!arr.length)return null;
-        const vals=arr.map(q=>{const x=st[q.topicId];return x&&x.answered?Math.min(100,(x.correct||0)/x.answered*100):0});
-        return Math.round(vals.reduce((a,b)=>a+b,0)/vals.length);
-      }
+      const total=qs.length;
+      const answered=qs.reduce((n,q)=>{
+        const k=window.masteryTopicKey?window.masteryTopicKey(q.topicId,sub):q.topicId;
+        return n+((st[k]||st[q.topicId])?.answered?1:0);
+      },0);
+      const coveredQs=qs.filter(q=>{
+        const k=window.masteryTopicKey?window.masteryTopicKey(q.topicId,sub):q.topicId;
+        return (st[k]||st[q.topicId])?.answered;
+      });
+      const accuracy=coveredQs.length?Math.round(coveredQs.reduce((a,q)=>{
+        const k=window.masteryTopicKey?window.masteryTopicKey(q.topicId,sub):q.topicId;
+        const x=st[k]||st[q.topicId];
+        return a+((x.correct||0)/(x.answered||1)*100);
+      },0)/coveredQs.length):0;
+      const mastery=ts.map(t=>masteryForTopic(t)).filter(x=>x>0);
+      const knowledge=mastery.length?Math.round(mastery.reduce((a,b)=>a+b,0)/mastery.length):0;
+      const coverage=total?Math.min(100,Math.round(answered/total*100)):0;
+      const dims=examProfile(sub).map(([id,cn])=>({id,name:cn,cn:cn,score:skillScoreFor(sub,id),weight:1}));
       const dimensions=[
-        {id:'knowledge',name:'Knowledge',cn:'知识掌握',score:Math.round(knowledge),weight:.35},
-        {id:'accuracy',name:'Question Accuracy',cn:'题目正确率',score:Math.round(accuracy),weight:.25},
-        {id:'coverage',name:'Syllabus Coverage',cn:'课程覆盖',score:Math.round(coverage),weight:.15},
-        {id:'calculation',name:'Calculation',cn:'计算能力',score:skillScore(calc),weight:.1},
-        {id:'graph',name:'Graph / Data',cn:'图像与数据',score:skillScore(graph),weight:.075},
-        {id:'practical',name:'Practical',cn:'实验技能',score:skillScore(practical),weight:.075}
-      ];
+        {id:'knowledge',name:'Knowledge',cn:'知识掌握',score:knowledge,weight:.30},
+        {id:'accuracy',name:'Question Accuracy',cn:'题目正确率',score:accuracy,weight:.20},
+        {id:'coverage',name:'Syllabus Coverage',cn:'课程覆盖',score:coverage,weight:.10}
+      ].concat(dims.map((d,i)=>Object.assign(d,{weight:Math.max(.05,.40/dims.length)})));
       const usable=dimensions.filter(d=>d.score!==null);
       const readiness=Math.round(usable.reduce((a,d)=>a+d.score*d.weight,0)/(usable.reduce((a,d)=>a+d.weight,0)||1));
       const target=85;
