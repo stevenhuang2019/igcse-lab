@@ -258,6 +258,8 @@
 <script src="data/igcse_questions_cs.js"></script>
 <script src="data/igcse_english_esl.js"></script>
 <script src="data/igcse_questions_english.js"></script>
+<script src="data/igcse_english_deep.js"></script>
+<script src="data/igcse_cs_deep.js"></script>
 <script src="data/igcse_assessment.js"></script>
 <script src="data/igcse_quickref.js"></script>
 <script src="data/igcse_mockpapers.js"></script>
@@ -370,8 +372,8 @@ function switchPage(id){
 navBtns.forEach(btn => { btn.onclick = () => { switchPage(btn.dataset.page); const pg = btn.dataset.page; if(pg === 'page-mistake') renderMistakePage(); else if(pg === 'page-homework') renderHomeworkRecords(); else if(pg === 'page-profile') renderProfile(); else if(pg === 'page-assessment') renderAssessmentPage(); else if(pg === 'page-quickref') renderQuickrefPage(); else if(pg === 'page-vocab') renderVocabPage(); else if(pg === 'page-resources') renderMyResources(); else if(pg === 'page-home') renderTodayCards(); else if(pg === 'page-practice'){ practiceSession = null; stopMockTimer(); renderPracticeTopicSelect(); renderMockEntry(); } else { stopMockTimer(); } }; });
 
 /* ===================== 全局变量 ===================== */
-let contentData = (window.IGCSE_CONTENT || []).concat(window.IGCSE_CS_CONTENT || [], window.IGCSE_ENGLISH_CONTENT || []);
-let questionData = (window.IGCSE_QUESTIONS || []).concat(window.IGCSE_CS_QUESTIONS || [], window.IGCSE_ENGLISH_QUESTIONS || []);
+let contentData = (window.IGCSE_CONTENT || []).concat(window.IGCSE_CS_CONTENT || [], window.IGCSE_ENGLISH_CONTENT || [], window.IGCSE_CS_DEEP_CONTENT || [], window.IGCSE_ENGLISH_DEEP_CONTENT || []);
+let questionData = (window.IGCSE_QUESTIONS || []).concat(window.IGCSE_CS_QUESTIONS || [], window.IGCSE_ENGLISH_QUESTIONS || [], window.IGCSE_CS_DEEP_QUESTIONS || [], window.IGCSE_ENGLISH_DEEP_QUESTIONS || []);
 let currentSubject = 'math';
 let currentTopicId = null;
 let practiceSession = null; // { topicId, order[], idx, combo, correct, total }
