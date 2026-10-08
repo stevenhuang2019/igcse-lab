@@ -4,7 +4,7 @@ A static learning application with seven subject catalogues, topic practice, a s
 
 ## Current coverage
 
-- 862 questions across 86 local topics and seven subjects.
+- 980 questions across 86 local topics and seven subjects.
 - 62 new original questions: 50 Physics questions spanning 25 course-map sections, plus two each for Math, Chemistry, D&T, Business, CS and English.
 - Every local topic has linked questions. This is **local catalogue coverage**, not proof of full official syllabus coverage, exam readiness or a predicted grade. CS and English still have comparatively shallow banks.
 - Physics includes the Solar System and stars/universe sections. Question IDs link topic, chapter and objective metadata without changing legacy learner keys.
@@ -21,6 +21,12 @@ Official references checked on 2026-10-09:
 - [Business Studies 0450](https://www.cambridgeinternational.org/programmes-and-qualifications/view/cambridge-igcse-business-studies-0450/): legacy catalogue targets 2026. From 2027 the qualification is Business 0264; a full content migration has not been certified.
 - [Design & Technology 0445](https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-design-and-technology-0445/): 2024–2026, 2027 and 2028–2030 are separate versions. The existing bank is not labelled as covering a nonexistent 2026–2028 version.
 - [Computer Science 0478](https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-computer-science-0478/): existing metadata targets 2026–2028, not the revised 2029–2031 curriculum.
+
+## Traceable outline audit
+
+The Dashboard includes a source-linked construction checklist for all seven subjects. `data/syllabus_registry.js` stores original concise labels, official section/assessment-objective identifiers, source PDF, edition and explicit local topic links. This is an outline, not an exhaustive transcription or a completed objective audit. `data/syllabus_audit.js` counts samples only when the question explicitly names the reference **and** matches the syllabus code and edition. Legacy questions without references are not silently credited. Status distinguishes sample practice, preparation only, content association and a construction gap; no percentage claims full official coverage.
+
+The additional 118 authored questions comprise 76 CS questions and 42 English questions. Answer positions are rotated and all prompts, answers and rationales are distinct. The 0510 English references R1–R4, W1–W4, L1–L4 and S1–S4 are tracked separately. English writing strategy, transcript and speaking-planning choices are labelled preparation, not evidence of full writing, auditory comprehension or oral performance. English 0511 is not independently audited. CS digital currency (5.2) and file handling (8.3), for example, currently have content associations but no explicitly mapped sample questions.
 
 ## Mock practice
 
@@ -48,4 +54,4 @@ Tailwind styles are precompiled and committed as `data/tailwind.css`. CI rebuild
 
 ## Remaining product depth
 
-Full official-objective audits for all seven subjects, deeper CS/English banks, authentic listening/speaking assessment, and externally marked full-paper mocks remain content/product work. Current automated tests establish the implemented local learning flows, not pedagogical validation of every legacy question or official assessment equivalence.
+Bullet-level official-objective audits for all seven subjects, further CS/English depth, authentic listening/speaking assessment, and externally marked full-paper mocks remain content/product work. Current automated tests establish the implemented local learning flows, not pedagogical validation of every legacy question or official assessment equivalence.

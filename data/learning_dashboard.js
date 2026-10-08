@@ -43,6 +43,11 @@
     startSessionFromIds(ids,task.type==='srs'?'srs':'normal',{topicId:task.topic,subject:task.subject,label:task.title});
   }
   window.IGCSE_DASHBOARD={summary,day,localDate,startTask};
+  function auditPanel(subject){
+    const a=window.getIGCSESyllabusAudit?.(subject);if(!a)return '';
+    const labels={'sample-practice':'已有样题','preparation-only':'准备练习','content-linked':'内容关联 · 待补样题','gap':'尚未建设'};
+    return '<section class="db-panel" id="dbSyllabusAudit"><h3>官方考纲建设清单</h3><p>'+esc(a.code)+' · '+esc(a.year)+' · <a href="'+esc(a.sourceUrl)+'" target="_blank" rel="noopener">查看官方考纲</a></p><p>'+esc(a.note)+'</p><p>'+a.sampled+'/'+a.sectionCount+' 项有明确关联样题。样题数不代表完整考纲覆盖或能力达标。</p><details><summary>展开各项建设状态</summary><div class="db-topics">'+a.sections.map(x=>'<article><div><b>'+esc(x.ref)+' · '+esc(x.label)+'</b><small>'+labels[x.status]+' · '+x.practiceCount+' 道样题 · '+x.preparationCount+' 道准备练习</small></div></article>').join('')+'</div></details></section>';
+  }
   function build(){
     const nav=document.getElementById('mainNav'),main=document.querySelector('main');
     if(!nav||!main||document.getElementById('page-dashboard'))return;
@@ -56,7 +61,7 @@
         '<section class="db-panel"><h3>今日学习计划</h3><p>优先复习到期错题，再练习薄弱主题。每项完成一次作答后计入完成。</p><div class="db-tasks">'+d.tasks.map(t=>'<button data-task="'+esc(t.id)+'" class="db-task"><small>'+esc(names[t.subject])+' · '+t.minutes+' 分钟</small><b>'+esc(t.title)+'</b><span>'+esc(catalog().topic(t.subject,t.topic)?.title||t.topic)+'</span><em>'+(d.completed.includes(t.id)?'✓ 已完成 · 再练习':'开始练习 →')+'</em></button>').join('')+'</div></section>'+
         '<section class="db-panel"><h3>全科学习概览</h3><div class="db-subjects">'+catalog().subjects.map(subject=>{const x=summary(subject);return '<button data-db-subject="'+subject+'" class="db-task"><b>'+esc(names[subject])+'</b><span>'+x.mastery+'% 掌握 · '+x.withQuestions+'/'+x.topics+' 主题有题</span>'+bar(x.mastery)+'</button>';}).join('')+'</div></section>'+
         '<section class="db-panel"><h3>课程地图与练习覆盖</h3><p>以下比例只统计本站课程主题，不代表完整官方考纲或考试等级预测。</p><div class="db-topics">'+catalog().topicsFor(sub).map(t=>{const count=catalog().questionsFor(sub,t.topicId).length,n=window.calculateMasteryV2(t.topicId,sub);return '<article><div><b>'+esc(t.title)+'</b><small>'+esc(t.chapter)+' · '+count+' 道题 · 掌握 '+n+'%</small>'+bar(n)+'</div><div class="db-actions"><button data-db-learn="'+esc(t.topicId)+'">学习</button><button data-db-practice="'+esc(t.topicId)+'" '+(!count?'disabled':'')+'>练习</button></div></article>';}).join('')+'</div></section>'+
-        '<section class="db-panel"><h3>错题与模拟考</h3><p>当前科目 '+state().mistakes.filter(m=>m.subject===sub&&!m.mastered).length+' 道待复习错题。</p>'+ (errors.length?'<p>常见错误类型：'+errors.map(e=>esc(e.type)+' ('+e.count+')').join('、')+'</p>':'')+'<div class="db-actions"><button id="dbMistakes">打开错题本</button><button id="dbMock">准备模拟考</button></div></section>';
+        auditPanel(sub)+'<section class="db-panel"><h3>错题与模拟考</h3><p>当前科目 '+state().mistakes.filter(m=>m.subject===sub&&!m.mastered).length+' 道待复习错题。</p>'+ (errors.length?'<p>常见错误类型：'+errors.map(e=>esc(e.type)+' ('+e.count+')').join('、')+'</p>':'')+'<div class="db-actions"><button id="dbMistakes">打开错题本</button><button id="dbMock">准备模拟考</button></div></section>';
       p.querySelectorAll('[data-task]').forEach(x=>x.onclick=()=>startTask(d.tasks.find(t=>t.id===x.dataset.task)));
       p.querySelectorAll('[data-db-subject]').forEach(x=>x.onclick=()=>{setCurrentSubjectSafe(x.dataset.dbSubject);render();});
       p.querySelectorAll('[data-db-practice]').forEach(x=>x.onclick=()=>gotoTopicPractice(x.dataset.dbPractice));

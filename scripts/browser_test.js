@@ -24,10 +24,20 @@ const server=http.createServer((req,res)=>{
    assert.equal(await page.evaluate(()=>userState===window.userState),true);
    for(const subject of ['math','physics','chemistry','dt','business','computer_science','english']){
     await page.locator('[data-db-subject="'+subject+'"]').click();
-    assert.equal(await page.locator('.db-topics article').count(),await page.evaluate(s=>IGCSE_CATALOG.topicsFor(s).length,subject));
+    assert.equal(await page.locator('#page-dashboard > .db-panel').filter({has:page.locator('h3', {hasText:'课程地图与练习覆盖'})}).locator('.db-topics article').count(),await page.evaluate(s=>IGCSE_CATALOG.topicsFor(s).length,subject));
    }
+   await page.locator('#dbSyllabusAudit summary').click();
+   assert.match(await page.locator('#dbSyllabusAudit').textContent(),/0510.*2027-2029/s);
+   assert.match(await page.locator('#dbSyllabusAudit').textContent(),/准备练习/);
+   assert.equal(await page.locator('#dbSyllabusAudit article').count(),16);
    const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1);assert.equal(overflow,false,'dashboard overflow '+width);
    await page.screenshot({path:path.join(results,'dashboard-'+width+'.png'),fullPage:true});
+   // Newly authored questions must enter the real practice flow and record evidence.
+   await page.evaluate(()=>{setCurrentSubjectSafe('computer_science');startSessionFromIds(['depth_cs_001'],'normal',{subject:'computer_science'});});
+   const depthAnswer=await page.evaluate(()=>{const q=findQuestion('depth_cs_001');return q.options.indexOf(q.answer);});
+   await page.locator('#questionArea .opt-btn').nth(depthAnswer).click();
+   assert.equal(await page.evaluate(()=>userState.questionStats.depth_cs_001.correct),1);
+   await page.locator('#dashboard-nav').click();
    await page.locator('[data-db-subject="math"]').click();
    const taskId=await page.locator('[data-task]').first().getAttribute('data-task');
    await page.locator('[data-task]').first().click();

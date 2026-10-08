@@ -299,6 +299,7 @@
 
 <script src="data/physics_0625_course_map.js"></script>
 <script src="data/igcse_questions_extension.js"></script>
+<script src="data/igcse_questions_depth.js"></script>
 <script src="data/learning_catalog.js"></script>
 <script>
 /* ===================== 用户状态管理 ===================== */
@@ -1444,7 +1445,7 @@ function renderMockEntry(){
 function prepareMock(subject){
     const qs=window.IGCSE_MOCK_ENGINE.selectQuestions(subject,30);
     const el=document.getElementById('mockEntry');
-    el.innerHTML='<div class="mock-preflight"><h3>模拟考准备 · '+esc(SUBJECT_NAMES[subject]||'全科混合')+'</h3><p>'+qs.length+' 道客观题 · 30 分钟 · '+new Set(qs.map(q=>q.subject+'::'+q.topicId)).size+' 个主题</p><p>原创练习组卷，按题数计分。交卷后显示解析与薄弱主题；不作为官方成绩预测。刷新后可继续，计时仍从原开始时间计算。</p><div class="mock-controls"><button id="confirmMock" '+(!qs.length?'disabled':'')+'>开始计时</button><button id="cancelMock">返回选择</button></div></div>';
+    el.innerHTML='<div class="mock-preflight"><h3>模拟考准备 · '+esc(SUBJECT_NAMES[subject]||'全科混合')+'</h3><p>'+qs.length+' 道客观题 · 30 分钟 · '+new Set(qs.map(q=>q.subject+'::'+q.topicId)).size+' 个主题</p><p>原创练习组卷，按题数计分。英语包含文字与策略练习，不评估真实听说能力或完整作文。交卷后显示解析与薄弱主题；不作为官方成绩预测。刷新后可继续，计时仍从原开始时间计算。</p><div class="mock-controls"><button id="confirmMock" '+(!qs.length?'disabled':'')+'>开始计时</button><button id="cancelMock">返回选择</button></div></div>';
     document.getElementById('confirmMock').onclick=()=>{if(subject!=='mixed')setCurrentSubjectSafe(subject);startSessionFromIds(qs.map(q=>q.id),'mock',{subject,label:'模拟考 · '+(SUBJECT_NAMES[subject]||'全科混合'),timeLimitSec:1800});};
     document.getElementById('cancelMock').onclick=renderMockEntry;
 }
@@ -1891,6 +1892,8 @@ document.addEventListener('DOMContentLoaded',function(){
 <script src="data/mastery_engine.js"></script>
 <script src="data/user_state_schema.js"></script>
 <script src="data/syllabus_map.js"></script>
+<script src="data/syllabus_registry.js"></script>
+<script src="data/syllabus_audit.js"></script>
 <script src="data/srs_engine.js"></script>
 <script src="data/error_diagnosis.js"></script>
 <script src="data/mock_exam_engine.js"></script>
