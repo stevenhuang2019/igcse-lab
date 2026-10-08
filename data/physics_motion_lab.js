@@ -104,3 +104,23 @@ document.addEventListener('DOMContentLoaded',function(){
  function check(v){var isBoss=tab==='boss',q=isBoss?lab.boss[bidx%lab.boss.length]:lab.questions[qidx%lab.questions.length],ok=String(v)===String(q.answer);var dim=q.command==='Calculate'?'Calculation':q.command==='Explain'?'Explanation':q.command==='State'?'Knowledge':'Application';window.updateMotionMastery(q.kp,ok,dim);window.scheduleMotionSRS(q.kp,ok);if(!ok)s.wrong.unshift({id:q.id,kp:q.kp,time:Date.now(),mistake:q.mistake||'Review the concept and command word.'});else s.quest.practice=Math.min(6,(s.quest.practice||0)+1);window.addMotionXP(ok?(isBoss?35:15):3);window.saveMotion();var fb=document.getElementById('mvFeedback');if(fb)fb.innerHTML='<div class="p-3 rounded-lg '+(ok?'bg-green-50 text-green-700':'bg-red-50 text-red-700')+'"><b>'+(ok?'✓ Correct':'✗ Review this')+'</b><p class="mt-1">'+esc(q.explanation)+'</p>'+(q.mistake?'<p class="text-xs mt-1">Common error: '+esc(q.mistake)+'</p>':'')+'</div><button id="mvNext" class="mt-2 bg-slate-900 text-white px-4 py-2 rounded-lg">Next</button>';document.getElementById('mvNext').onclick=function(){if(isBoss)bidx++;else qidx++;render();};}
  render();
 });
+
+/* Exam-skill extension: graph/data/practical questions + diagnostic error taxonomy */
+(function(){
+  var L=window.PHYSICS_MOTION_LAB;
+  L.examSkills=[
+   {id:'graph',name:'Graph Skills',items:['read axes and units','calculate gradient','interpret shape','use area under speed-time graph']},
+   {id:'data',name:'Data Analysis',items:['identify trend','compare values','calculate from data','comment on anomalies']},
+   {id:'calculation',name:'Calculation',items:['select formula','substitute values','calculate','include unit','check significant figures']},
+   {id:'practical',name:'Practical Skills',items:['independent/dependent variables','repeat measurements','plot graph','reduce random error','identify limitations and improvements']}
+  ];
+  L.examQuestions=(L.examQuestions||[]).concat([
+   {id:'E-G1',kp:'M4',skill:'graph',type:'choice',marks:2,command:'Describe',question:'A distance-time graph rises as a straight line. What does this show about the object?',options:['It is stationary','It moves at constant speed','It accelerates uniformly','It changes direction continuously'],answer:1,explanation:'A constant gradient on a distance-time graph means constant speed.',errorType:'graph_interpretation'},
+   {id:'E-G2',kp:'M5',skill:'graph',type:'number',marks:2,command:'Calculate',question:'A section of a speed-time graph has speed 6 m/s for 10 s. Calculate the distance travelled during this section.',answer:60,unit:'m',explanation:'Distance = area under the graph = 6 × 10 = 60 m.',errorType:'graph_operation'},
+   {id:'E-D1',kp:'M3',skill:'data',type:'number',marks:2,command:'Calculate',question:'A student travels 240 m in 20 s, then 160 m in 10 s. Calculate the average speed for the complete journey.',answer:13.3333333333,tolerance:0.1,unit:'m/s',explanation:'Total distance = 400 m; total time = 30 s; average speed = 400/30 = 13.3 m/s.',errorType:'data_selection'},
+   {id:'E-C1',kp:'M6',skill:'calculation',type:'number',marks:2,command:'Determine',question:'A car increases velocity from 5 m/s to 17 m/s in 6 s. Determine its acceleration.',answer:2,tolerance:0.01,unit:'m/s²',explanation:'a = (17 − 5)/6 = 2 m/s².',errorType:'calculation'},
+   {id:'E-P1',kp:'M1',skill:'practical',type:'choice',marks:2,command:'Suggest',question:'A student measures a short distance and time once to calculate speed. Which improvement most directly improves reliability?',options:['Use a longer measured distance and repeat the timing','Use fewer measurements','Remove the units','Round every value to the nearest 10'],answer:0,explanation:'A longer distance gives a larger time interval and repeated measurements reduce random error.',errorType:'practical_method'},
+   {id:'E-E1',kp:'M8',skill:'practical',type:'choice',marks:2,command:'Explain',question:'Explain why the acceleration of a falling object becomes zero at terminal velocity.',options:['The object has no mass','Weight is balanced by air resistance','Gravity stops acting','The object stops moving'],answer:1,explanation:'At terminal velocity, air resistance equals weight, so resultant force is zero and acceleration is zero.',errorType:'concept_explanation'}
+  ]);
+  L.diagnosticTypes={knowledge:'Knowledge gap',calculation:'Calculation / formula',command_word:'Command word / task interpretation',english:'English comprehension',graph_interpretation:'Graph interpretation',graph_operation:'Graph operation',data_selection:'Data selection',practical_method:'Practical method',concept_explanation:'Concept explanation'};
+})();
