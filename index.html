@@ -15,6 +15,20 @@
         .page.active { display: block; }
         .nav-btn.active { background:#4f46e5; }
         body { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif; }
+        :root{--ig-primary:#4f46e5;--ig-primary-dark:#3730a3;--ig-bg:#f8fafc;--ig-surface:#fff;--ig-border:#e2e8f0;--ig-text:#0f172a;--ig-muted:#64748b;--ig-success:#16a34a;--ig-warning:#d97706;--ig-danger:#dc2626;--ig-radius:14px;--ig-shadow:0 1px 3px rgba(15,23,42,.08),0 8px 24px rgba(15,23,42,.05)}
+        body{background:var(--ig-bg);color:var(--ig-text)}
+        header{background:linear-gradient(135deg,var(--ig-primary-dark),var(--ig-primary))}
+        .page>div{border-color:var(--ig-border);border-radius:var(--ig-radius);box-shadow:var(--ig-shadow)}
+        .page h2{letter-spacing:-.01em}
+        button,.btn,.nav-btn{transition:background-color .15s ease,border-color .15s ease,box-shadow .15s ease,transform .12s ease}
+        .nav-btn.active{background:var(--ig-primary)!important;box-shadow:0 2px 8px rgba(79,70,229,.25)}
+        .nav-btn:not(.active){background:#fff!important;color:#334155;border:1px solid var(--ig-border)}
+        .nav-btn:not(.active):hover{border-color:#a5b4fc;color:var(--ig-primary)}
+        .ig-progress{height:8px;border-radius:999px;background:#e2e8f0;overflow:hidden}.ig-progress>span{display:block;height:100%;border-radius:inherit;background:var(--ig-primary)}
+        .ig-section-label{font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ig-muted)}
+        .ig-focus{border:1px solid #c7d2fe;background:#eef2ff;border-radius:12px}
+        @media (prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
         .opt-btn { transition: all .12s ease; }
         .opt-btn:hover { border-color:#818cf8; background:#eef2ff; }
         .opt-btn.picked { border-color:#4f46e5; background:#eef2ff; box-shadow:0 0 0 1px #4f46e5; }
