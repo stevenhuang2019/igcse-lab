@@ -603,6 +603,7 @@ function markAnswered(q, isCorrect, area){
         }
     }
     saveUserState(userState);
+    window.dispatchEvent(new CustomEvent('igcse-answer-recorded',{detail:{topicId:q.topicId,subject:subj,correct:isCorrect,srs:s.mode==='srs'}}));
     checkBadges();
     const fb = area.querySelector('.q-feedback');
     if(fb){
@@ -1768,6 +1769,7 @@ document.addEventListener('DOMContentLoaded',function(){
 })();
 </script><script src="data/chapter_learning_engine.js"></script>
 <script src="data/learning_dashboard.js"></script>
+<script src="data/mastery_engine.js"></script>
 <script src="data/physics_0625_course_map.js"></script>
 </body>
 </html>
