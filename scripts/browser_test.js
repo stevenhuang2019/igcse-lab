@@ -99,13 +99,14 @@ const server=http.createServer((req,res)=>{
    const taskId=await page.locator('[data-task]').first().getAttribute('data-task');
    await page.locator('[data-task]').first().click();
    const qid=await page.evaluate(()=>practiceSession.order[0]);
+   const priorAnswers=await page.evaluate(id=>userState.questionStats?.[id]?.answered||0,qid);
    const type=await page.evaluate(()=>findQuestion(practiceSession.order[0]).type);
    if(type==='choice')await page.locator('#questionArea .opt-btn').first().click();
    else if(type==='number'){await page.locator('#numberInput').fill('9999');await page.locator('[data-act=number-check]').click();}
    else{await page.locator('#essayInput').fill('My practice answer');await page.locator('[data-act=essay-check]').click();await page.locator('[data-self=no]').click();}
    assert.ok(await page.evaluate(id=>IGCSE_DASHBOARD.day().completed.includes(id),taskId));
    await page.reload();await page.locator('#dashboard-nav').click();
-   assert.equal(await page.evaluate(id=>userState.questionStats[id].answered,qid),1);
+   assert.equal(await page.evaluate(id=>userState.questionStats[id].answered,qid),priorAnswers+1);
    assert.ok(await page.evaluate(id=>IGCSE_DASHBOARD.day().completed.includes(id),taskId));
    // Subject controls, chapters and all existing page renderers must execute without exceptions.
    for(const id of ['page-textbook','page-assessment','page-mistake','page-quickref','page-vocab','page-resources','page-homework','page-profile','page-progress','page-chapters','motion-lab-page','page-home','page-dashboard']){
