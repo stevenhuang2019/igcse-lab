@@ -7,7 +7,7 @@ test('restore preserves answer evidence, clears transient sessions and previews 
 });
 test('restore rejects corrupted shapes, prototype keys and forged display counters',()=>{
  const {api}=backup();assert.throws(()=>api.parse('{}'));assert.throws(()=>api.parse('{"__proto__":{}}'));
- for(const mutate of [s=>s.globalStats.totalAnswered='html',s=>s.questionStats.q.correct=9,s=>s.level='<img>',s=>s.curriculum={yearGroup:99},s=>s.progress={subjects:[]},s=>s.activityByDay={today:{math:{answered:'bad'}}},s=>s.mockExams.records=[{id:'bad',questionIds:[],result:{total:2,correct:1,accuracy:'<img>'}}]]){const s=fixture();mutate(s);assert.throws(()=>api.parse(JSON.stringify(s)));}
+ for(const mutate of [s=>s.globalStats.totalAnswered='html',s=>s.questionStats.q.correct=9,s=>s.level='<img>',s=>s.xpNextLevel=0,s=>s.lastSciSubject='absent',s=>s.curriculum={yearGroup:99},s=>s.progress={subjects:[]},s=>s.activityByDay={today:{math:{answered:'bad'}}},s=>s.mockExams.records=[{id:'bad',questionIds:[],result:{total:2,correct:1,accuracy:'<img>'}}]]){const s=fixture();mutate(s);assert.throws(()=>api.parse(JSON.stringify(s)));}
  const text=JSON.stringify(fixture()).replace('"learnedTopics"','"constructor":{},"learnedTopics"');assert.throws(()=>api.parse(text));
 });
 test('restore is blocked during a live exam and failed writes do not replace the previous learner record',()=>{

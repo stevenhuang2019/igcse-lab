@@ -14,6 +14,8 @@
   for(const name of ['topicStats','dailyPlan','subjectStats','progress','mastery','srs','assessments','mockExams','achievements','errorDiagnosis','englishMaster','activityByDay','curriculum','learningPath'])if(s[name]!==undefined&&!object(s[name]))fail();
   function counts(r,answerKey='answered',correctKey='correct'){if(!object(r))fail();for(const key of [answerKey,correctKey])if(r[key]!==undefined&&(!Number.isInteger(r[key])||r[key]<0))fail();if((r[correctKey]||0)>(r[answerKey]||0))fail();}
   for(const key of ['level','xp','xpNextLevel','schemaVersion'])if(s[key]!==undefined&&(typeof s[key]!=='number'||s[key]<0))fail();
+  if(s.xpNextLevel!==undefined&&s.xpNextLevel<=0)fail();if(s.level!==undefined&&(!Number.isInteger(s.level)||s.level<1))fail();
+  if(s.lastSciSubject!==undefined&&!window.IGCSE_CATALOG.subjects.includes(s.lastSciSubject))fail();
   counts(s.globalStats,'totalAnswered','totalCorrect');for(const r of Object.values(s.questionStats))counts(r);for(const r of Object.values(s.subjectStats||{}))counts(r);
   for(const r of Object.values(s.topicStats||{}))if(!object(r))fail();
   for(const day of Object.values(s.activityByDay||{})){if(!object(day))fail();for(const r of Object.values(day))counts(r);}
