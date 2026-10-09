@@ -163,8 +163,9 @@ const server=http.createServer((req,res)=>{
     assert.match(await page.locator('.db-hero').textContent(),/英语/);
    }
    await page.goto(base);await page.locator('#dbProgress').waitFor();assert.equal(await page.locator('#page-dashboard.active').count(),1,'default landing');
+   await require('./curriculum_browser.cjs')(page,width,results);
    assert.deepEqual(errors,[],'browser errors '+width);assert.equal(expectedHTTP.size,0,'expected error fixtures observed');
-   console.log('[ok] '+width+'px: dashboard, seven subjects, task completion, storage, navigation, mock resume/submit/timeout/report; '+(Date.now()-started)+'ms');
+   console.log('[ok] '+width+'px: dashboard, seven subjects, task completion, storage, navigation, mock resume/submit/timeout/report, curriculum pacing/stages/export; '+(Date.now()-started)+'ms');
    await context.close();
   }
   fs.writeFileSync(path.join(results,'performance.json'),JSON.stringify(metrics,null,2));console.log('[ok] startup budgets: '+JSON.stringify(metrics));

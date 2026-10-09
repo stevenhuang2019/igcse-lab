@@ -5,8 +5,8 @@
 (function(){
   function esc(x){return String(x??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
   function subjects(){return [...new Set((contentData||[]).map(x=>x.subject))];}
-  function topics(sub,chapter){return (contentData||[]).filter(x=>x.subject===sub&&(!chapter||x.chapter===chapter));}
-  function qs(sub,chapter,topicId){const ids=new Set(topics(sub,chapter).map(t=>t.topicId));return (questionData||[]).filter(q=>q.subject===sub&&ids.has(q.topicId)&&(!topicId||q.topicId===topicId));}
+  function topics(sub,chapter){return (window.IGCSE_CURRICULUM?.ordered(sub)||(contentData||[]).filter(x=>x.subject===sub)).filter(x=>!chapter||x.chapter===chapter);}
+  function qs(sub,chapter,topicId){const ids=new Set(topics(sub,chapter).map(t=>t.topicId));return (questionData||[]).filter(q=>q.subject===sub&&ids.has(q.topicId)&&(!topicId||q.topicId===topicId)&&(!window.IGCSE_CURRICULUM||window.IGCSE_CURRICULUM.practiceTopics(sub,window.IGCSE_CURRICULUM.profile(sub)?.scope||'taught').some(t=>t.topicId===q.topicId)));}
   function chapters(sub){return [...new Set(topics(sub).map(x=>x.chapter))];}
   function label(s){return ({math:'数学 Math',physics:'物理 Physics',chemistry:'化学 Chemistry',dt:'设计 DT',business:'商业 Business',english:'英语 English'})[s]||s;}
   function command(q){
@@ -56,7 +56,7 @@
     }
     function progress(){
       const all=topics(sub,ch), qq=qs(sub,ch), answered=all.filter(t=>(userState.topicStats?.[sub+'::'+t.topicId]||userState.topicStats?.[t.topicId])?.answered).length;
-      ceProgress.innerHTML='<span class="px-3 py-2 rounded-lg bg-indigo-50 text-indigo-700">本章 '+all.length+' 个主题 · '+qq.length+' 道题 · 已练 '+answered+' 个主题</span>';
+      ceProgress.innerHTML='<span class="px-3 py-2 rounded-lg bg-indigo-50 text-indigo-700">'+esc(window.IGCSE_CURRICULUM?.edition(sub).message||'')+'<br>本章 '+all.length+' 个主题 · '+qq.length+' 道题 · 已练 '+answered+' 个主题</span>';
     }
     function overview(){
       const all=topics(sub,ch);
