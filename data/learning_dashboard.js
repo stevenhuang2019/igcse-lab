@@ -33,10 +33,15 @@
       }
       d.tasks=tasks;window.saveUserState(s);
     }
+    const materialTasks=window.IGCSE_MATERIAL_PLAN?.tasks()||[];
+    d.tasks=d.tasks.filter(t=>t.type!=='material').concat(materialTasks);
+    if(d.pendingTask?.type==='material'&&!materialTasks.some(t=>t.id===d.pendingTask.id))d.pendingTask=null;
     return d;
   }
   function startTask(task){
     if(!task)return;
+    if(state().mockExams?.activePractice){switchPage('page-practice');renderMockEntry();return;}
+    if(task.type==='material'){window.IGCSE_MATERIAL_PLAN.learn(task);return;}
     const d=day();d.pendingTask={...task};window.saveUserState(state());
     setCurrentSubjectSafe(task.subject);
     const ids=task.qid?[task.qid]:catalog().questionsFor(task.subject,task.topic).slice(0,5).map(q=>q.id);
@@ -58,10 +63,11 @@
       const sub=document.getElementById('subjectSelect').value,s=summary(sub),d=day(),errors=window.IGCSE_ERROR_DIAGNOSIS.top(sub).slice(0,3),done=d.tasks.filter(t=>d.completed.includes(t.id)).length;
       p.innerHTML='<div class="db-hero"><div><p class="section-label">IGCSE PERSONAL LEARNING OS</p><h2>今天，从下一步开始</h2><p>'+esc(names[sub])+' · '+s.learned+'/'+s.topics+' 个主题已学 · '+s.mastered+' 个主题练习表现稳固</p></div><div><strong>'+s.mastery+'%</strong><p>当前科目平均掌握估计</p></div></div>'+
         '<div class="db-stats"><div><b>'+done+'/'+d.tasks.length+'</b><span>今日任务完成</span></div><div><b>'+s.practiced+'/'+s.questions+'</b><span>实际练过的题目</span></div><div><b>'+(s.accuracy===null?'—':s.accuracy+'%')+'</b><span>已记录答题正确率</span></div><div><b>'+s.withQuestions+'/'+s.topics+'</b><span>本站有题的主题</span></div></div>'+
-        '<div class="db-actions"><button id="dbMaterials">上传与查看本科目资料</button><button id="dbProgress">查看进度与掌握依据</button></div><section class="db-panel"><h3>今日学习计划</h3><p>优先复习到期错题，再练习薄弱主题。每项完成一次作答后计入完成。</p><div class="db-tasks">'+d.tasks.map(t=>'<button data-task="'+esc(t.id)+'" class="db-task"><small>'+esc(names[t.subject])+' · '+t.minutes+' 分钟</small><b>'+esc(t.title)+'</b><span>'+esc(catalog().topic(t.subject,t.topic)?.title||t.topic)+'</span><em>'+(d.completed.includes(t.id)?'✓ 已完成 · 再练习':'开始练习 →')+'</em></button>').join('')+'</div></section>'+
+        '<div class="db-actions"><button id="dbMaterials">上传与查看本科目资料</button><button id="dbProgress">查看进度与掌握依据</button></div><section class="db-panel"><h3>今日学习计划</h3><p>优先复习到期错题，再练习薄弱主题。资料任务先学习章节，再完成一次对应作答；上传与阅读不计为练习完成。</p><div class="db-tasks">'+d.tasks.map(t=>'<button data-task="'+esc(t.id)+'" class="db-task"><small>'+esc(names[t.subject])+' · '+t.minutes+' 分钟</small><b>'+esc(t.title)+'</b><span>'+esc(catalog().topic(t.subject,t.topic)?.title||t.topic)+'</span>'+(t.materialTitle?'<small>资料：'+esc(t.materialTitle)+'</small>':'')+'<em>'+(d.completed.includes(t.id)?'✓ 已完成 · 再练习':'开始练习 →')+'</em></button>').join('')+'</div>'+d.tasks.filter(t=>t.type==='material').map(t=>'<div class="db-actions"><button data-material-review="'+esc(t.id)+'">复习资料章节错题 · '+esc(t.materialTitle)+'</button></div>').join('')+'</section>'+
         '<section class="db-panel"><h3>全科学习概览</h3><div class="db-subjects">'+catalog().subjects.map(subject=>{const x=summary(subject);return '<button data-db-subject="'+subject+'" class="db-task"><b>'+esc(names[subject])+'</b><span>'+x.mastery+'% 估计 · '+x.withQuestions+'/'+x.topics+' 主题有题</span>'+bar(x.mastery)+'</button>';}).join('')+'</div></section>'+
         '<section class="db-panel"><h3>课程地图与练习覆盖</h3><p>以下比例只统计本站课程主题，不代表完整官方考纲或考试等级预测。</p><div class="db-topics">'+catalog().topicsFor(sub).map(t=>{const count=catalog().questionsFor(sub,t.topicId).length,n=window.calculateMasteryV2(t.topicId,sub);return '<article><div><b>'+esc(t.title)+'</b><small>'+esc(t.chapter)+' · '+count+' 道题 · 掌握 '+n+'%</small>'+bar(n)+'</div><div class="db-actions"><button data-db-learn="'+esc(t.topicId)+'">学习</button><button data-db-practice="'+esc(t.topicId)+'" '+(!count?'disabled':'')+'>练习</button></div></article>';}).join('')+'</div></section>'+
         auditPanel(sub)+'<section class="db-panel"><h3>错题与模拟考</h3><p>当前科目 '+state().mistakes.filter(m=>m.subject===sub&&!m.mastered).length+' 道待复习错题。</p>'+ (errors.length?'<p>常见错误类型：'+errors.map(e=>esc(e.type)+' ('+e.count+')').join('、')+'</p>':'')+'<div class="db-actions"><button id="dbMistakes">打开错题本</button><button id="dbMock">准备模拟考</button></div></section>';
+      p.querySelectorAll('[data-material-review]').forEach(b=>b.onclick=()=>window.IGCSE_MATERIAL_PLAN.review(d.tasks.find(t=>t.id===b.dataset.materialReview)));
       p.querySelectorAll('[data-task]').forEach(x=>x.onclick=()=>startTask(d.tasks.find(t=>t.id===x.dataset.task)));
       p.querySelectorAll('[data-db-subject]').forEach(x=>x.onclick=()=>{setCurrentSubjectSafe(x.dataset.dbSubject);render();});
       p.querySelectorAll('[data-db-practice]').forEach(x=>x.onclick=()=>gotoTopicPractice(x.dataset.dbPractice));

@@ -33,3 +33,11 @@
 `npm ci --ignore-scripts` 后运行 `node scripts/build_material_assets.cjs`、`npm test`、`npm run build:css` 和 `npm run test:browser`。GitHub 源码需要先构建读取组件；交付 ZIP 和 CI 的 learner-preview 附件已包含组件。固定版本与校验摘要保存在仓库中，构建时核对后生成本地组件。文档读取库仅在上传 PDF / DOCX 时加载，不增加首页启动下载。
 
 依赖审计目前报告已有 Tailwind 构建依赖及 Mammoth CLI 的间接依赖告警。浏览器只使用 Mammoth 的纯文字读取包，没有调用其 CLI；不能据此声称整个依赖树无漏洞。升级构建链应单独验证兼容性。
+
+## 资料联动每日计划
+
+保存章节关联后，每日计划增加最多两项资料任务（优先最近上传的资料，重复章节只安排一次）。点击任务先进入章节学习；可查看来源资料，再点击「下一步：资料练习」。完成一次对应主题作答后计入当日任务完成，答错后可通过「复习资料章节错题」继续巩固。上传、AI 建议或仅阅读不会完成练习任务，也不会直接提高掌握度。取消关联或删除资料会移除相关任务，保留真实作答历史。旧资料在打开新版时会重新整理已确认关联。
+
+资料页面会显示 AI 服务是否已配置；没有凭据时禁用发送按钮。配置完成后，可在项目目录运行 `node scripts/verify_live_material_ai.cjs --file /你的资料路径 --subject math`（科目值为 math / physics / chemistry / dt / business / computer_science / english）对选中的真实文件进行一次接口验证。该操作会发送文件并可能计费。报告只保存验证统计，不记录密钥或教材原文。PDF、扫描件和 Word 的引用仍须人工核对；接口响应成功不等于教材内容与教学效果已验收。
+
+当前环境未配置密钥，本轮没有真实 AI 调用，也没有真实教材分析效果验收。

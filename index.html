@@ -456,6 +456,7 @@ function renderTopicList(){
     if(learnedAll) checkBadges();
 }
 function openTopic(topic){
+    document.getElementById('materialLearningNext')?.remove();
     currentTopicId = topic.topicId;
     const L = window.getTopicLanguage ? window.getTopicLanguage(topic) : {title:topic.title,body:topic.knowledge||''};
     document.getElementById('topicTitle').innerText = L.title;
@@ -1899,6 +1900,7 @@ document.addEventListener('DOMContentLoaded',function(){
 <script src="data/error_diagnosis.js"></script>
 <script src="data/mock_exam_engine.js"></script>
 <script src="data/learning_progress.js"></script>
+<script src="data/material_study_plan.js"></script>
 <script src="data/learning_dashboard.js"></script>
 <script src="data/progress_view.js"></script>
 <script src="data/material_library.js"></script>

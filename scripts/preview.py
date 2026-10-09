@@ -13,6 +13,16 @@ root = pathlib.Path(__file__).resolve().parents[1]
 class Handler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *a, **kw):
         super().__init__(*a, directory=str(root), **kw)
+    def do_GET(self):
+        if self.path == '/api/ai/status':
+            payload = b'{"configured":false,"liveValidated":false}'
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Content-Length', str(len(payload)))
+            self.end_headers()
+            self.wfile.write(payload)
+        else:
+            super().do_GET()
     def do_POST(self):
         if self.path == '/api/materials/analyse':
             payload = '{"error":"AI 服务尚未启用，请配置服务端凭据并启动 AI 预览服务；上传与手动关联仍可使用。"}'.encode()

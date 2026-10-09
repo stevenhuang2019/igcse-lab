@@ -4,6 +4,7 @@ const fs=require('node:fs'),path=require('node:path'),http=require('node:http'),
 const root=path.resolve(__dirname,'..'),results=path.join(root,'test-results'),metrics=[];
 fs.mkdirSync(results,{recursive:true});
 const server=http.createServer((req,res)=>{
+ if(req.url==='/api/ai/status'){res.setHeader('Content-Type','application/json');res.end(JSON.stringify({configured:false}));return;}
  const route=decodeURIComponent(new URL(req.url,'http://localhost').pathname),file=path.resolve(root,'.'+(route==='/'?'/index.html':route));
  if(!file.startsWith(root+path.sep)){res.writeHead(403).end();return;}
  try{res.setHeader('Content-Type',(file.endsWith('.js')||file.endsWith('.mjs'))?'text/javascript':file.endsWith('.css')?'text/css':'text/html');res.end(fs.readFileSync(file));}catch{res.writeHead(404).end();}
@@ -22,6 +23,7 @@ const server=http.createServer((req,res)=>{
    const performance=await page.evaluate(()=>({domReadyMs:Math.round(window.performance.getEntriesByType('navigation')[0].domContentLoadedEventEnd),localAssetBytes:window.performance.getEntriesByType('resource').filter(r=>r.name.startsWith(location.origin)).reduce((n,r)=>n+r.decodedBodySize,0)}));
    assert.ok(performance.domReadyMs<5000,'startup budget '+width);assert.ok(performance.localAssetBytes<3*1024*1024,'local asset budget '+width);metrics.push({width,...performance});
    await require('./material_browser_flows.cjs')(page,width,results);
+   await require('./material_plan_browser.cjs')(page);
    assert.equal(await page.locator('.page.active').count(),1);
    assert.equal(await page.locator('#dashboard-nav').getAttribute('aria-current'),'page');
    assert.equal(await page.evaluate(()=>userState===window.userState),true);
