@@ -6,7 +6,7 @@ module.exports=async(page,width,results)=>{
  const l=page.locator('[data-advanced-lesson="as_derivative"]');await l.locator('summary').click();assert.equal(await l.locator('button[type=submit]').first().isDisabled(),true);
  await l.locator('[data-advanced-status]').selectOption('current');await l.locator('[data-advanced-plan]').click();
  await l.locator('summary').click();const q=l.locator('[data-advanced-question="as_derivative_1"]');await q.locator('input').fill('19');await q.locator('button').click();assert.match(await q.locator('[role=status]').textContent(),/答案正确/);
- const open=l.locator('[data-advanced-question="as_derivative_3"]');await open.locator('textarea').fill('The derivative describes local change rather than a point coordinate.');await open.locator('button').click();assert.match(await open.locator('[role=status]').textContent(),/未自动评分/);
+ const open=l.locator('[data-advanced-question="as_derivative_3"]');await open.locator('textarea').fill('The derivative describes local change rather than a point coordinate.');await open.locator('button').click();assert.match(await open.locator('[role=status]').textContent(),/未自动评分/);assert.match(await l.locator('[data-advanced-count]').textContent(),/2 \/ 3/);
  await page.reload();await page.locator('#advanced-nav').click();await l.locator('summary').click();assert.equal(await q.locator('input').inputValue(),'19');assert.match(await l.textContent(),/2 \/ 3/);
  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,'advanced overflow '+width);
  await page.screenshot({path:path.join(results,'advanced-'+width+'.png'),fullPage:true});
