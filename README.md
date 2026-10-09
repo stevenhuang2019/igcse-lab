@@ -71,3 +71,5 @@ Bullet-level official-objective audits for all seven subjects, further CS/Englis
 
 
 教材与作业：七个科目均可在「我的教材与作业」上传资料、读取文字、保存章节关联并进入练习。详见 [资料库与 AI 使用说明](MATERIALS_GUIDE.md)。资料附件保存在浏览器中，不包含于学习记录备份。AI 分析需要配置服务端凭据。
+
+英语写作：五类 ESL 原创范文、提纲、写作提示和逐条语法修改，见 [写作学习说明](WRITING_GUIDE.md)。

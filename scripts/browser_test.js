@@ -15,8 +15,8 @@ const server=http.createServer((req,res)=>{
   await new Promise(r=>server.listen(0,'127.0.0.1',r));const base='http://127.0.0.1:'+server.address().port;
   browser=await chromium.launch({headless:true,...(process.env.CHROME_PATH?{executablePath:process.env.CHROME_PATH}:{})});
   for(const width of [1280,768,390]){
-   const context=await browser.newContext({viewport:{width,height:900}}),page=await context.newPage(),errors=[];
-   page.on('pageerror',e=>errors.push(e.stack));page.on('response',r=>{if(r.url().startsWith(base)&&r.status()>=400)errors.push(r.status()+' '+r.url());});
+   const context=await browser.newContext({viewport:{width,height:900}}),page=await context.newPage(),errors=[],expectedHTTP=new Set();
+   page.on('pageerror',e=>errors.push(e.stack));page.on('response',r=>{if(r.url().startsWith(base)&&r.status()>=400){const label=r.status()+' '+r.url();if(!expectedHTTP.delete(label))errors.push(label);}});
    // Application flows must work even when optional external math resources are unavailable.
    await page.route('**/*',route=>route.request().url().startsWith(base)?route.continue():route.abort());
    const started=Date.now();await page.goto(base+'/#page-dashboard');await page.locator('#dbMock').waitFor();
@@ -25,6 +25,7 @@ const server=http.createServer((req,res)=>{
    await require('./material_browser_flows.cjs')(page,width,results);
    await require('./material_plan_browser.cjs')(page);
    await require('./study_resources_browser.cjs')(page,width,results);
+   await require('./writing_browser.cjs')(page,width,results,expectedHTTP);
    assert.equal(await page.locator('.page.active').count(),1);
    assert.equal(await page.locator('#dashboard-nav').getAttribute('aria-current'),'page');
    assert.equal(await page.evaluate(()=>userState===window.userState),true);
@@ -162,7 +163,7 @@ const server=http.createServer((req,res)=>{
     assert.match(await page.locator('.db-hero').textContent(),/英语/);
    }
    await page.goto(base);await page.locator('#dbProgress').waitFor();assert.equal(await page.locator('#page-dashboard.active').count(),1,'default landing');
-   assert.deepEqual(errors,[],'browser errors '+width);
+   assert.deepEqual(errors,[],'browser errors '+width);assert.equal(expectedHTTP.size,0,'expected error fixtures observed');
    console.log('[ok] '+width+'px: dashboard, seven subjects, task completion, storage, navigation, mock resume/submit/timeout/report; '+(Date.now()-started)+'ms');
    await context.close();
   }

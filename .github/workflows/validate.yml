@@ -38,5 +38,7 @@ jobs:
             start-local.command
             start-ai.command
             server/material_ai.cjs
+            server/writing_ai.cjs
             USER_GUIDE.md
             MATERIALS_GUIDE.md
+            WRITING_GUIDE.md

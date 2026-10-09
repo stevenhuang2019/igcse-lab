@@ -24,7 +24,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         else:
             super().do_GET()
     def do_POST(self):
-        if self.path == '/api/materials/analyse':
+        if self.path in ('/api/materials/analyse', '/api/writing/coach'):
             payload = '{"error":"AI 服务尚未启用，请配置服务端凭据并启动 AI 预览服务；上传与手动关联仍可使用。"}'.encode()
             self.send_response(503)
             self.send_header('Content-Type', 'application/json')
