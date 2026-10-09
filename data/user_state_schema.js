@@ -15,6 +15,7 @@
     s.achievements=s.achievements||{unlocked:[]};
     s.errorDiagnosis=s.errorDiagnosis||{};
     s.topicStats=s.topicStats||{};
+    s.questionStats=s.questionStats||{};
     s.mistakes=s.mistakes||[];
     s.learnedTopics=s.learnedTopics||[];
     s.assessmentRecords=s.assessmentRecords||[];

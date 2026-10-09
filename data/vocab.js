@@ -1896,7 +1896,7 @@ window.SUBJECT_VOCAB = [
   { "subject": "business", "chapter": "外部环境", "en": "competition policy", "zh": "竞争政策" },
   { "subject": "business", "chapter": "外部环境", "en": "monopoly", "zh": "垄断" },
   { "subject": "business", "chapter": "外部环境", "en": "oligopoly", "zh": "寡头垄断" },
-  { "subject": "business", "chapter": "外部环境", "en": "market liberalisation", "zh": "市场自由化" }
+  { "subject": "business", "chapter": "外部环境", "en": "market liberalisation", "zh": "市场自由化" },
 /* ============ English ESL ============ */
 { "subject":"english","chapter":"ESL","en":"gist","zh":"主旨大意" },
 { "subject":"english","chapter":"ESL","en":"infer","zh":"推断" },

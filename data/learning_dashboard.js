@@ -1,267 +1,113 @@
-/* IGCSE Personal Learning OS — Dashboard v1
- * Unified Course Map / Mastery / Error Diagnosis / Today Mission.
- * Reuses existing contentData, questionData, userState and Motion Lab state.
- */
+/* Learning dashboard: catalogue coverage and evidence-based next actions. */
 (function(){
   'use strict';
-  const esc=x=>String(x??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-  const subjName=s=>({math:'数学 Math',physics:'物理 Physics',chemistry:'化学 Chemistry',dt:'设计 DT',business:'商业 Business',computer_science:'计算机科学 CS',english:'英语 English'})[s]||s;
-  const key='igcse_dashboard_v1';
-
-  function getState(){
-    window.userState=window.userState||{};
-    return window.userState;
+  const names={math:'数学',physics:'物理',chemistry:'化学',dt:'设计 DT',business:'商业研究',computer_science:'计算机科学',english:'英语 ESL'};
+  const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const catalog=()=>window.IGCSE_CATALOG;
+  const state=()=>window.userState;
+  const localDate=(date=new Date())=>date.getFullYear()+'-'+String(date.getMonth()+1).padStart(2,'0')+'-'+String(date.getDate()).padStart(2,'0');
+  function stats(subject,id){return state().topicStats[subject+'::'+id]||state().topicStats[id]||{};}
+  function summary(subject){
+    const ts=window.IGCSE_CURRICULUM?.ordered(subject)||catalog().topicsFor(subject),qs=ts.flatMap(t=>catalog().questionsFor(subject,t.topicId));
+    const mastery=ts.map(t=>window.calculateMasteryV2?window.calculateMasteryV2(t.topicId,subject):Number(stats(subject,t.topicId).mastery||0));
+    const attempts=qs.map(q=>state().questionStats?.[q.id]).filter(Boolean);
+    const answered=attempts.reduce((n,x)=>n+x.answered,0),correct=attempts.reduce((n,x)=>n+x.correct,0);
+    return {subject,topics:ts.length,questions:qs.length,learned:ts.filter(t=>state().learnedTopics.includes(t.topicId)).length,
+      withQuestions:ts.filter(t=>catalog().questionsFor(subject,t.topicId).length).length,
+      practiced:attempts.length,accuracy:answered?Math.round(correct/answered*100):null,
+      mastery:ts.length?Math.round(mastery.reduce((a,b)=>a+b,0)/ts.length):0,mastered:ts.filter(t=>window.getTopicMasteryEvidence?.(t.topicId,subject).established).length};
   }
-  function todayKey(){return new Date().toISOString().slice(0,10);}
-  function dailyState(){
-    const st=getState(); st.dailyPlan=st.dailyPlan||{}; const k=todayKey();
-    if(!st.dailyPlan[k])st.dailyPlan[k]={completed:[],startedAt:null,tasks:null,pendingTask:null};
-    return st.dailyPlan[k];
-  }
-  function dailyPlanTasks(){
-    const d=dailyState();
+  function day(){
+    const s=state();s.dailyPlan=s.dailyPlan||{};
+    const k=localDate();s.dailyPlan[k]=s.dailyPlan[k]||{completed:[],tasks:[]};
+    const d=s.dailyPlan[k],cp=window.IGCSE_CURRICULUM;
+    const planSignature=cp?JSON.stringify(cp.state()):'';if(d.curriculumSignature!==planSignature){d.tasks=null;d.pendingTask=null;d.curriculumSignature=planSignature;}
+    if(d.version!==2){d.version=2;d.completed=Array.isArray(d.completed)?d.completed:[];d.pendingTask=null;d.tasks=null;}
     if(!Array.isArray(d.tasks)){
-      const plan=adaptivePlan();
-      d.tasks=plan.tasks.map(x=>({id:x.id,type:x.type,title:x.title,text:x.text,minutes:x.minutes,priority:x.priority,subject:x.subject||'',topic:x.topic||'',qid:x.qid||''}));
-      if(window.saveUserState)window.saveUserState(getState());
+      const due=window.IGCSE_SRS?window.IGCSE_SRS.dueCards(3):[];
+      const tasks=due.filter(c=>catalog().question(c.qid)&&(!cp||cp.eligible(c.subject,c.topicId))).map(c=>({id:'srs_'+c.qid,qid:c.qid,subject:c.subject,topic:c.topicId,minutes:5,type:'srs',title:'复习到期错题'}));
+      const weak=catalog().topics.filter(t=>catalog().questionsFor(t.subject,t.topicId).length&&(!cp||cp.eligible(t.subject,t.topicId))).map(t=>({t,n:window.calculateMasteryV2(t.topicId,t.subject)})).sort((a,b)=>(cp?cp.priority(a.t.subject,a.t.topicId)-cp.priority(b.t.subject,b.t.topicId):0)||(window.IGCSE_LEARNING_PATH?(window.IGCSE_LEARNING_PATH.repairPriority(a.t.subject,a.t.topicId)-window.IGCSE_LEARNING_PATH.repairPriority(b.t.subject,b.t.topicId)):0)||a.n-b.n);
+      for(const {t,n} of weak){
+        if(tasks.length>=5)break;
+        if(tasks.some(x=>x.subject===t.subject&&(!cp?.profile(t.subject)||x.topic===t.topicId)))continue;
+        tasks.push({id:'topic_'+t.subject+'_'+t.topicId,subject:t.subject,topic:t.topicId,minutes:8,type:'practice',title:cp?.status(t.subject,t.topicId)==='current'?'跟进学校当前章节':n?'巩固薄弱主题':'建立基础练习'});
+      }
+      d.tasks=tasks;window.saveUserState(s);
     }
-    return d.tasks;
+    const materialTasks=(window.IGCSE_MATERIAL_PLAN?.tasks()||[]).filter(t=>!cp||cp.eligible(t.subject,t.topic));
+    d.tasks=d.tasks.filter(t=>t.type!=='material').concat(materialTasks);
+    if(d.pendingTask?.type==='material'&&!materialTasks.some(t=>t.id===d.pendingTask.id))d.pendingTask=null;
+    return d;
   }
-  function markDailyTask(id){
-    const d=dailyState(); if(!d.completed.includes(id))d.completed.push(id);
-    if(!d.startedAt)d.startedAt=new Date().toISOString();
-    if(window.saveUserState)window.saveUserState(getState());
+  function startTask(task){
+    if(!task)return;
+    if(state().mockExams?.activePractice){switchPage('page-practice');renderMockEntry();return;}
+    if(task.type==='material'){window.IGCSE_MATERIAL_PLAN.learn(task);return;}
+    const d=day();d.pendingTask={...task};window.saveUserState(state());
+    setCurrentSubjectSafe(task.subject);
+    const ids=task.qid?[task.qid]:catalog().questionsFor(task.subject,task.topic).slice(0,5).map(q=>q.id);
+    startSessionFromIds(ids,task.type==='srs'?'srs':'normal',{topicId:task.topic,subject:task.subject,label:task.title});
   }
-  function dailyStats(){
-    const d=dailyState(), tasks=dailyPlanTasks(), total=Math.max(tasks.length,1);
-    return {completed:d.completed.length,total:tasks.length,rate:Math.min(100,Math.round(d.completed.length/total*100))};
-  }
-  function streakDays(){
-    const plans=getState().dailyPlan||{}, today=new Date(); let n=0;
-    for(let i=0;i<365;i++){
-      const d=new Date(today); d.setDate(today.getDate()-i);
-      const p=plans[d.toISOString().slice(0,10)];
-      if(p&&p.completed&&p.completed.length)n++; else if(i>0)break;
-    }
-    return n;
-  }
-
-  function topics(sub){
-    const base=(window.contentData||[]).filter(x=>x.subject===sub);
-    if(sub==='physics'&&window.PHYSICS_0625_COURSE_MAP){
-      const ids=new Set(base.map(x=>x.topicId));
-      const extra=window.PHYSICS_0625_COURSE_MAP.filter(x=>!ids.has(x.topicId)).map(x=>({subject:'physics',chapter:x.chapter,topicId:x.topicId,title:x.title,knowledge:x.knowledge,formulas:x.formulas,commonMistake:x.commonMistake}));
-      return base.concat(extra);
-    }
-    return base;
-  }
-  function questions(sub){return (window.questionData||[]).filter(x=>x.subject===sub);}
-  function topicStats(){return getState().topicStats||{};}
-  function masteryForTopic(t){
-    const sub=t.subject||currentSubject();
-    if(window.calculateMasteryV2)return window.calculateMasteryV2(t.topicId,sub);
-    const key=window.masteryTopicKey?window.masteryTopicKey(t.topicId,sub):t.topicId;
-    const st=topicStats()[key]||topicStats()[t.topicId]||{};
-    return st.mastery||0;
-  }
-  function allSubjects(){return ['math','physics','chemistry','dt','business','computer_science','english'];}
-  function topicPriority(t){
-    const n=masteryForTopic(t);
-    const qs=questions(t.subject||currentSubject()).filter(q=>q.topicId===t.topicId);
-    const key=(window.masteryTopicKey?window.masteryTopicKey(t.topicId,t.subject||currentSubject()):t.topicId);
-    const legacy=topicStats()[t.topicId], ns=topicStats()[key]||legacy;
-    const unanswered=qs.filter(q=>!(ns?.answered)).length;
-    return (100-n)*0.7+Math.min(20,unanswered*2);
-  }
-  function examProfile(sub){
-    const profiles={
-      physics:[['calculation','Calculation'],['graph','Graph / Data'],['practical','Practical'],['command','Exam English'],['explanation','Explanation']],
-      chemistry:[['calculation','Calculation'],['practical','Practical'],['data','Data Analysis'],['command','Exam English'],['explanation','Explanation']],
-      math:[['calculation','Calculation'],['problem','Problem Solving'],['graph','Graph / Data'],['command','Exam English']],
-      computer_science:[['algorithm','Algorithm'],['programming','Programming'],['trace','Trace Table / Testing'],['logic','Boolean Logic'],['command','Exam English']],
-      english:[['reading','Reading'],['writing','Writing'],['listening','Listening'],['speaking','Speaking'],['language','Language / Grammar']],
-      business:[['knowledge','Business Knowledge'],['application','Application'],['analysis','Analysis'],['evaluation','Evaluation'],['command','Exam English']],
-      dt:[['design','Design Thinking'],['technical','Technical Knowledge'],['analysis','Analysis'],['evaluation','Evaluation'],['command','Exam English']]
-    }; return profiles[sub]||[['knowledge','Knowledge'],['application','Application'],['command','Exam English']];
-  }
-  function skillScoreFor(sub,id){
-    const qs=questions(sub).filter(q=>{
-      const s=String(q.skill||'').toLowerCase(), c=String(q.commandWord||q.command||'').toLowerCase(), k=String(q.knowledgePoint||'').toLowerCase(), t=String(q.topicId||'').toLowerCase();
-      if(id==='calculation')return s.includes('calculation')||c==='calculate';
-      if(id==='graph')return s.includes('graph')||s.includes('data')||/graph|gradient|图像|数据/.test(String(q.question||''));
-      if(id==='practical')return s.includes('practical')||q.type==='practical';
-      if(id==='command')return !!(q.commandWord||q.command);
-      if(id==='explanation')return c==='explain'||s.includes('explain');
-      if(id==='algorithm')return /algorithm|伪代码|pseudocode/.test(s+' '+k+' '+t);
-      if(id==='programming')return /program|python|code/.test(s+' '+k+' '+t);
-      if(id==='trace')return /trace|test|debug/.test(s+' '+k+' '+t);
-      if(id==='logic')return /boolean|logic|truth/.test(s+' '+k+' '+t);
-      if(id==='reading')return /read/.test(s+' '+t);
-      if(id==='writing')return /writ/.test(s+' '+t);
-      if(id==='listening')return /listen/.test(s+' '+t);
-      if(id==='speaking')return /speak/.test(s+' '+t);
-      if(id==='language')return /grammar|vocab|language/.test(s+' '+t);
-      return s.includes(id)||k.includes(id)||t.includes(id);
-    });
-    if(!qs.length)return null;
-    const st=topicStats(), vals=qs.map(q=>{
-      const k=window.masteryTopicKey?window.masteryTopicKey(q.topicId,sub):q.topicId;
-      const x=st[k]||st[q.topicId];
-      return x&&x.answered?Math.min(100,(x.correct||0)/x.answered*100):0;
-    });
-    return Math.round(vals.reduce((a,b)=>a+b,0)/vals.length);
-  }
-  function globalWeaknesses(){
-    const out=[];
-    allSubjects().forEach(sub=>topics(sub).forEach(t=>{
-      const n=masteryForTopic(t);
-      if(n<85) out.push({subject:sub,t,n,priority:topicPriority(Object.assign({},t,{subject:sub}))});
-    }));
-    return out.sort((a,b)=>b.priority-a.priority);
-  }
-  function adaptivePlan(){
-    const weak=globalWeaknesses().slice(0,6);
-    const readinessWeak=examReadiness(currentSubject()).gaps.slice(0,2);
-    const diag=(window.IGCSE_ERROR_DIAGNOSIS&&window.IGCSE_ERROR_DIAGNOSIS.top)?window.IGCSE_ERROR_DIAGNOSIS.top(currentSubject()).slice(0,2):[];
-    const mistakes=(window.IGCSE_SRS&&window.IGCSE_SRS.dueCards)?window.IGCSE_SRS.dueCards(6):[];
-    const tasks=[];
-    diag.forEach((g,i)=>tasks.push({id:'diag_'+currentSubject()+'_'+g.type,type:'repair',icon:'🧩',title:subjName(currentSubject())+' · '+g.type+' 修复',text:'针对近期高频错误类型进行专项修复 · '+g.count+' 次',minutes:8,priority:102-i*3,subject:currentSubject()}));
-    readinessWeak.forEach((g,i)=>{
-      const candidates=questions(currentSubject()).filter(q=>{
-        const s=String(q.skill||'').toLowerCase(), id=g.id;
-        if(id==='calculation')return s.includes('calculation')||String(q.commandWord||'').toLowerCase()==='calculate';
-        if(id==='graph')return s.includes('graph')||s.includes('data');
-        if(id==='practical')return s.includes('practical')||q.type==='practical';
-        if(id==='command')return !!q.commandWord;
-        if(id==='explanation')return String(q.commandWord||'').toLowerCase()==='explain';
-        return s.includes(id);
-      });
-      const target=candidates[0];
-      tasks.push({id:'skill_'+currentSubject()+'_'+g.id,type:'skill',icon:'🧠',title:subjName(currentSubject())+' · '+g.cn+'强化',text:'针对考试能力弱项训练 · 当前 '+g.score+'%'+(target?' · 推荐主题 '+(target.topicId||'') :''),minutes:10,priority:96-i*3,subject:currentSubject(),topic:target&&target.topicId||'' ,qid:target&&target.id||''});
-    });
-    mistakes.slice(0,2).forEach((m,i)=>tasks.push({id:'srs_'+(m.qid||m.key||i),type:'srs',icon:'🔁',title:'SRS 错题复习',text:'复习到期错题并重新作答',minutes:5,priority:100-i*2,qid:m.qid||'',topic:m.topicId||'',subject:m.subject||currentSubject()}));
-    weak.slice(0,5).forEach((x,i)=>{
-      const type=x.n===0?'learn':x.n<50?'practice':x.n<70?'repair':'reinforce';
-      const meta={learn:['📘','知识学习','先建立核心知识框架',8],practice:['🎯','针对练习','集中训练薄弱知识点',10],repair:['🛠️','错因修复','针对常见错误进行强化',10],reinforce:['⚡','巩固练习','保持已建立的掌握度',8]}[type];
-      tasks.push({id:'topic_'+x.subject+'_'+x.t.topicId,type,icon:meta[0],title:subjName(x.subject)+' · '+meta[1],text:meta[2]+' · 当前掌握度 '+x.n+'%',minutes:meta[3],priority:Math.round(x.priority),subject:x.subject,topic:x.t.topicId});
-    });
-    tasks.sort((a,b)=>b.priority-a.priority);
-    return {tasks:tasks.slice(0,5),totalMinutes:tasks.slice(0,5).reduce((a,x)=>a+x.minutes,0)};
+  window.IGCSE_DASHBOARD={summary,day,localDate,startTask};
+  function auditPanel(subject){
+    const a=window.getIGCSESyllabusAudit?.(subject);if(!a)return '';
+    const labels={'sample-practice':'已有样题','preparation-only':'准备练习','content-linked':'内容关联 · 待补样题','gap':'尚未建设'};
+    return '<section class="db-panel" id="dbSyllabusAudit"><h3>官方考纲建设清单</h3><p>'+esc(a.code)+' · '+esc(a.year)+' · <a href="'+esc(a.sourceUrl)+'" target="_blank" rel="noopener">查看官方考纲</a></p><p>'+esc(a.note)+'</p><p>'+a.sampled+'/'+a.sectionCount+' 项有明确关联样题。样题数不代表完整考纲覆盖或能力达标。</p><details><summary>展开各项建设状态</summary><label class="db-audit-filter">显示条目 <select id="dbAuditFilter"><option value="all">全部</option><option value="needs-practice">待建设样题</option><option value="preparation-only">只有准备练习</option></select></label><div class="db-topics">'+a.sections.map(x=>'<article data-audit-status="'+x.status+'"><div><b>'+esc(x.ref)+' · '+esc(x.label)+'</b><small>'+labels[x.status]+' · '+x.practiceCount+' 道样题 · '+x.preparationCount+' 道准备练习</small><small>样题已作答 '+x.attemptedCount+'/'+x.practiceCount+' · 准备练习已作答 '+x.preparationAttemptedCount+'/'+x.preparationCount+'</small></div><div class="db-actions">'+(x.topicIds.length?'<button data-db-learn="'+esc(x.topicIds[0])+'" aria-label="学习 '+esc(x.ref)+'">学习</button>':'')+(x.questionIds.length?'<button data-syllabus-practice="'+esc(x.ref)+'" aria-label="'+(x.practiceCount?'练习 ':'准备练习 ')+esc(x.ref)+'">'+(x.practiceCount?'练习样题':'准备练习')+'</button>':'')+'</div></article>').join('')+'</div><p id="dbAuditEmpty" hidden>当前筛选没有条目。</p></details></section>';
   }
   function build(){
-    if(document.getElementById('page-dashboard'))return;
     const nav=document.getElementById('mainNav'),main=document.querySelector('main');
-    if(!nav||!main)return;
-    const b=document.createElement('button');
-    b.id='dashboard-nav';b.className='nav-btn px-3 py-1 rounded bg-indigo-700';b.textContent='🧭 学习驾驶舱';
-    nav.appendChild(b);
-    const p=document.createElement('div');p.id='page-dashboard';p.className='page';
-    p.innerHTML='<div class="space-y-4">'+
-      '<div class="bg-gradient-to-r from-slate-900 via-indigo-900 to-violet-900 text-white rounded-2xl shadow p-5">'+
-      '<div class="text-xs text-indigo-200 font-bold">IGCSE PERSONAL LEARNING OS</div><div class="flex flex-wrap justify-between gap-4 items-end"><div><h2 class="text-3xl font-bold mt-1">🧭 学习驾驶舱</h2><p class="text-indigo-100 mt-1">不是只看分数，而是找出“下一步最值得学什么”。</p></div><div id="dbOverall" class="text-right"></div></div></div>'+
-      '<div id="dbMission"></div><div id="dbMap"></div><div id="dbDiagnosis"></div><div id="dbReadiness"></div></div>';
-    main.appendChild(p);
-
-    let sub=currentSubject();
+    if(!nav||!main||document.getElementById('page-dashboard'))return;
+    const b=document.createElement('button');b.id='dashboard-nav';b.dataset.page='page-dashboard';b.className='nav-btn px-3 py-1 rounded bg-indigo-700';b.textContent='学习驾驶舱';nav.prepend(b);
+    const p=document.createElement('section');p.id='page-dashboard';p.className='page';main.append(p);
+    const bar=n=>'<progress class="db-progress" max="100" value="'+n+'" aria-label="掌握度 '+n+'%">'+n+'%</progress>';
     function render(){
-      sub=currentSubject();
-      document.getElementById('dbOverall').innerHTML=overall();
-      document.getElementById('dbMission').innerHTML=mission();
-      document.getElementById('dbMap').innerHTML=courseMap();
-      document.getElementById('dbDiagnosis').innerHTML=diagnosis();
-      document.getElementById('dbReadiness').innerHTML=readiness();
-      bind();
-    }
-    function overall(){
-      const subjects=allSubjects().map(x=>{const ts=topics(x),vals=ts.map(masteryForTopic).filter(v=>v>0);return {sub:x,avg:vals.length?Math.round(vals.reduce((a,b)=>a+b,0)/vals.length):0,started:vals.length,total:ts.length};});
-      const active=subjects.find(x=>x.sub===sub)||{avg:0};
-      const started=subjects.filter(x=>x.started>0);
-      const global=started.length?Math.round(started.reduce((a,x)=>a+x.avg,0)/started.length):0;
-      const weakest=subjects.filter(x=>x.started>0).sort((a,b)=>a.avg-b.avg)[0];
-      const qs=questions(sub),st=getState(),gs=st.globalStats||{},acc=gs.totalAnswered?Math.round(gs.totalCorrect/gs.totalAnswered*100):0;
-      return '<div class="text-3xl font-bold">'+active.avg+'%</div><div class="text-xs text-indigo-200">当前科目掌握度 · '+esc(subjName(sub))+'</div><div class="text-xs text-indigo-200 mt-1">全科学习指数 '+global+'% · '+(weakest?'最需关注：'+esc(subjName(weakest.sub)):'尚未形成全科数据')+'</div><div class="text-xs text-indigo-200 mt-1">'+qs.length+' 道题 · '+(gs.totalAnswered||0)+' 次答题 · 总正确率 '+acc+'%</div>';
-    }
-  ;function examReadiness(sub){
-      const qs=questions(sub), ts=topics(sub), st=topicStats();
-      const total=qs.length;
-      const answered=qs.reduce((n,q)=>{
-        const k=window.masteryTopicKey?window.masteryTopicKey(q.topicId,sub):q.topicId;
-        return n+((st[k]||st[q.topicId])?.answered?1:0);
-      },0);
-      const coveredQs=qs.filter(q=>{
-        const k=window.masteryTopicKey?window.masteryTopicKey(q.topicId,sub):q.topicId;
-        return (st[k]||st[q.topicId])?.answered;
+      const sub=document.getElementById('subjectSelect').value,s=summary(sub),d=day(),errors=window.IGCSE_ERROR_DIAGNOSIS.top(sub).slice(0,3),done=d.tasks.filter(t=>d.completed.includes(t.id)).length;
+      p.innerHTML='<div class="db-hero"><div><p class="section-label">IGCSE PERSONAL LEARNING OS</p><h2>今天，从下一步开始</h2><p>'+esc(names[sub])+' · '+s.learned+'/'+s.topics+' 个主题已学 · '+s.mastered+' 个主题练习表现稳固</p></div><div><strong>'+s.mastery+'%</strong><p>本站 IGCSE 平均掌握估计</p></div></div>'+
+        '<div class="db-stats"><div><b>'+done+'/'+d.tasks.length+'</b><span>今日任务完成</span></div><div><b>'+s.practiced+'/'+s.questions+'</b><span>实际练过的题目</span></div><div><b>'+(s.accuracy===null?'—':s.accuracy+'%')+'</b><span>已记录答题正确率</span></div><div><b>'+s.withQuestions+'/'+s.topics+'</b><span>本站有题的主题</span></div></div>'+
+        '<section class="db-panel"><h3>学校学习安排</h3><p>'+esc(window.IGCSE_CURRICULUM?.edition(sub).message||'')+'</p><p>Y'+(window.IGCSE_CURRICULUM?.state().yearGroup||10)+' · '+(window.IGCSE_CURRICULUM?.ordered(sub)||catalog().topicsFor(sub)).filter(t=>['taught','review'].includes(window.IGCSE_CURRICULUM?.status(sub,t.topicId))).length+'/'+s.topics+' 个本站单元已教；阅读记录与掌握证据分别统计。</p><button id="dbCurriculum">设置考试档案与学校进度</button><button id="dbPath">学习路径与阶段检查</button></section><div class="db-actions"><button id="dbMaterials">上传与查看本科目资料</button><button id="dbProgress">查看进度与掌握依据</button></div><section class="db-panel"><h3>今日学习计划</h3><p>按学校当前章节优先安排练习，并复习已教内容；设置档案后，未教章节不进入每日任务。资料任务先学习章节，再完成一次对应作答；上传与阅读不计为练习完成。</p><div class="db-tasks">'+d.tasks.map(t=>'<button data-task="'+esc(t.id)+'" class="db-task"><small>'+esc(names[t.subject])+' · '+t.minutes+' 分钟</small><b>'+esc(t.title)+'</b><span>'+esc(catalog().topic(t.subject,t.topic)?.title||t.topic)+'</span>'+(t.materialTitle?'<small>资料：'+esc(t.materialTitle)+'</small>':'')+'<em>'+(d.completed.includes(t.id)?'✓ 已完成 · 再练习':'开始练习 →')+'</em></button>').join('')+'</div>'+d.tasks.filter(t=>t.type==='material').map(t=>'<div class="db-actions"><button data-material-review="'+esc(t.id)+'">复习资料章节错题 · '+esc(t.materialTitle)+'</button></div>').join('')+'</section>'+
+        '<section class="db-panel"><h3>全科学习概览</h3><div class="db-subjects">'+catalog().subjects.map(subject=>{const x=summary(subject);return '<button data-db-subject="'+subject+'" class="db-task"><b>'+esc(names[subject])+'</b><span>'+x.mastery+'% 估计 · '+x.withQuestions+'/'+x.topics+' 主题有题</span>'+bar(x.mastery)+'</button>';}).join('')+'</div></section>'+
+        '<section class="db-panel"><h3>课程地图与练习覆盖</h3><p>以下比例只统计本站课程主题，不代表完整官方考纲或考试等级预测。</p><div class="db-topics">'+(window.IGCSE_CURRICULUM?.ordered(sub)||catalog().topicsFor(sub)).map(t=>{const count=catalog().questionsFor(sub,t.topicId).length,n=window.calculateMasteryV2(t.topicId,sub);return '<article><div><b>'+esc(t.title)+'</b><small>'+esc(t.chapter)+' · '+count+' 道题 · 掌握 '+n+'%</small>'+bar(n)+'</div><div class="db-actions"><button data-db-learn="'+esc(t.topicId)+'">学习</button><button data-db-practice="'+esc(t.topicId)+'" '+(!count?'disabled':'')+'>练习</button></div></article>';}).join('')+'</div></section>'+
+        auditPanel(sub)+'<section class="db-panel"><h3>错题与模拟考</h3><p>当前科目 '+state().mistakes.filter(m=>m.subject===sub&&!m.mastered).length+' 道待复习错题。</p>'+ (errors.length?'<p>常见错误类型：'+errors.map(e=>esc(e.type)+' ('+e.count+')').join('、')+'</p>':'')+'<div class="db-actions"><button id="dbMistakes">打开错题本</button><button id="dbMock">准备模拟考</button></div></section>';
+      p.querySelectorAll('[data-material-review]').forEach(b=>b.onclick=()=>window.IGCSE_MATERIAL_PLAN.review(d.tasks.find(t=>t.id===b.dataset.materialReview)));
+      p.querySelectorAll('[data-task]').forEach(x=>x.onclick=()=>startTask(d.tasks.find(t=>t.id===x.dataset.task)));
+      p.querySelectorAll('[data-db-subject]').forEach(x=>x.onclick=()=>{setCurrentSubjectSafe(x.dataset.dbSubject);render();});
+      p.querySelectorAll('[data-db-practice]').forEach(x=>x.onclick=()=>gotoTopicPractice(x.dataset.dbPractice));
+      p.querySelectorAll('[data-db-learn]').forEach(x=>x.onclick=()=>{const t=catalog().topic(sub,x.dataset.dbLearn);setCurrentSubjectSafe(sub);renderTopicList();switchPage('page-textbook');openTopic(t);});
+      p.querySelectorAll('[data-syllabus-practice]').forEach(x=>x.onclick=()=>{
+        const a=window.getIGCSESyllabusAudit(sub),section=a?.sections.find(t=>t.ref===x.dataset.syllabusPractice);
+        if(!section?.questionIds.length)return;
+        if(state().mockExams?.activePractice){switchPage('page-practice');renderMockEntry();return;}
+        setCurrentSubjectSafe(sub);
+        startSessionFromIds(section.questionIds,'normal',{subject:sub,label:(section.practiceCount?'考纲样题 · ':'准备练习 · ')+section.ref+' '+section.label});
       });
-      const accuracy=coveredQs.length?Math.round(coveredQs.reduce((a,q)=>{
-        const k=window.masteryTopicKey?window.masteryTopicKey(q.topicId,sub):q.topicId;
-        const x=st[k]||st[q.topicId];
-        return a+((x.correct||0)/(x.answered||1)*100);
-      },0)/coveredQs.length):0;
-      const mastery=ts.map(t=>masteryForTopic(t)).filter(x=>x>0);
-      const knowledge=mastery.length?Math.round(mastery.reduce((a,b)=>a+b,0)/mastery.length):0;
-      const coverage=total?Math.min(100,Math.round(answered/total*100)):0;
-      const dims=examProfile(sub).map(([id,cn])=>({id,name:cn,cn:cn,score:skillScoreFor(sub,id),weight:1}));
-      const dimensions=[
-        {id:'knowledge',name:'Knowledge',cn:'知识掌握',score:knowledge,weight:.30},
-        {id:'accuracy',name:'Question Accuracy',cn:'题目正确率',score:accuracy,weight:.20},
-        {id:'coverage',name:'Syllabus Coverage',cn:'课程覆盖',score:coverage,weight:.10}
-      ].concat(dims.map((d,i)=>Object.assign(d,{weight:Math.max(.05,.40/dims.length)})));
-      const usable=dimensions.filter(d=>d.score!==null);
-      const readiness=Math.round(usable.reduce((a,d)=>a+d.score*d.weight,0)/(usable.reduce((a,d)=>a+d.weight,0)||1));
-      const target=85;
-      const gaps=dimensions.filter(d=>d.score!==null&&d.score<target).sort((a,b)=>a.score-b.score);
-      return {readiness,target,dimensions,gaps,coverage,answered,total};
+      const filter=p.querySelector('#dbAuditFilter');
+      if(filter)filter.onchange=()=>{
+        let visible=0;
+        p.querySelectorAll('[data-audit-status]').forEach(row=>{
+          const status=row.dataset.auditStatus;
+          row.hidden=filter.value==='needs-practice'?!['gap','content-linked'].includes(status):filter.value!=='all'&&status!==filter.value;
+          if(!row.hidden)visible++;
+        });
+        p.querySelector('#dbAuditEmpty').hidden=visible>0;
+      };
+      p.querySelector('#dbPath').onclick=()=>switchPage('page-path');
+      p.querySelector('#dbCurriculum').onclick=()=>switchPage('page-curriculum');
+      p.querySelector('#dbMaterials').onclick=()=>switchPage('page-materials');
+      p.querySelector('#dbProgress').onclick=()=>switchPage('page-progress');
+      p.querySelector('#dbMistakes').onclick=()=>{switchPage('page-mistake');renderMistakePage();};
+      p.querySelector('#dbMock').onclick=()=>{switchPage('page-practice');renderPracticeTopicSelect();renderMockEntry();};
     }
-    function readinessGapText(r){
-      if(r.readiness>=85)return '已达到 A* readiness 目标，建议转入整套模拟考试与限时训练。';
-      const g=r.gaps[0];
-      return g?'距离目标还差 '+(r.target-r.readiness)+' 分；最优先提升：'+g.cn+'（'+g.score+'%）。':'继续完成课程覆盖并积累答题数据。';
-    }
-  
-  
-  
-    function mission(){
-      const daily=dailyState(), cards=dailyPlanTasks().slice(0,3), ds=dailyStats(), plan={tasks:dailyPlanTasks(),totalMinutes:dailyPlanTasks().reduce((a,x)=>a+x.minutes,0)};
-      return '<section class="bg-white rounded-2xl shadow p-5"><div class="flex flex-wrap justify-between gap-3 items-center"><div><h3 class="text-xl font-bold">🎯 今日学习计划</h3><p class="text-sm text-slate-500 mt-1">系统按 SRS、薄弱知识点与掌握阶段自动安排下一步。</p></div><div class="text-right"><div class="text-lg font-bold text-indigo-700">'+plan.totalMinutes+' min</div><div class="text-xs text-slate-500">预计学习时间</div><div class="text-xs text-slate-500 mt-1">今日完成 '+ds.completed+'/'+ds.total+' · '+ds.rate+'% · 🔥 '+streakDays()+' 天</div></div></div><div class="grid md:grid-cols-3 gap-3 mt-4">'+(cards.length?cards.map((c,i)=>'<button data-topic="'+esc(c.topic||'')+'" data-subject="'+esc(c.subject||'')+'" data-qid="'+esc(c.qid||'')+'" class="text-left border rounded-xl p-4 hover:bg-indigo-50"><div class="flex justify-between"><span class="text-2xl">'+c.icon+'</span><span class="text-xs px-2 py-1 rounded-full bg-slate-100">'+c.minutes+' min</span></div><div class="font-bold mt-2">'+esc(c.title)+'</div><div class="text-sm text-slate-600 mt-1">'+esc(c.text)+'</div><div class="text-xs text-indigo-600 mt-3">优先级 '+c.priority+(daily.completed.includes(c.id)?' · ✅ 已完成':'')+'</div></button>').join(''):'<div class="col-span-full p-4 rounded-xl bg-green-50 text-green-700">🏆 今日没有明显弱项，可以进入 Boss Challenge。</div>')+'</div></section>';
-    }
-    function courseMap(){
-      const cs=chapters(sub);
-      return '<section class="bg-white rounded-2xl shadow p-5"><div class="flex justify-between items-center"><div><h3 class="text-xl font-bold">🗺️ Course Map · '+esc(subjName(sub))+'</h3><p class="text-sm text-slate-500 mt-1">章节 → 主题 → 掌握度。绿色不是“学过”，而是达到掌握标准。</p></div><button id="openChapterEngine" class="text-sm border rounded-lg px-3 py-2 hover:bg-slate-50">打开章节学习中心 →</button></div><div class="mt-4 space-y-3">'+cs.map((c,ci)=>{const ts=topics(sub).filter(t=>t.chapter===c),avg=ts.length?Math.round(ts.reduce((a,t)=>a+masteryForTopic(t),0)/ts.length):0;return '<div class="border rounded-xl p-4"><div class="flex justify-between gap-3"><div><b>'+esc(c)+'</b><span class="text-xs text-slate-500 ml-2">'+ts.length+' topics</span></div><b>'+avg+'%</b></div>'+bar(avg)+'<div class="grid md:grid-cols-3 gap-2 mt-3">'+ts.slice(0,6).map(t=>{const n=masteryForTopic(t),bd=band(n);return '<div class="border rounded-lg p-2 text-sm"><div class="flex justify-between gap-2"><span class="truncate">'+esc(t.title)+'</span><span class="text-xs '+bd[1]+' px-1 rounded">'+n+'%</span></div></div>';}).join('')+'</div></div>';}).join('')+'</div></section>';
-    }
-    function diagnosis(){
-      const mistakes=getState().mistakes||[];
-      const counts={}; mistakes.forEach(m=>{const k=m.errorType||m.mistake||'Knowledge gap';counts[k]=(counts[k]||0)+1;});
-      const rows=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,8);
-      const weak=topics(sub).map(t=>({t,n:masteryForTopic(t)})).filter(x=>x.n<70).sort((a,b)=>a.n-b.n).slice(0,5);
-      return '<section class="bg-white rounded-2xl shadow p-5"><div><h3 class="text-xl font-bold">🩺 错题诊断</h3><p class="text-sm text-slate-500 mt-1">从“错了几道题”升级为“为什么错”。</p></div><div class="grid lg:grid-cols-2 gap-5 mt-4"><div><h4 class="font-semibold mb-2">Error Taxonomy</h4>'+(rows.length?rows.map(r=>'<div class="flex items-center gap-3 mb-2"><div class="w-36 text-sm truncate">'+esc(r[0])+'</div><div class="flex-1">'+bar(Math.min(100,r[1]*12))+'</div><b class="text-sm">'+r[1]+'</b></div>').join(''):'<p class="text-sm text-slate-400">暂无错题数据。</p>')+'</div><div><h4 class="font-semibold mb-2">Top Weak Knowledge Points</h4>'+(weak.length?weak.map(x=>'<div class="flex justify-between border-b py-2 text-sm"><span>'+esc(x.t.title)+'</span><b class="text-red-600">'+x.n+'%</b></div>').join(''):'<p class="text-sm text-slate-400">没有低于 70% 的主题，继续保持。</p>')+'</div></div></section>';
-    }
-    function readiness(){
-      const r=examReadiness(sub);
-      return '<section class="bg-white rounded-2xl shadow p-5"><div class="flex flex-wrap justify-between gap-3 items-center"><div><h3 class="text-xl font-bold">🎓 Exam Readiness</h3><p class="text-sm text-slate-500 mt-1">'+esc(readinessGapText(r))+'</p></div><div class="text-right"><div class="text-3xl font-bold text-indigo-700">'+r.readiness+'%</div><div class="text-xs text-slate-500">目标 85% · '+esc(subjName(sub))+'</div></div></div><div class="grid md:grid-cols-3 gap-3 mt-4">'+r.dimensions.map(d=>'<div class="border rounded-xl p-3"><div class="flex justify-between text-sm"><span>'+esc(d.cn)+'</span><b>'+(d.score===null?'—':d.score+'%')+'</b></div>'+ (d.score===null?'<div class="text-xs text-slate-400 mt-2">数据不足</div>':bar(d.score))+'</div>').join('')+'</div><div class="mt-4 p-4 rounded-xl bg-indigo-50"><b>📌 考试准备诊断</b><div class="text-sm mt-1">已覆盖 '+r.coverage+'% 题库 · 已有 '+r.answered+' 个题目主题产生答题数据。</div></div></section>';
-    }
-    function bind(){
-      document.querySelectorAll('#dbMission [data-topic]').forEach(x=>x.onclick=()=>{
-        const t=x.dataset.topic, targetSub=x.dataset.subject, qid=x.dataset.qid;
-        const taskId=qid||('topic_'+targetSub+'_'+t);
-        const d=dailyState(); d.pendingTask={id:taskId,topic:t,qid:qid||'',subject:targetSub||currentSubject()};
-        if(window.saveUserState)window.saveUserState(getState());
-        if(targetSub && window.subjectSelect){ window.subjectSelect.value=targetSub; window.subjectSelect.dispatchEvent(new Event('change')); }
-        const btn=document.querySelector('#chapter-engine-nav'); if(btn)btn.click();
-        setTimeout(()=>{const sel=document.getElementById('ceTopic');if(sel&&t){sel.value=t;sel.dispatchEvent(new Event('change'));}},100);
-      });
-      const oc=document.getElementById('openChapterEngine');if(oc)oc.onclick=()=>document.getElementById('chapter-engine-nav')?.click();
-    }
-    b.onclick=()=>{if(window.switchPage)window.switchPage('page-dashboard');b.classList.add('active');render();};
-    document.getElementById('subjectSelect')?.addEventListener('change',()=>{sub=currentSubject();if(document.getElementById('page-dashboard')?.classList.contains('active'))render();});
-    window.addEventListener('igcse-subject-change',()=>{sub=currentSubject();if(document.getElementById('page-dashboard')?.classList.contains('active'))render();});
+    b.onclick=()=>switchPage('page-dashboard');
+    window.addEventListener('igcse-page-change',e=>{if(e.detail.id==='page-dashboard')render();});
+    document.getElementById('subjectSelect').addEventListener('change',()=>{if(p.classList.contains('active'))render();});
     window.addEventListener('igcse-answer-recorded',e=>{
-      const d=e.detail||{}, p=dailyState().pendingTask;
-      if(!p)return;
-      if((p.qid&&p.qid===d.qid)||(p.topic&&p.topic===d.topicId)){
-        markDailyTask(p.id); delete dailyState().pendingTask; render();
+      const answer=e.detail||{},d=day(),pending=d.pendingTask;
+      if(pending&&pending.subject===answer.subject&&(pending.qid?pending.qid===answer.qid:pending.topic===answer.topicId)){
+        if(!d.completed.includes(pending.id))d.completed.push(pending.id);
+        d.pendingTask=null;window.saveUserState(state());
       }
     });
-    window.addEventListener('igcse-dashboard-refresh',render);
+    window.addEventListener('igcse-dashboard-refresh',()=>{if(p.classList.contains('active'))render();});
   }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',build);else setTimeout(build,0);
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',build);else build();
 })();

@@ -12,5 +12,39 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
-      - run: node scripts/integration_smoke.js
+          node-version: 22
+      - run: npm ci --ignore-scripts
+      - run: node scripts/build_material_assets.cjs
+      - run: npm test
+      - run: npm run build:css
+      - run: git diff --exit-code -- data/tailwind.css
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:browser
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: browser-screenshots
+          path: test-results/
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        with:
+          name: learner-preview
+          path: |
+            index.html
+            data/
+            vendor/
+            scripts/preview.py
+            scripts/verify_live_material_ai.cjs
+            start-local.command
+            start-ai.command
+            server/material_ai.cjs
+            server/writing_ai.cjs
+            USER_GUIDE.md
+            MATERIALS_GUIDE.md
+            WRITING_GUIDE.md
+            CURRICULUM_GUIDE.md
+            CONTENT_EXPANSION_GUIDE.md
+            LEARNING_PATH_GUIDE.md
+            RELEASE_GUIDE.md
+            ROADMAP_STATUS.md
+            PRODUCT_ACCEPTANCE.md

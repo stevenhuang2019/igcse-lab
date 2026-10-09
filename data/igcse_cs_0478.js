@@ -18,3 +18,87 @@ window.IGCSE_CS_CONTENT = [
  examSkill:x.examSkill,knowledge:x.knowledge,formulas:x.formulas,commonMistake:x.commonMistake,
  vocabulary:x.vocabulary.map(v=>({en:v[0],zh:v[1]}))
 }));
+/* Focused original lessons for previously unpractised outline sections. */
+window.IGCSE_CS_CONTENT.push(...[
+  {
+    "topicId": "cs0478_5_currency",
+    "chapter": "5 The internet and its uses",
+    "title": "5.2 Digital currency · 数字货币",
+    "objectives": [
+      "Electronic value and payment",
+      "Timestamped transaction records",
+      "Linked blocks and detectable tampering"
+    ],
+    "knowledge": "数字货币用电子记录表示和转移价值，不是通过网络传送实物硬币。区块链把交易按时间记录，并使后续区块依赖前面区块的信息；修改早期记录会破坏这些关联，因此可被发现。它不保证价格稳定、绝对隐私或每个收款方都可信。学习时区分电子支付、交易记录与区块链机制。",
+    "commonMistake": "数字货币不等于所有电子数据；区块链也不等于价格稳定或绝对匿名。",
+    "vocabulary": [
+      {
+        "en": "digital currency",
+        "zh": "数字货币"
+      },
+      {
+        "en": "transaction",
+        "zh": "交易"
+      },
+      {
+        "en": "blockchain",
+        "zh": "区块链"
+      },
+      {
+        "en": "timestamp",
+        "zh": "时间戳"
+      }
+    ],
+    "subject": "computer_science",
+    "syllabus": "0478",
+    "syllabusYear": "2026-2028",
+    "commandWords": [
+      "Explain",
+      "Trace",
+      "Write"
+    ],
+    "examSkill": "Systems and programming",
+    "formulas": []
+  },
+  {
+    "topicId": "cs0478_8_files",
+    "chapter": "8 Programming",
+    "title": "8.3 File handling · 文件操作",
+    "objectives": [
+      "Persist results between runs",
+      "Open for reading or writing",
+      "Read and write text items",
+      "Close files after use"
+    ],
+    "knowledge": "变量通常只在程序运行期间保存数据；文件可在程序结束后继续保留结果。Cambridge 伪代码：OPENFILE \"scores.txt\" FOR READ，然后 READFILE \"scores.txt\", Score，最后 CLOSEFILE \"scores.txt\"。写入时用 FOR WRITE 和 WRITEFILE；WRITE 会建立新文件或覆盖已有内容，不能用它读取需要保留的数据。连续读取会取得后续项目或文本行。先确认打开模式、读取顺序和关闭步骤，再跟踪变量值。",
+    "commonMistake": "不要用 WRITE 模式打开待保留的旧结果；它可能覆盖文件。READFILE 的后一次赋值会替换同一变量的先前值。",
+    "vocabulary": [
+      {
+        "en": "persistent storage",
+        "zh": "持久存储"
+      },
+      {
+        "en": "read mode",
+        "zh": "读取模式"
+      },
+      {
+        "en": "write mode",
+        "zh": "写入模式"
+      },
+      {
+        "en": "file handle",
+        "zh": "文件句柄"
+      }
+    ],
+    "subject": "computer_science",
+    "syllabus": "0478",
+    "syllabusYear": "2026-2028",
+    "commandWords": [
+      "Explain",
+      "Trace",
+      "Write"
+    ],
+    "examSkill": "Systems and programming",
+    "formulas": []
+  }
+]);

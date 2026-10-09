@@ -47,10 +47,9 @@
   function upsertFromAnswer(d){
     if(!d||!d.topicId)return;
     const card=schedule(d.topicId,d.subject,!!d.correct,{source:d.pastPaper?'past-paper':(d.mode||'practice'),qid:d.qid});
-    if(card&&window.getTopicMasteryStats){
-      const st=window.getTopicMasteryStats(d.topicId,d.subject); st.srsRetention=card.retention;
-      if(window.calculateMasteryV2)window.calculateMasteryV2(d.topicId,d.subject);
-    }
+    // Scheduling every answer is useful, but ordinary practice must not overwrite
+    // the retention measured by actual SRS reviews in the mastery engine.
+    return card;
   }
   function seedFromMistakes(limit){
     const s=state(), mistakes=Array.isArray(s.mistakes)?s.mistakes:[],out=[];

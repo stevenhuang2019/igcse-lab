@@ -1,0 +1,17 @@
+{
+  "name": "igcse-personal-learning-os",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "test": "node scripts/integration_smoke.js && node --test tests/*.test.js",
+    "test:browser": "node scripts/browser_test.js",
+    "build:css": "tailwindcss -i data/tailwind.input.css -o data/tailwind.css --minify"
+  },
+  "devDependencies": {
+    "jszip": "3.10.1",
+    "mammoth": "1.13.0",
+    "pdfjs-dist": "6.4.299",
+    "playwright": "1.62.1",
+    "tailwindcss": "3.4.17"
+  }
+}
