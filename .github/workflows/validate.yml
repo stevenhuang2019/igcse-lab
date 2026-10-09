@@ -36,6 +36,7 @@ jobs:
             scripts/preview.py
             scripts/verify_live_material_ai.cjs
             start-local.command
+            start-ai.command
             server/material_ai.cjs
             USER_GUIDE.md
             MATERIALS_GUIDE.md
