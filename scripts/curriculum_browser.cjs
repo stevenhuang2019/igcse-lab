@@ -5,6 +5,7 @@ module.exports=async(page,width,results)=>{
  assert.equal(await page.locator('#page-curriculum.active').count(),1);
  await page.locator('#curriculumYear').selectOption('10');await page.locator('#curriculumExamYear').fill('2027');await page.locator('#curriculumQualification').selectOption('IGCSE');
  await page.getByRole('button',{name:'保存学习安排',exact:true}).click();
+ await page.locator('#page-curriculum [data-browse-chapter]').selectOption('');
  const current=page.locator('[data-curriculum-topic="math_transform_01"]');await current.locator('select').selectOption('current');await current.locator('input').fill('1');await current.getByRole('button',{name:'保存章节',exact:true}).click();
  const taught=page.locator('[data-curriculum-topic="math_algebra_01"]');await taught.locator('select').selectOption('taught');await taught.locator('input').fill('2');await taught.getByRole('button',{name:'保存章节',exact:true}).click();
  assert.equal(await page.locator('[data-curriculum-topic]').first().getAttribute('data-curriculum-topic'),'math_transform_01');
@@ -13,7 +14,7 @@ module.exports=async(page,width,results)=>{
  await page.locator('#dashboard-nav').click();
  assert.ok(await page.evaluate(()=>IGCSE_DASHBOARD.day().tasks.every(t=>t.subject==='math'&&['math_transform_01','math_algebra_01'].includes(t.topic))));
  assert.equal(await page.evaluate(()=>IGCSE_DASHBOARD.day().tasks.find(t=>t.type==='practice').topic),'math_transform_01');
- await page.locator('[data-page="page-practice"]').click();assert.equal(await page.locator('[data-start-topic]').count(),2);
+ await page.locator('[data-page="page-practice"]').click();await page.locator('#practiceSchoolScope').selectOption('taught');assert.equal(await page.locator('[data-start-topic]').count(),2);
  await page.locator('#practiceSchoolScope').selectOption('all');assert.equal(await page.locator('[data-start-topic]').count(),15);
  await page.locator('#practiceSchoolScope').selectOption('taught');
  await page.locator('[data-practice-tab="mock"]').click();await page.locator('#mockSchoolScope').selectOption('taught');await page.locator('[data-mock="math"]').click();
@@ -25,7 +26,7 @@ module.exports=async(page,width,results)=>{
  await page.locator('#curriculumYear').selectOption('12');await page.locator('#curriculumQualification').selectOption('AS');assert.equal(await page.locator('#curriculumCode').inputValue(),'9709');await page.locator('#curriculumExamYear').fill('2028');await page.getByRole('button',{name:'保存学习安排',exact:true}).click();
  assert.match(await page.locator('#curriculumEdition').textContent(),/高级课程入口/);
  await page.locator('#dashboard-nav').click();assert.equal(await page.evaluate(()=>IGCSE_DASHBOARD.day().tasks.length),0);
- await page.locator('[data-page="page-practice"]').click();assert.equal(await page.locator('[data-start-topic]').count(),0);
+ await page.locator('[data-page="page-practice"]').click();await page.locator('#practiceSchoolScope').selectOption('all');assert.equal(await page.locator('[data-start-topic]').count(),15);
  await page.locator('#curriculum-nav').click();await page.locator('#curriculumFoundation').check();await page.getByRole('button',{name:'保存学习安排',exact:true}).click();
  await page.locator('#dashboard-nav').click();assert.ok(await page.evaluate(()=>IGCSE_DASHBOARD.day().tasks.length)>0);
  await page.locator('#curriculum-nav').click();await page.locator('#curriculumFoundation').uncheck();await page.locator('#curriculumQualification').selectOption('IGCSE');await page.getByRole('button',{name:'保存学习安排',exact:true}).click();

@@ -6,7 +6,7 @@
   function esc(x){return String(x??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
   function subjects(){return [...new Set((contentData||[]).map(x=>x.subject))];}
   function topics(sub,chapter){return (window.IGCSE_CURRICULUM?.ordered(sub)||(contentData||[]).filter(x=>x.subject===sub)).filter(x=>!chapter||x.chapter===chapter);}
-  function qs(sub,chapter,topicId){const ids=new Set(topics(sub,chapter).map(t=>t.topicId));return (questionData||[]).filter(q=>q.subject===sub&&ids.has(q.topicId)&&(!topicId||q.topicId===topicId)&&(!window.IGCSE_CURRICULUM||window.IGCSE_CURRICULUM.practiceTopics(sub,window.IGCSE_CURRICULUM.profile(sub)?.scope||'taught').some(t=>t.topicId===q.topicId)));}
+  function qs(sub,chapter,topicId){const ids=new Set(topics(sub,chapter).map(t=>t.topicId));return (questionData||[]).filter(q=>q.subject===sub&&ids.has(q.topicId)&&(!topicId||q.topicId===topicId)&&(!window.IGCSE_CURRICULUM||window.IGCSE_CURRICULUM.practiceTopics(sub,'all').some(t=>t.topicId===q.topicId)));}
   function chapters(sub){return [...new Set(topics(sub).map(x=>x.chapter))];}
   function label(s){return ({math:'数学 Math',physics:'物理 Physics',chemistry:'化学 Chemistry',dt:'设计 DT',business:'商业 Business',english:'英语 English'})[s]||s;}
   function command(q){
@@ -45,7 +45,7 @@
         control('ceSub',subjects().map(s=>'<option value="'+s+'" '+(s===sub?'selected':'')+'>'+label(s)+'</option>').join(''))+
         control('ceCh',chs.map(x=>'<option value="'+esc(x)+'" '+(x===ch?'selected':'')+'>'+esc(x)+'</option>').join(''))+
         control('ceTopic',ts.map(x=>'<option value="'+x.topicId+'" '+(x.topicId===topic?'selected':'')+'>'+esc(x.title)+'</option>').join(''));
-      ceSub.onchange=()=>{sub=ceSub.value;ch='';topic='';mode='overview';render();};
+      ceSub.onchange=()=>{sub=ceSub.value;setCurrentSubjectSafe(sub);ch='';topic='';mode='overview';render();};
       ceCh.onchange=()=>{ch=ceCh.value;topic='';mode='overview';render();};
       ceTopic.onchange=()=>{topic=ceTopic.value;mode='knowledge';render();};
     }
@@ -62,7 +62,7 @@
       const all=topics(sub,ch);
       return '<div class="grid md:grid-cols-2 gap-3">'+all.map(t=>{
         const n=qs(sub,ch,t.topicId).length, st=userState.topicStats?.[sub+'::'+t.topicId]||userState.topicStats?.[t.topicId]||{}, rate=st.answered?Math.round(st.correct/st.answered*100):0;
-        return '<button data-topic="'+t.topicId+'" class="text-left border rounded-xl p-4 hover:bg-indigo-50"><div class="flex justify-between gap-2"><b>'+esc(t.title)+'</b><span class="text-xs '+(rate>=80?'text-green-600':'text-slate-500')+'">'+(st.answered?rate+'%':'未开始')+'</span></div><div class="text-xs text-slate-500 mt-1">'+esc(t.topicId)+' · '+n+' 题</div><div class="text-sm text-slate-600 mt-2">'+esc((t.knowledge||'').slice(0,150))+'…</div></button>';
+        return '<button data-topic="'+t.topicId+'" class="text-left border rounded-xl p-4 hover:bg-indigo-50"><div class="flex justify-between gap-2"><b>'+esc(t.title)+'</b><span class="text-xs '+(rate>=80?'text-green-600':'text-slate-500')+'">'+(st.answered?rate+'%':'未开始')+'</span></div><div class="text-xs text-slate-500 mt-1">'+esc(t.topicId)+' · '+esc(window.IGCSE_CURRICULUM?.labels[window.IGCSE_CURRICULUM.status(sub,t.topicId)]||'自主学习')+' · '+n+' 题</div><div class="text-sm text-slate-600 mt-2">'+esc((t.knowledge||'').slice(0,150))+'…</div></button>';
       }).join('')+'</div>';
     }
     function knowledge(){
@@ -89,6 +89,7 @@
         '<div class="border rounded-2xl p-5"><div class="text-xs text-indigo-600 font-bold">'+esc(command(q))+' · '+esc(skill(q))+'</div><div class="text-lg font-semibold mt-2">'+questionStemHtml(q)+'</div>'+
         (q.type==='choice'?'<div class="grid gap-2 mt-4">'+(q.options||[]).map((o,i)=>'<button data-ans="'+i+'" class="border rounded-lg p-3 text-left hover:bg-indigo-50">'+String.fromCharCode(65+i)+'. '+o+'</button>').join('')+'</div>':'<textarea id="ceEssay" class="w-full border rounded-lg p-3 mt-4 h-28" placeholder="写出你的答案，再对照 Mark Scheme 自查"></textarea><button id="ceEssayBtn" class="mt-2 bg-indigo-600 text-white px-4 py-2 rounded-lg">查看解析</button>')+
         questionMeta(q)+'<div id="ceFeedback" class="mt-4"></div></div>';
+      window.IGCSE_DISCOVERY?.attachHint(ceBody,q,mode==='practice'?'chapter':'test',(id,level)=>{session.hints=session.hints||{};session.hints[id]=level;});
       if(q.type==='choice')ceBody.querySelectorAll('[data-ans]').forEach(x=>x.onclick=()=>answer(q,Number(x.dataset.ans)));
       if(q.type!=='choice')ceEssayBtn.onclick=()=>selfCheck(q);
       if(window.renderMathInElement)renderMathInElement(ceBody,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});
@@ -99,6 +100,7 @@
     }
     function record(q,ok){
       userState.topicStats=userState.topicStats||{};
+      const hintButton=ceBody.querySelector('[data-hint-button]');if(hintButton)hintButton.disabled=true;
       const key=window.masteryTopicKey?window.masteryTopicKey(q.topicId,q.subject||sub):q.topicId; const st=userState.topicStats[key]||userState.topicStats[q.topicId]||{subject:q.subject||sub,topicId:q.topicId,answered:0,correct:0,lastWrongAt:null};
       st.answered++; if(ok)st.correct++; else st.lastWrongAt=new Date().toISOString();
       userState.topicStats[key]=st;
@@ -111,7 +113,7 @@
         if(old){old.wrongCount=(old.wrongCount||0)+1;old.lastResult='fail';}
         else userState.mistakes.push({questionId:q.id,subject:q.subject,topicId:q.topicId,time:new Date().toISOString(),wrongCount:1,srsStage:0,nextReviewAt:new Date(Date.now()+864e5).toISOString(),mastered:false,reviewedCount:0,lastResult:'fail'});
       }
-      addXp(ok?(q.xpReward||10):2); if(window.dispatchEvent)window.dispatchEvent(new CustomEvent('igcse-answer-recorded',{detail:{topicId:q.topicId,qid:q.id,subject:q.subject||sub,correct:ok,srs:false,pastPaper:!!q.pastPaper,mode:'chapter',question:q}}));
+      addXp(ok?(q.xpReward||10):2); if(window.dispatchEvent)window.dispatchEvent(new CustomEvent('igcse-answer-recorded',{detail:{topicId:q.topicId,qid:q.id,subject:q.subject||sub,correct:ok,assisted:!!session.hints?.[q.id],srs:false,pastPaper:!!q.pastPaper,mode:'chapter',question:q}}));
       saveUserState(userState);
     }
     function answer(q,i){
@@ -153,7 +155,7 @@
       const st=document.getElementById('ceStartTopic'); if(st)st.onclick=()=>{mode='practice';render();};
       const ct=document.getElementById('ceStartTest'); if(ct)ct.onclick=()=>{mode='chapterTest';render();};
     }
-    function render(){renderControls();renderTabs();progress();renderBody();}
+    function render(){renderControls();renderTabs();progress();renderBody();window.IGCSE_DISCOVERY?.enhancePage('page-chapters');}
     window.addEventListener('igcse-subject-change',e=>{if(e.detail?.subject){sub=e.detail.subject;ch='';topic='';mode='overview';render();}});
     const ss=document.getElementById('subjectSelect');
     if(ss) ss.addEventListener('change',()=>{sub=ss.value;ch='';topic='';mode='overview';render();});

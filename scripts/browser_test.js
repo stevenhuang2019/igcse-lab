@@ -22,8 +22,9 @@ const server=http.createServer((req,res)=>{
    const started=Date.now();await page.goto(base+'/#page-dashboard');await page.locator('#dbMock').waitFor();
    const performance=await page.evaluate(()=>({domReadyMs:Math.round(window.performance.getEntriesByType('navigation')[0].domContentLoadedEventEnd),localAssetBytes:window.performance.getEntriesByType('resource').filter(r=>r.name.startsWith(location.origin)).reduce((n,r)=>n+r.decodedBodySize,0)}));
    assert.ok(performance.domReadyMs<5000,'startup budget '+width);assert.ok(performance.localAssetBytes<3*1024*1024,'local asset budget '+width);metrics.push({width,...performance});
-   await require('./workspace_browser.cjs')(page,width,results);
-   if(process.env.WORKSPACE_ONLY){assert.deepEqual(errors,[]);await context.close();continue;}
+   if(!process.env.DISCOVERY_ONLY)await require('./workspace_browser.cjs')(page,width,results);
+   await require('./discovery_browser.cjs')(page,width,results);
+   if(process.env.WORKSPACE_ONLY||process.env.DISCOVERY_ONLY){assert.deepEqual(errors,[]);await context.close();continue;}
    await require('./material_browser_flows.cjs')(page,width,results);
    await require('./material_plan_browser.cjs')(page);
    await require('./study_resources_browser.cjs')(page,width,results);
@@ -83,6 +84,7 @@ const server=http.createServer((req,res)=>{
    }
    await page.locator('#dbProgress').click();assert.equal(await page.locator('#page-progress.active').count(),1);
    assert.equal(await page.locator('[data-progress-topic]').count(),15);
+   await page.locator('#page-progress [data-browse-chapter]').selectOption('');
    const transform=page.locator('[data-progress-topic="math_transform_01"]');assert.match(await transform.textContent(),/样本有限/);
    await transform.locator('summary').click();assert.match(await transform.textContent(),/未测量/);
    assert.ok(await page.evaluate(()=>IGCSE_PROGRESS_VIEW.model('math').days.at(-1).answered>=1));

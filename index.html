@@ -224,7 +224,7 @@
         <!-- 公式速查卡页 -->
         <div id="page-quickref" class="page">
             <div class="bg-white rounded-xl shadow p-6">
-                <h2 class="text-2xl font-bold mb-2">📇 公式速查卡</h2>
+                <h2 class="text-2xl font-bold mb-2">📇 公式、术语与语法速查</h2>
                 <p class="text-sm text-gray-600 mb-4">按科目汇总核心公式与要点，考前快速翻阅。</p>
                 <div id="quickrefContent"></div>
             </div>
@@ -305,6 +305,7 @@
 <script src="data/igcse_quickref.js"></script>
 <script src="data/igcse_mockpapers.js"></script>
 <script src="data/vocab.js"></script>
+<script src="data/learning_extensions_data.js"></script>
 <script src="data/english_master_database.js"></script>
 <script src="data/mock-exams.js"></script>
 
@@ -485,7 +486,9 @@ function openTopic(topic){
         bodyHtml += '<div class="bg-amber-50 border-l-4 border-amber-400 p-3 mt-4"><strong>' + ((window.IGCSE_GLOBAL_LANG||'learn')==='exam'?'Common mistake:':'常见误区：') + '</strong>' + esc(topic.commonMistake) + '</div>';
     }
     if(topic.subject==='english'&&(/Writing/i.test(topic.chapter||topic.examSkill||'')||String(topic.syllabusRef||'').startsWith('W'))){bodyHtml+='<button id="topicWritingStudio" class="material-entry">进入写作工作室：范文与 AI 辅助</button>';}
+    if(topic.subject==='english')bodyHtml+='<button id="topicVocabEntry" class="material-entry">学习本章节词汇与词汇游戏</button>';
     document.getElementById('topicBody').innerHTML = bodyHtml;
+    const vocabEntry=document.getElementById('topicVocabEntry');if(vocabEntry)vocabEntry.onclick=()=>{switchPage('page-vocab');window.IGCSE_WORKSPACE.setVocabRange(topic.chapter);};
     const writingEntry=document.getElementById('topicWritingStudio');if(writingEntry)writingEntry.onclick=()=>window.IGCSE_WRITING.open();
     if(window.renderMathInElement) renderMathInElement(document.getElementById('topicBody'), { delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}] });
     document.getElementById('topicContent').classList.remove('hidden');
@@ -547,7 +550,7 @@ function startSessionFromIds(qids, mode, opts){
         topicId: opts.topicId || null,
         order: opts.noShuffle ? valid.slice() : shuffle(valid.slice()),
         idx: 0, combo: 0, correct: 0, total: valid.length,
-        mode: mode || 'normal', label: opts.label || '',
+        mode: mode || 'normal', noHints:!!opts.noHints, label: opts.label || '',
         id: 'session_'+Date.now()+'_'+Math.random().toString(36).slice(2),
         startedAt: Date.now(), timeLimitSec: opts.timeLimitSec || 0, timedOut: false, subject: opts.subject || currentSubject
     };
@@ -609,6 +612,7 @@ function renderQuestion(){
     html += '</div>';
     if(s.mode==='mock') html += '<div class="mock-controls"><button id="mockSubmitEarly">提前交卷</button></div>';
     area.innerHTML = html;
+    if(!s.noHints)window.IGCSE_DISCOVERY?.attachHint(area,q,s.mode,(id,level)=>{s.hints=s.hints||{};s.hints[id]=level;});
     const early=document.getElementById('mockSubmitEarly');if(early)early.onclick=()=>{finishPractice();};
     if(window.renderMathInElement){
         renderMathInElement(area, { delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}] });
@@ -631,6 +635,7 @@ function markAnswered(q, isCorrect, area){
     if(!s || Object.prototype.hasOwnProperty.call(s.outcomes||{},q.id)) return;
     s.outcomes = s.outcomes || {};
     s.outcomes[q.id] = !!isCorrect;
+    const hintButton=area.querySelector('[data-hint-button]');if(hintButton)hintButton.disabled=true;
     s.idx++;
     if(s.mode==='mock')window.IGCSE_MOCK_ENGINE.saveActive(s);
     userState.globalStats.totalAnswered++;
@@ -670,7 +675,7 @@ function markAnswered(q, isCorrect, area){
         }
     }
     /* 复习模式：答对后的 SRS 流转 / 错题重练直接掌握 */
-    if(isCorrect && (s.mode === 'srs' || s.mode === 'mistake-review')){
+    if(isCorrect && !s.hints?.[q.id] && (s.mode === 'srs' || s.mode === 'mistake-review')){
         const existing = userState.mistakes.find(m => mistakeQid(m) === q.id);
         if(existing){
             existing.reviewedCount = (existing.reviewedCount || 0) + 1;
@@ -694,7 +699,7 @@ function markAnswered(q, isCorrect, area){
     saveUserState(userState);
     const paperMode = !!q.pastPaper || s.mode === 'mock' || s.mode === 'paper';
     const sessionAccuracy = s.idx ? Math.round((s.correct / s.idx) * 100) : (isCorrect ? 100 : 0);
-    window.dispatchEvent(new CustomEvent('igcse-answer-recorded',{detail:{topicId:q.topicId,qid:q.id,subject:subj,correct:isCorrect,srs:s.mode==='srs',pastPaper:paperMode,pastPaperType:(q.pastPaperType||((s.mode==='paper'&&q.pastPaper)?'official':'mock')),accuracy:sessionAccuracy,mode:s.mode,sessionId:s.id,question:q}}));
+    window.dispatchEvent(new CustomEvent('igcse-answer-recorded',{detail:{topicId:q.topicId,qid:q.id,subject:subj,correct:isCorrect,assisted:!!s.hints?.[q.id],srs:s.mode==='srs',pastPaper:paperMode,pastPaperType:(q.pastPaperType||((s.mode==='paper'&&q.pastPaper)?'official':'mock')),accuracy:sessionAccuracy,mode:s.mode,sessionId:s.id,question:q}}));
     checkBadges();
     const fb = area.querySelector('.q-feedback');
     if(s.mode==='mock'){
@@ -836,6 +841,7 @@ function mistakeStatusBadge(m){
     return '<span class="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">待重练 · Stage' + st + (due ? ' · 今日到期' : '') + '</span>';
 }
 function renderMistakePage(){
+    if(window.IGCSE_DISCOVERY){window.IGCSE_DISCOVERY.renderReviews();return;}
     const container = document.getElementById('mistakeList');
     const stats = document.getElementById('mistakeStats');
     const subjectMistakes = userState.mistakes.filter(m => subjectMatchesMistake(m, currentSubject));
@@ -1964,6 +1970,7 @@ document.addEventListener('DOMContentLoaded',function(){
 <script src="data/writing_studio.js"></script>
 
 <script src="data/learning_workspace.js"></script>
+<script src="data/learning_discovery.js"></script>
 <script>
 // Use existing navigation handlers so history restores page-specific views too.
 function restoreLearningRoute(){

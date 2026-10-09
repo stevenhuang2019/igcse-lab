@@ -33,11 +33,11 @@ test('diagnostics require fresh session evidence, preserve first responses and r
  assert.deepEqual(w.userState.dailyPlan.today.completed,['kept']);assert.equal(w.userState.dailyPlan.today.pendingTask,null);assert.equal(w.userState.dailyPlan.today.tasks,null);
  w.userState.mockExams={activePractice:{}};assert.equal(path.start('math'),false);assert.equal(path.summary('math').correct,7);
 });
-test('school status, edition, legacy Business and advanced opt-in constrain diagnostics without inferring prerequisites mastered',()=>{
- const {w,cp,path}=setup();cp.setProfile('math',{qualification:'IGCSE',code:'0580',examYear:2027});assert.equal(path.pool('math').length,0);
- cp.setTopic('math','course_math_reverse','current',1);assert.equal(path.pool('math').length,2);assert.equal(path.needs(w.IGCSE_CATALOG.topic('math','course_math_reverse')).length,1);
- path.start('math');cp.setProfile('math',{qualification:'IGCSE',code:'0580',examYear:2028});assert.equal(path.summary('math').invalidated,true);assert.equal(path.pool('math').length,0);
- cp.setProfile('math',{qualification:'AS',code:'9709',examYear:2028,foundation:false});assert.equal(path.pool('math').length,0);
- cp.setProfile('math',{qualification:'AS',code:'9709',examYear:2028,foundation:true});assert.equal(path.pool('math').length,2);
+test('manual diagnostics ignore teaching status while retaining legacy Business edition selection',()=>{
+ const {w,cp,path}=setup();cp.setProfile('math',{qualification:'IGCSE',code:'0580',examYear:2027});assert.equal(path.pool('math').length,8);
+ cp.setTopic('math','course_math_reverse','current',1);assert.equal(path.pool('math').length,8);assert.equal(path.needs(w.IGCSE_CATALOG.topic('math','course_math_reverse')).length,1);
+ path.start('math');cp.setProfile('math',{qualification:'IGCSE',code:'0580',examYear:2028});assert.equal(path.summary('math').invalidated,true);assert.equal(path.pool('math').length,8);
+ cp.setProfile('math',{qualification:'AS',code:'9709',examYear:2028,foundation:false});assert.equal(path.pool('math').length,8);
+ cp.setProfile('math',{qualification:'AS',code:'9709',examYear:2028,foundation:true});assert.equal(path.pool('math').length,8);
  cp.setProfile('business',{qualification:'IGCSE',code:'0450',examYear:2026});assert.equal(path.pool('business').length,0);
 });

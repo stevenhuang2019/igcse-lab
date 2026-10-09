@@ -17,13 +17,13 @@ test('school pacing never infers taught status or mastery from reading; plans in
  assert.equal(w.userState.topicStats.a.answered,9);assert.equal(w.userState.dailyPlan.today.tasks,null);
  assert.deepEqual(w.userState.dailyPlan.today.completed,['done']);
 });
-test('exam editions and advanced stages require explicit foundation opt in and preserve school pacing',()=>{
+test('recommendations retain edition and school pacing while manual practice remains free',()=>{
  const {cp}=setup();cp.setProfile('business',{examYear:2027,code:'0264',qualification:'IGCSE'});cp.setTopic('business','c','current',1);
  assert.equal(cp.edition('business').matches,false);assert.equal(cp.eligible('business','c'),false);
  cp.setProfile('business',{examYear:2027,code:'0264',qualification:'IGCSE',foundation:true});assert.equal(cp.eligible('business','c'),true);
  cp.state().yearGroup=12;assert.equal(cp.eligible('math','a'),false);
  cp.setProfile('math',{examYear:2028,qualification:'AS',code:'9709'});cp.setTopic('math','a','current',1);
- assert.equal(cp.practiceTopics('math','all').length,0);assert.equal(cp.eligible('math','a'),false);
+ assert.equal(cp.practiceTopics('math','all').length,2);assert.equal(cp.eligible('math','a'),false);
  cp.setProfile('math',{examYear:2028,qualification:'AS',code:'9709',foundation:true});assert.equal(cp.practiceTopics('math','taught').length,1);assert.equal(cp.practiceTopics('math','all').length,2);
  assert.equal(cp.eligible('math','b'),false);
 });

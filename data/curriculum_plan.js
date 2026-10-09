@@ -22,7 +22,7 @@
  function ordered(subject){return catalog().topicsFor(subject).filter(t=>topicAllowed(subject,t)).slice().sort((a,b)=>(profile(subject)?.order?.[a.topicId]??9999)-(profile(subject)?.order?.[b.topicId]??9999));}
  function eligible(subject,id){if(!topicAllowed(subject,catalog().topic(subject,id)||{}))return false;const p=profile(subject);if(!p)return !advanced(subject);return (!advanced(subject)&&edition(subject).matches||p.foundation===true)&&status(subject,id)!=='unstarted';}
  function priority(subject,id){return ({current:0,review:1,taught:2,unstarted:3})[status(subject,id)];}
- function practiceTopics(subject,scope){const p=profile(subject);if(advanced(subject)&&!p?.foundation)return [];return ordered(subject).filter(t=>scope==='all'||(!p&&!advanced(subject))||status(subject,t.topicId)!=='unstarted');}
+ function practiceTopics(subject,scope='all'){return ordered(subject).filter(t=>scope!=='taught'||status(subject,t.topicId)!=='unstarted');}
  function changed(){
   const s=window.userState;Object.values(s.dailyPlan||{}).forEach(d=>{d.tasks=null;d.pendingTask=null;});
   window.saveUserState?.(s);window.dispatchEvent?.(new CustomEvent('igcse-curriculum-change'));

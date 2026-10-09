@@ -3,11 +3,11 @@ module.exports=async(page,width,results)=>{
  await page.locator('#curriculum-nav').click();await page.locator('#subjectSelect').selectOption('math');
  await page.locator('#curriculumQualification').selectOption('AS');await page.locator('#curriculumExamYear').fill('2027');await page.getByRole('button',{name:'保存学习安排',exact:true}).click();
  await page.locator('#advanced-nav').click();assert.match(await page.locator('#advancedProfile').textContent(),/匹配 1 个单元/);
- const l=page.locator('[data-advanced-lesson="as_derivative"]');await l.locator('summary').click();assert.equal(await l.locator('button[type=submit]').first().isDisabled(),true);
- await l.locator('[data-advanced-status]').selectOption('current');await l.locator('[data-advanced-plan]').click();
- await l.locator('summary').click();const q=l.locator('[data-advanced-question="as_derivative_1"]');await q.locator('input').fill('19');await q.locator('button').click();assert.match(await q.locator('[role=status]').textContent(),/答案正确/);
+ const l=page.locator('[data-advanced-lesson="as_derivative"]');await l.locator('[data-advanced-practice] > summary').click();assert.equal(await l.locator('button[type=submit]').first().isDisabled(),false);
+ assert.equal(await l.locator('[data-advanced-status]').inputValue(),'unstarted');
+ const q=l.locator('[data-advanced-question="as_derivative_1"]');await q.locator('input').fill('19');await q.locator('button').click();assert.match(await q.locator('[role=status]').textContent(),/答案正确/);
  const open=l.locator('[data-advanced-question="as_derivative_3"]');await open.locator('textarea').fill('The derivative describes local change rather than a point coordinate.');await open.locator('button').click();assert.match(await open.locator('[role=status]').textContent(),/未自动评分/);assert.match(await l.locator('[data-advanced-count]').textContent(),/2 \/ 3/);
- await page.reload();await page.locator('#advanced-nav').click();await l.locator('summary').click();assert.equal(await q.locator('input').inputValue(),'19');assert.match(await l.textContent(),/2 \/ 3/);
+ await page.reload();await page.locator('#advanced-nav').click();await l.locator('[data-advanced-practice] > summary').click();assert.equal(await q.locator('input').inputValue(),'19');assert.match(await l.textContent(),/2 \/ 3/);
  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,'advanced overflow '+width);
  await page.screenshot({path:path.join(results,'advanced-'+width+'.png'),fullPage:true});
  await page.locator('#curriculum-nav').click();await page.locator('#curriculumQualification').selectOption('A Level');await page.getByRole('button',{name:'保存学习安排',exact:true}).click();await page.locator('#advanced-nav').click();assert.equal(await page.locator('[data-advanced-lesson]').count(),2);
