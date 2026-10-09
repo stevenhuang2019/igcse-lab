@@ -8,7 +8,7 @@ Start a local preview with `python3 scripts/preview.py` or double-click `start-l
 
 ## Current coverage
 
-- 1038 questions across 97 local topics and seven subjects.
+- 1148 questions/tasks across 152 local topics (including retained legacy editions) and seven subjects.
 - 62 new original questions: 50 Physics questions spanning 25 course-map sections, plus two each for Math, Chemistry, D&T, Business, CS and English.
 - Every local topic has linked questions. This is **local catalogue coverage**, not proof of full official syllabus coverage, exam readiness or a predicted grade. CS and English still have comparatively shallow banks.
 - The legacy `phy0625_4_6` ID is retained for saved progress, while its display/reference uses official 4.5 subdivisions (induction 4.5.1, generator 4.5.2, transformer 4.5.6), not a nonexistent official 4.6.
@@ -23,7 +23,7 @@ Syllabus structure and original learning content are separate. Topic mapping doe
 Official references checked on 2026-10-09:
 
 - [Physics 0625](https://www.cambridgeinternational.org/Images/697209-2026-2028-syllabus.pdf): course-map section references target examinations in 2026–2028. The concise original objectives and two-question minimum do not provide full depth for every objective or Core/Supplement distinction.
-- [Business Studies 0450](https://www.cambridgeinternational.org/programmes-and-qualifications/view/cambridge-igcse-business-studies-0450/): legacy catalogue targets 2026. From 2027 the qualification is Business 0264; a full content migration has not been certified.
+- [Business Studies 0450](https://www.cambridgeinternational.org/programmes-and-qualifications/view/cambridge-igcse-business-studies-0450/): legacy catalogue targets 2026 and remains accessible under its own profile. Business 0264 2027–2029 now has 29 original subsection lessons and 58 checks/open tasks; complete official bullet coverage has not been certified.
 - [Design & Technology 0445](https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-design-and-technology-0445/): 2024–2026, 2027 and 2028–2030 are separate versions. The existing bank is not labelled as covering a nonexistent 2026–2028 version.
 - [Computer Science 0478](https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-computer-science-0478/): existing metadata targets 2026–2028, not the revised 2029–2031 curriculum.
 
@@ -73,3 +73,5 @@ Bullet-level official-objective audits for all seven subjects, further CS/Englis
 教材与作业：七个科目均可在「我的教材与作业」上传资料、读取文字、保存章节关联并进入练习。详见 [资料库与 AI 使用说明](MATERIALS_GUIDE.md)。资料附件保存在浏览器中，不包含于学习记录备份。AI 分析需要配置服务端凭据。
 
 英语写作：五类 ESL 原创范文、提纲、写作提示和逐条语法修改，见 [写作学习说明](WRITING_GUIDE.md)。
+
+Six-subject content expansion: 55 original worked lessons and 110 checks/open tasks, with Business 0264 edition isolation and reviewed Math/Physics/Chemistry objective references. See [CONTENT_EXPANSION_GUIDE.md](CONTENT_EXPANSION_GUIDE.md). D&T expansion is paused.
