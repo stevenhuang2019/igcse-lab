@@ -23,7 +23,7 @@ module.exports=async(page,width,results)=>{
  await page.reload();await page.locator('#curriculum-nav').click();
  assert.equal(await page.locator('[data-curriculum-topic]').first().getAttribute('data-curriculum-topic'),'math_transform_01');
  await page.locator('#curriculumYear').selectOption('12');await page.locator('#curriculumQualification').selectOption('AS');assert.equal(await page.locator('#curriculumCode').inputValue(),'9709');await page.locator('#curriculumExamYear').fill('2028');await page.getByRole('button',{name:'保存学习安排',exact:true}).click();
- assert.match(await page.locator('#curriculumEdition').textContent(),/高级课程待建设/);
+ assert.match(await page.locator('#curriculumEdition').textContent(),/高级课程入口/);
  await page.locator('#dashboard-nav').click();assert.equal(await page.evaluate(()=>IGCSE_DASHBOARD.day().tasks.length),0);
  await page.locator('[data-page="page-practice"]').click();assert.equal(await page.locator('[data-start-topic]').count(),0);
  await page.locator('#curriculum-nav').click();await page.locator('#curriculumFoundation').check();await page.getByRole('button',{name:'保存学习安排',exact:true}).click();

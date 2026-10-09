@@ -748,9 +748,9 @@
   const registry=window.getIGCSERegistry?.(subject),edition=editions[subject];
   if(!registry||!edition||registry.code!==edition[0]||registry.year!==edition[1])return null;
   return {subject,code:edition[0],year:edition[1],sourceUrl:registry.sourceUrl,checkedOn:'2026-10-09',scope:'selected-priority-objectives-not-full-inventory',fullInventoryReviewed:false,rows:rows.filter(r=>r.subject===subject).map(r=>{
-   const evidence=r.questionIds.map(id=>window.IGCSE_CATALOG.question(id)).filter(q=>q&&q.subject===subject&&q.syllabus===edition[0]&&q.syllabusYear===edition[1]);
+   const evidence=r.questionIds.concat((window.IGCSE_RELEASE_DEPTH_QUESTIONS||[]).filter(q=>q.objectiveAuditId===r.id).map(q=>q.id)).map(id=>window.IGCSE_CATALOG.question(id)).filter(q=>q&&q.subject===subject&&q.syllabus===edition[0]&&q.syllabusYear===edition[1]);
    const objective=evidence.filter(q=>q.type!=='essay'&&q.assessmentMode!=='preparation'),open=evidence.filter(q=>q.type==='essay'),preparation=evidence.filter(q=>q.assessmentMode==='preparation');
-   return {...r,questionIds:evidence.map(q=>q.id),objectiveCount:objective.length,openCount:open.length,preparationCount:preparation.length,status:objective.length?'partial':evidence.length?'preparation':'gap'};
+   return {...r,remaining:r.id==='math_surds'&&objective.length?'已补有理化讲解与两道样题；仍需更多根式组合及独立解答':r.id==='computer_science_sql'&&evidence.length?'已补筛选、排序与完整手工查询；真实 SQL 执行验证仍待建设':r.remaining,questionIds:evidence.map(q=>q.id),objectiveCount:objective.length,openCount:open.length,preparationCount:preparation.length,status:objective.length?'partial':evidence.length?'preparation':'gap'};
   })};
  };
 })();

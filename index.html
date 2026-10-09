@@ -311,6 +311,7 @@
 <script src="data/igcse_skill_depth.js"></script>
 <script src="data/structured_tasks.js"></script>
 <script src="data/objective_coverage.js"></script>
+<script src="data/igcse_release_depth.js"></script>
 <script src="data/learning_catalog.js"></script>
 <script>
 /* ===================== 用户状态管理 ===================== */
@@ -976,7 +977,7 @@ function setEnglishMode(on){
     });
 }
 document.getElementById('subjectSelect').onchange = function(){
-    if(this.value === 'english' && !['page-dashboard','page-materials','page-progress','page-resources','page-writing','page-curriculum'].some(id=>document.getElementById(id)?.classList.contains('active'))){
+    if(this.value === 'english' && !['page-dashboard','page-materials','page-progress','page-resources','page-writing','page-curriculum','page-advanced'].some(id=>document.getElementById(id)?.classList.contains('active'))){
         setEnglishMode(false);
         currentSubject = 'english';
         userState.lastSciSubject = 'english';
@@ -1535,7 +1536,7 @@ function renderQuickrefPage(){
 /* footer 版本号 */
 function renderFooter(){
     const f = document.getElementById('appFooter');
-    if(f) f.textContent = '题库 v1.2 · ' + window.IGCSE_CATALOG.questions.length + ' 题 · ' + (window.SUBJECT_VOCAB ? window.SUBJECT_VOCAB.length : 0) + ' 词 · 更新于 2026-10-09';
+    if(f) f.textContent = '题库 v1.2 · ' + window.IGCSE_CATALOG.questions.length + ' 题 · ' + (window.SUBJECT_VOCAB ? window.SUBJECT_VOCAB.length : 0) + ' 词 · 更新于 2026-10-10';
 }
 /* 英语页返回 IGCSE */
 document.getElementById('englishBackBtn').onclick = () => {
@@ -1933,6 +1934,9 @@ document.addEventListener('DOMContentLoaded',function(){
 <script src="data/curriculum_expansion_map.js"></script>
 <script src="data/syllabus_audit.js"></script>
 <script src="data/curriculum_plan.js"></script>
+<script src="data/learner_setup.js"></script>
+<script src="data/advanced_content.js"></script>
+<script src="data/advanced_learning.js"></script>
 <script src="data/learning_path.js"></script>
 <script src="data/srs_engine.js"></script>
 <script src="data/error_diagnosis.js"></script>

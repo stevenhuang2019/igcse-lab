@@ -3,7 +3,7 @@ function load(){
  const window={userState:{learnedTopics:[],topicStats:{},questionStats:{},dailyPlan:{},mistakes:[]},addEventListener(){},dispatchEvent(){},saveUserState(){}};
  const context=vm.createContext({window,Date,console,document:{readyState:'loading',addEventListener(){}},CustomEvent:function(){}});
  const run=f=>vm.runInContext(fs.readFileSync('data/'+f,'utf8'),context);
- for(const f of ['igcse_content.js','igcse_questions.js','igcse_questions_math.js','igcse_questions_physics.js','igcse_questions_chemistry.js','igcse_questions_dt.js','igcse_questions_business.js','igcse_cs_0478.js','igcse_questions_cs.js','igcse_english_esl.js','igcse_questions_english.js','igcse_english_deep.js','igcse_cs_deep.js','physics_0625_course_map.js','igcse_questions_extension.js','igcse_questions_depth.js','igcse_foundation.js','igcse_curriculum_expansion.js','igcse_skill_depth.js','structured_tasks.js','objective_coverage.js','learning_catalog.js','syllabus_registry.js','curriculum_expansion_map.js','syllabus_audit.js','curriculum_plan.js','mastery_engine.js','mock_exam_engine.js'])run(f);
+ for(const f of ['igcse_content.js','igcse_questions.js','igcse_questions_math.js','igcse_questions_physics.js','igcse_questions_chemistry.js','igcse_questions_dt.js','igcse_questions_business.js','igcse_cs_0478.js','igcse_questions_cs.js','igcse_english_esl.js','igcse_questions_english.js','igcse_english_deep.js','igcse_cs_deep.js','physics_0625_course_map.js','igcse_questions_extension.js','igcse_questions_depth.js','igcse_foundation.js','igcse_curriculum_expansion.js','igcse_skill_depth.js','structured_tasks.js','objective_coverage.js','igcse_release_depth.js','learning_catalog.js','syllabus_registry.js','curriculum_expansion_map.js','syllabus_audit.js','curriculum_plan.js','mastery_engine.js','mock_exam_engine.js'])run(f);
  window.questionData=window.IGCSE_CATALOG.questions;return window;
 }
 test('priority audit preserves bounded scope, editions, source pages and explicit gaps',()=>{
@@ -12,7 +12,7 @@ test('priority audit preserves bounded scope, editions, source pages and explici
   const a=w.getIGCSEObjectiveAudit(subject);assert.equal(a.fullInventoryReviewed,false);assert.equal(a.rows.length,4);count+=a.rows.length;
   for(const row of a.rows){assert.ok(row.page>0);assert.ok(row.remaining);assert.ok(w.IGCSE_CATALOG.topic(subject,row.topicId));for(const id of row.questionIds){const q=w.IGCSE_CATALOG.question(id);assert.equal(q.syllabus,a.code);assert.equal(q.syllabusYear,a.year);}}
  }
- assert.equal(count,24);assert.equal(w.getIGCSEObjectiveAudit('dt'),null);assert.equal(w.getIGCSEObjectiveAudit('math').rows.find(r=>r.id==='math_surds').status,'gap');
+ assert.equal(count,24);assert.equal(w.getIGCSEObjectiveAudit('dt'),null);assert.equal(w.getIGCSEObjectiveAudit('math').rows.find(r=>r.id==='math_surds').status,'partial');
  assert.equal(w.getIGCSEObjectiveAudit('english').rows.find(r=>r.id==='english_listen').questionIds.length,0);
  w.IGCSE_CURRICULUM.setProfile('business',{qualification:'IGCSE',code:'0450',examYear:2026});assert.equal(w.getIGCSEObjectiveAudit('business'),null);assert.ok(w.IGCSE_MOCK_ENGINE.selectStructured('business').every(q=>q.syllabus!=='0264'));
  w.IGCSE_CURRICULUM.setProfile('math',{qualification:'AS',code:'9709',examYear:2028,foundation:false});assert.equal(w.IGCSE_MOCK_ENGINE.selectStructured('math').length,0);
