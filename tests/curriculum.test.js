@@ -1,6 +1,6 @@
 const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),vm=require('vm');
 function setup(){
- const topics=[{subject:'math',topicId:'a'},{subject:'math',topicId:'b'},{subject:'business',topicId:'c'}];
+ const topics=[{subject:'math',topicId:'a'},{subject:'math',topicId:'b'},{subject:'business',topicId:'c',syllabus:'0264'}];
  const window={userState:{learnedTopics:['a'],topicStats:{a:{answered:9}},dailyPlan:{today:{tasks:[{id:'old'}],completed:['done'],pendingTask:{id:'old'}}}},saveUserState(){},dispatchEvent(){}};
  window.IGCSE_CATALOG={subjects:['math','business'],topics,topicsFor:s=>topics.filter(t=>t.subject===s),topic:(s,id)=>topics.find(t=>t.subject===s&&t.topicId===id)};
  window.IGCSE_SYLLABUS_REGISTRY={math:{code:'0580',year:'2025-2027'},business:{code:'0450',year:'2026'}};

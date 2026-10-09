@@ -68,6 +68,7 @@
     function knowledge(){
       const t=(contentData||[]).find(x=>x.topicId===topic); if(!t)return '<p>请选择知识主题。</p>';
       return '<div class="border rounded-xl p-5"><div class="text-xs text-indigo-600 font-bold">'+esc(t.chapter)+' · '+esc(t.topicId)+'</div><h3 class="text-2xl font-bold mt-1">'+esc(t.title)+'</h3><div class="mt-4 prose max-w-none">'+(t.knowledge||'暂无知识说明')+'</div>'+
+        (t.workedExample?'<section class="db-panel"><h3>例题与推理</h3><p>'+esc(t.workedExample)+'</p><p>关联细目：'+esc((t.objectiveRefs||[]).join('、'))+' · '+esc(t.tier)+'</p><ul>'+(t.checklist||[]).map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul><p>原创教学样例，不是完整考纲。</p></section>':'')+
         (t.formulas?.length?'<div class="mt-4 p-4 rounded-xl bg-indigo-50"><b>核心公式 / 关系</b>'+t.formulas.map(f=>'<div class="mt-2">'+f+'</div>').join('')+'</div>':'')+
         '<div class="mt-4 p-4 rounded-xl bg-amber-50 border border-amber-200"><b>⚠ 常见错误</b><p class="mt-1 text-sm">'+esc(t.commonMistake||'暂无')+'</p></div>'+
         '<div class="mt-4 flex flex-wrap gap-2"><button id="ceStartTopic" class="bg-indigo-600 text-white px-4 py-2 rounded-lg">开始本主题练习</button><button id="ceStartTest" class="border px-4 py-2 rounded-lg">完成本章测试</button></div></div>';
@@ -126,7 +127,7 @@
         session.answered=true;const ok=Math.abs(Number(v)-Number(q.answer))<=(q.tolerance??1e-9);record(q,ok);
         ceFeedback.innerHTML=feedback(q,ok);ceNext.onclick=()=>{session.idx++;if(ok)session.correct++;renderQuestion();};return;
       }
-      ceFeedback.innerHTML='<div class="border rounded p-4"><b>参考答案</b><p>'+esc(q.answer)+'</p><p>'+esc(q.explain)+'</p><button data-ce-self="yes" class="mock-action">我已覆盖得分点</button><button data-ce-self="no" class="mock-action">需要复习</button></div>';
+      ceFeedback.innerHTML='<div class="border rounded p-4"><b>'+ (q.rubric?'原创参考要点 · 自评，非官方评分':'参考答案')+'</b><p>'+esc(q.answer)+'</p><p>'+esc(q.explain)+'</p><button data-ce-self="yes" class="mock-action">我已覆盖得分点</button><button data-ce-self="no" class="mock-action">需要复习</button></div>';
       ceFeedback.querySelectorAll('[data-ce-self]').forEach(b=>b.onclick=()=>{
         if(session.answered)return;session.answered=true;const ok=b.dataset.ceSelf==='yes';record(q,ok);
         ceFeedback.innerHTML=feedback(q,ok);ceNext.onclick=()=>{session.idx++;if(ok)session.correct++;renderQuestion();};

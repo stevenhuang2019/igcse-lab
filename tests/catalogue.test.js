@@ -6,8 +6,8 @@ function load(){
  const window={},listeners={};window.addEventListener=(event,fn)=>{(listeners[event]||=[]).push(fn);};
  const document={readyState:'loading',addEventListener(){}};
  const ctx=vm.createContext({window,document,console,Date,CustomEvent:function(type,{detail}){this.type=type;this.detail=detail;}});
- const run=f=>vm.runInContext(fs.readFileSync(path.join(root,'data',f),'utf8'),ctx,{filename:f});
- for(const f of ['igcse_content.js','igcse_questions.js','igcse_questions_math.js','igcse_questions_physics.js','igcse_questions_chemistry.js','igcse_questions_dt.js','igcse_questions_business.js','igcse_cs_0478.js','igcse_questions_cs.js','igcse_english_esl.js','igcse_questions_english.js','igcse_english_deep.js','igcse_cs_deep.js','physics_0625_course_map.js','igcse_questions_extension.js','igcse_questions_depth.js','igcse_foundation.js','learning_catalog.js'])run(f);
+ const run=f=>{vm.runInContext(fs.readFileSync(path.join(root,'data',f),'utf8'),ctx,{filename:f});if(f==='syllabus_registry.js')run('curriculum_expansion_map.js');};
+ for(const f of ['igcse_content.js','igcse_questions.js','igcse_questions_math.js','igcse_questions_physics.js','igcse_questions_chemistry.js','igcse_questions_dt.js','igcse_questions_business.js','igcse_cs_0478.js','igcse_questions_cs.js','igcse_english_esl.js','igcse_questions_english.js','igcse_english_deep.js','igcse_cs_deep.js','physics_0625_course_map.js','igcse_questions_extension.js','igcse_questions_depth.js','igcse_foundation.js','igcse_curriculum_expansion.js','learning_catalog.js'])run(f);
  window.userState={topicStats:{},questionStats:{},learnedTopics:[],dailyPlan:{},mistakes:[]};window.saveUserState=()=>{};
  return {window,run,listeners};
 }
@@ -30,7 +30,7 @@ test('syllabus mapping includes physical course objectives and actual topic ques
  assert.equal(physics.find(t=>t.topicId==='phy0625_6_2').questionIds.length,2);
  const coverage=window.getIGCSESyllabusCoverage('physics');
  assert.equal(coverage.questionCoverage,100);assert.equal(coverage.coverage,0);assert.equal(coverage.scope,'local-catalogue');
- assert.equal(map.business.syllabusYear,'2026');assert.match(map.business.note,/0264/);
+ assert.equal(map.business.syllabusYear,'2027-2029');assert.match(map.business.note,/0264/);
 });
 test('dashboard counts individual question evidence and averages over unstarted topics',()=>{
  const {window,run,listeners}=load();window.questionData=window.IGCSE_CATALOG.questions;
@@ -38,7 +38,7 @@ test('dashboard counts individual question evidence and averages over unstarted 
  run('learning_progress.js');run('learning_dashboard.js');
  const answer={detail:{qid:'math_q001',subject:'math',topicId:'math_algebra_01',correct:true}};
  listeners['igcse-answer-recorded'].forEach(fn=>fn(answer));
- let summary=window.IGCSE_DASHBOARD.summary('math');assert.equal(summary.practiced,1);assert.equal(summary.mastery,7);assert.equal(summary.accuracy,100);
+ let summary=window.IGCSE_DASHBOARD.summary('math');assert.equal(summary.practiced,1);assert.equal(summary.mastery,4);assert.equal(summary.accuracy,100);
  answer.detail.correct=false;listeners['igcse-answer-recorded'].forEach(fn=>fn(answer));
  summary=window.IGCSE_DASHBOARD.summary('math');assert.equal(summary.practiced,1);assert.equal(summary.accuracy,50);
  assert.equal(window.IGCSE_DASHBOARD.localDate(new Date(2026,9,9,0,5)),'2026-10-09');
@@ -86,8 +86,8 @@ test('authored depth has meaningful unique prompts and balanced answer positions
   for(const q of added){assert.equal(q.source,'original');assert.equal(q.pastPaper,false);assert.ok(q.syllabusRef);counts[q.options.indexOf(q.answer)]++;}
   assert.ok(Math.max(...counts)-Math.min(...counts)<=1);
  }
- assert.equal(window.IGCSE_CATALOG.questions.filter(q=>q.subject==='computer_science').length,114);
- assert.equal(window.IGCSE_CATALOG.questions.filter(q=>q.subject==='english').length,66);
+ assert.equal(window.IGCSE_CATALOG.questions.filter(q=>q.subject==='computer_science').length,122);
+ assert.equal(window.IGCSE_CATALOG.questions.filter(q=>q.subject==='english').length,74);
 });
 
 test('section progress counts unique answered samples separately from preparation',()=>{
@@ -95,7 +95,7 @@ test('section progress counts unique answered samples separately from preparatio
  const audit=window.getIGCSESyllabusAudit;
  window.userState.questionStats.gap_cs_005={answered:5,correct:3};
  const files=audit('computer_science').sections.find(s=>s.ref==='8.3');
- assert.equal(files.attemptedCount,1);assert.equal(files.practiceCount,4);
+ assert.equal(files.attemptedCount,1);assert.equal(files.practiceCount,6);
  window.userState.questionStats.depth_en_022={answered:1,correct:1};
  const listening=audit('english').sections.find(s=>s.ref==='L1');
  assert.equal(listening.preparationAttemptedCount,1);assert.equal(listening.attemptedCount,0);
@@ -106,7 +106,7 @@ test('section progress counts unique answered samples separately from preparatio
 test('foundation chapters have edition-linked samples and new lessons retain all legacy topics',()=>{
  const {window:w,run}=load();run('syllabus_registry.js');run('syllabus_audit.js');
  assert.equal(w.IGCSE_FOUNDATION_CONTENT.length,9);assert.equal(w.IGCSE_FOUNDATION_QUESTIONS.length,42);
- assert.equal(w.IGCSE_CATALOG.topics.length,97);assert.equal(w.IGCSE_CATALOG.questions.length,1038);
+ assert.equal(w.IGCSE_CATALOG.topics.length,152);assert.equal(w.IGCSE_CATALOG.questions.length,1148);
  assert.equal(new Set(w.IGCSE_FOUNDATION_QUESTIONS.map(q=>q.question)).size,42);
  for(const [subject,n] of [['math',9],['chemistry',12]]){
   const a=w.getIGCSESyllabusAudit(subject);assert.equal(a.sampled,n);

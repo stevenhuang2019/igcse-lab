@@ -47,7 +47,7 @@ window.IGCSE_MOCK_ENGINE={ensure,getQuestions,start,score,finish,report,recordPr
 (function(){
  const engine=window.IGCSE_MOCK_ENGINE;
  engine.selectQuestions=function(subject,count=30,scope='all'){
-  const pool=(window.questionData||[]).filter(q=>q.type==='choice'&&(subject==='mixed'||q.subject===subject)&&(scope==='all'||!window.IGCSE_CURRICULUM||(window.IGCSE_CURRICULUM.profile(q.subject)&&window.IGCSE_CURRICULUM.eligible(q.subject,q.topicId))));
+  const pool=(window.questionData||[]).filter(q=>q.type==='choice'&&(!window.IGCSE_CURRICULUM||window.IGCSE_CURRICULUM.questionAllowed(q))&&(subject==='mixed'||q.subject===subject)&&(scope==='all'||!window.IGCSE_CURRICULUM||(window.IGCSE_CURRICULUM.profile(q.subject)&&window.IGCSE_CURRICULUM.eligible(q.subject,q.topicId))));
   const groups=new Map();
   pool.forEach(q=>{const key=q.subject+'::'+q.topicId;if(!groups.has(key))groups.set(key,[]);groups.get(key).push(q);});
   const buckets=Array.from(groups.values()).map(items=>items.map(q=>({q,r:Math.random()})).sort((a,b)=>a.r-b.r).map(x=>x.q));

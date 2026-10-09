@@ -31,7 +31,7 @@ const server=http.createServer((req,res)=>{
    assert.equal(await page.evaluate(()=>userState===window.userState),true);
    for(const subject of ['math','physics','chemistry','dt','business','computer_science','english']){
     await page.locator('[data-db-subject="'+subject+'"]').click();
-    assert.equal(await page.locator('#page-dashboard > .db-panel').filter({has:page.locator('h3', {hasText:'课程地图与练习覆盖'})}).locator('.db-topics article').count(),await page.evaluate(s=>IGCSE_CATALOG.topicsFor(s).length,subject));
+    assert.equal(await page.locator('#page-dashboard > .db-panel').filter({has:page.locator('h3', {hasText:'课程地图与练习覆盖'})}).locator('.db-topics article').count(),await page.evaluate(s=>IGCSE_CURRICULUM.ordered(s).length,subject));
    }
    await page.locator('#dbSyllabusAudit summary').click();
    assert.match(await page.locator('#dbSyllabusAudit').textContent(),/0510.*2027-2029/s);
@@ -58,9 +58,12 @@ const server=http.createServer((req,res)=>{
    assert.ok(await page.evaluate(()=>userState.learnedTopics.includes('cs0478_8_files')));
    await page.locator('#dashboard-nav').click();await page.locator('#dbSyllabusAudit summary').click();
    await page.getByRole('button',{name:'练习 8.3',exact:true}).click();
-   assert.equal(await page.evaluate(()=>practiceSession.order.length),4);
+   assert.equal(await page.evaluate(()=>practiceSession.order.length),6);
    assert.ok(await page.evaluate(()=>practiceSession.order.every(id=>{const q=findQuestion(id);return q.syllabus==='0478'&&q.syllabusYear==='2026-2028'&&q.syllabusRef==='8.3';})));
-   await page.locator('#questionArea .opt-btn').first().click();
+   const fileQuestionType=await page.evaluate(()=>findQuestion(practiceSession.order[practiceSession.idx]).type);
+   if(fileQuestionType==='choice')await page.locator('#questionArea .opt-btn').first().click();
+   else if(fileQuestionType==='number'){await page.locator('#numberInput').fill('9999');await page.locator('[data-act=number-check]').click();}
+   else{await page.locator('#essayInput').fill('My practice answer');await page.locator('[data-act=essay-check]').click();await page.locator('[data-self=no]').click();}
    await page.reload();await page.locator('#dashboard-nav').click();
    assert.equal(await page.evaluate(()=>getIGCSESyllabusAudit('computer_science').sections.find(s=>s.ref==='8.3').attemptedCount),1);
    assert.equal(await page.evaluate(()=>getIGCSESyllabusAudit('english').sections.find(s=>s.ref==='L1').preparationAttemptedCount),1);
@@ -77,7 +80,7 @@ const server=http.createServer((req,res)=>{
     await page.locator('#dashboard-nav').click();
    }
    await page.locator('#dbProgress').click();assert.equal(await page.locator('#page-progress.active').count(),1);
-   assert.equal(await page.locator('[data-progress-topic]').count(),9);
+   assert.equal(await page.locator('[data-progress-topic]').count(),15);
    const transform=page.locator('[data-progress-topic="math_transform_01"]');assert.match(await transform.textContent(),/样本有限/);
    await transform.locator('summary').click();assert.match(await transform.textContent(),/未测量/);
    assert.ok(await page.evaluate(()=>IGCSE_PROGRESS_VIEW.model('math').days.at(-1).answered>=1));
@@ -163,6 +166,7 @@ const server=http.createServer((req,res)=>{
     assert.match(await page.locator('.db-hero').textContent(),/英语/);
    }
    await page.goto(base);await page.locator('#dbProgress').waitFor();assert.equal(await page.locator('#page-dashboard.active').count(),1,'default landing');
+   await require('./content_expansion_browser.cjs')(page,width,results);
    await require('./curriculum_browser.cjs')(page,width,results);
    assert.deepEqual(errors,[],'browser errors '+width);assert.equal(expectedHTTP.size,0,'expected error fixtures observed');
    console.log('[ok] '+width+'px: dashboard, seven subjects, task completion, storage, navigation, mock resume/submit/timeout/report, curriculum pacing/stages/export; '+(Date.now()-started)+'ms');

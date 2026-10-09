@@ -13,7 +13,7 @@ module.exports=async(page,width,results)=>{
  assert.ok(await page.evaluate(()=>IGCSE_DASHBOARD.day().tasks.every(t=>t.subject==='math'&&['math_transform_01','math_algebra_01'].includes(t.topic))));
  assert.equal(await page.evaluate(()=>IGCSE_DASHBOARD.day().tasks.find(t=>t.type==='practice').topic),'math_transform_01');
  await page.locator('[data-page="page-practice"]').click();assert.equal(await page.locator('[data-start-topic]').count(),2);
- await page.locator('#practiceSchoolScope').selectOption('all');assert.equal(await page.locator('[data-start-topic]').count(),9);
+ await page.locator('#practiceSchoolScope').selectOption('all');assert.equal(await page.locator('[data-start-topic]').count(),15);
  await page.locator('#practiceSchoolScope').selectOption('taught');
  await page.locator('#mockSchoolScope').selectOption('taught');await page.locator('[data-mock="math"]').click();
  assert.match(await page.locator('.mock-preflight').textContent(),/已教范围测验/);await page.locator('#confirmMock').click();

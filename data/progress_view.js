@@ -4,7 +4,7 @@
  const names={math:'数学',physics:'物理',chemistry:'化学',dt:'设计 DT',business:'商业研究',computer_science:'计算机科学',english:'英语 ESL'};
  const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  function model(subject){
-  const topics=window.IGCSE_CATALOG.topicsFor(subject).map(t=>({...t,evidence:window.getTopicMasteryEvidence(t.topicId,subject)}));
+  const topics=(window.IGCSE_CURRICULUM?.ordered(subject)||window.IGCSE_CATALOG.topicsFor(subject)).map(t=>({...t,evidence:window.getTopicMasteryEvidence(t.topicId,subject)}));
   const now=new Date(),days=[];
   for(let i=6;i>=0;i--){const date=new Date(now.getFullYear(),now.getMonth(),now.getDate()-i),key=window.IGCSE_DASHBOARD.localDate(date),a=window.userState.activityByDay?.[key]?.[subject];days.push({date:key,answered:a?.answered||0,correct:a?.correct||0});}
   return {subject,topics,days,summary:window.IGCSE_DASHBOARD.summary(subject)};

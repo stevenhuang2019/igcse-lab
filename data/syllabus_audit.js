@@ -2,7 +2,7 @@
 (function(){
  'use strict';
  function audit(subject){
-  const registry=window.IGCSE_SYLLABUS_REGISTRY?.[subject],catalog=window.IGCSE_CATALOG;
+  const registry=window.getIGCSERegistry?.(subject)||window.IGCSE_SYLLABUS_REGISTRY?.[subject],catalog=window.IGCSE_CATALOG;
   if(!registry||!catalog)return null;
   const qs=catalog.questions.filter(q=>q.subject===subject),refs=new Set(registry.sections.map(s=>s.ref));
   const editionMatches=q=>q.syllabus===registry.code&&q.syllabusYear===registry.year;
