@@ -49,3 +49,5 @@
 资料页面会显示 AI 服务是否已配置；没有凭据时禁用发送按钮。配置完成后，可在项目目录运行 `node scripts/verify_live_material_ai.cjs --file /你的资料路径 --subject math`；DeepSeek 验证命令需加 `node --env-file=/私有配置路径`，CLI 文字验证使用 TXT / Markdown（科目值为 math / physics / chemistry / dt / business / computer_science / english）对选中的真实文件进行一次接口验证。该操作会发送文件并可能计费。报告只保存验证统计，不记录密钥或教材原文。PDF、扫描件和 Word 的引用仍须人工核对；接口响应成功不等于教材内容与教学效果已验收。
 
 本机 DeepSeek 已配置并完成测试资料真实验证；公共部署、真实教材教学效果和设备同步仍需后续建设。
+
+学习进度现支持学习 JSON 的校验、预览与确认恢复，但教材附件仍不包含其中。恢复学习记录会保留本机现有附件，来源任务从现有资料重建；更换浏览器时仍需保留并重新上传原文件。

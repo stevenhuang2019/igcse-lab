@@ -35,12 +35,12 @@ test('navigation validates destinations, updates accessibility and preserves his
 test('mock reports retain practice outcomes including self-assessed essays and unanswered questions',()=>{
  const window={userState:{}};
  vm.runInNewContext(fs.readFileSync(path.join(root,'data/mock_exam_engine.js'),'utf8'),{window});
- const qs=[{id:'choice',options:['A','B'],answer:'B',topicId:'a'},{id:'essay',answer:'reference',topicId:'b'},{id:'unanswered',answer:'X',topicId:'a'}];
+ const qs=[{id:'choice',options:['A','B'],answer:'B',topicId:'a'},{id:'essay',type:'essay',answer:'reference',topicId:'b'},{id:'unanswered',answer:'X',topicId:'a'}];
  const engine=window.IGCSE_MOCK_ENGINE;
  assert.equal(engine.score({answers:{choice:1}},qs).correct,1);
  const record=engine.recordPracticeSession({subject:'math',mode:'mock',outcomes:{choice:false,essay:true}},qs);
- assert.equal(record.result.correct,1);
+ assert.equal(record.result.correct,0);
  assert.equal(record.result.total,3);
- assert.equal(engine.report(record).accuracy,33);
+ assert.equal(engine.report(record).accuracy,0);
  assert.equal(window.userState.mockExams.records.length,1);
 });

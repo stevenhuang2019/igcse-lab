@@ -309,6 +309,7 @@
 <script src="data/igcse_foundation.js"></script>
 <script src="data/igcse_curriculum_expansion.js"></script>
 <script src="data/igcse_skill_depth.js"></script>
+<script src="data/structured_tasks.js"></script>
 <script src="data/learning_catalog.js"></script>
 <script>
 /* ===================== 用户状态管理 ===================== */
@@ -591,8 +592,8 @@ function renderQuestion(){
     } else if(q.type==='number'){
         html += '<label for="numberInput">数值答案 '+esc(q.unit||'')+'</label><input id="numberInput" type="number" step="any" class="w-full border rounded p-3"><button data-act="number-check" class="mock-action">提交答案</button>';
     } else {
-        html += '<textarea id="essayInput" class="w-full border rounded-lg p-2 h-28 text-sm" placeholder="写下你的回答（中英文均可），提交后对照 Mark Scheme 自查"></textarea>';
-        html += '<div class="mt-2"><button data-act="essay-check" class="bg-indigo-600 text-white px-4 py-2 rounded text-sm hover:bg-indigo-700">提交并查看参考答案</button></div>';
+        html += '<textarea id="essayInput" class="w-full border rounded-lg p-2 h-28 text-sm" maxlength="12000" placeholder="写下你的回答；计时测验交卷后查看原创参考要点"></textarea>';
+        html += '<div class="mt-2"><button data-act="essay-check" class="bg-indigo-600 text-white px-4 py-2 rounded text-sm hover:bg-indigo-700">'+(s.mode==='mock'?'保存回答':'提交并查看参考答案')+'</button></div>';
     }
     html += '<div class="q-feedback mt-3"></div>';
     html += '</div>';
@@ -607,14 +608,16 @@ function renderQuestion(){
             btn.onclick = () => submitChoice(q, parseInt(btn.dataset.opt, 10), area);
         });
     } else if(q.type==='number'){
-        area.querySelector('[data-act=number-check]').onclick=()=>{const raw=area.querySelector('#numberInput').value;if(!raw.trim()||!Number.isFinite(Number(raw))){showToast('请输入有效数字');return;}
+        area.querySelector('[data-act=number-check]').onclick=()=>{if(!practiceSession||Object.hasOwn(practiceSession.outcomes||{},q.id))return;if(practiceSession.mode==='mock'&&Date.now()-practiceSession.startedAt>=practiceSession.timeLimitSec*1000){practiceSession.timedOut=true;finishPractice();return;}const raw=area.querySelector('#numberInput').value;if(!raw.trim()||!Number.isFinite(Number(raw))){showToast('请输入有效数字');return;}
+        practiceSession.answers=practiceSession.answers||{};practiceSession.answers[q.id]=raw;
         const ok=Math.abs(Number(raw)-Number(q.answer))<=(q.tolerance??1e-9);markAnswered(q,ok,area);};
     } else {
-        area.querySelector('[data-act=essay-check]').onclick = () => showEssaySelfCheck(q, area);
+        area.querySelector('[data-act=essay-check]').onclick = () => s.mode==='mock'?saveMockWritten(q,area):showEssaySelfCheck(q, area);
     }
 }
 function markAnswered(q, isCorrect, area){
     const s = practiceSession;
+    if(s?.mode==='mock'&&Date.now()-s.startedAt>=s.timeLimitSec*1000){s.timedOut=true;finishPractice();return;}
     if(!s || Object.prototype.hasOwnProperty.call(s.outcomes||{},q.id)) return;
     s.outcomes = s.outcomes || {};
     s.outcomes[q.id] = !!isCorrect;
@@ -684,7 +687,7 @@ function markAnswered(q, isCorrect, area){
     window.dispatchEvent(new CustomEvent('igcse-answer-recorded',{detail:{topicId:q.topicId,qid:q.id,subject:subj,correct:isCorrect,srs:s.mode==='srs',pastPaper:paperMode,pastPaperType:(q.pastPaperType||((s.mode==='paper'&&q.pastPaper)?'official':'mock')),accuracy:sessionAccuracy,mode:s.mode,sessionId:s.id,question:q}}));
     checkBadges();
     const fb = area.querySelector('.q-feedback');
-    if(s.mode==='mock'&&q.type==='choice'){
+    if(s.mode==='mock'){
         window.IGCSE_MOCK_ENGINE.saveActive(s);
         if(fb)fb.textContent='答案已记录，交卷后查看结果。';
         const next=document.createElement('button');next.textContent=s.idx>=s.total?'交卷并查看报告':'下一题';next.className='mock-action';next.dataset.act='next-q';next.onclick=nextQuestion;area.appendChild(next);return;
@@ -714,6 +717,16 @@ function submitChoice(q, idx, area){
         if(b.dataset.opt === String(idx) && !isCorrect) b.classList.add('wrong');
     });
     markAnswered(q, isCorrect, area);
+}
+function saveMockWritten(q,area){
+    const s=practiceSession,input=area.querySelector('#essayInput');
+    if(!s||!input?.value.trim()){showToast('请先写下回答');return;}
+    if(Date.now()-s.startedAt>=s.timeLimitSec*1000){s.timedOut=true;finishPractice();return;}
+    if(Object.hasOwn(s.answers||{},q.id))return;
+    s.answers=s.answers||{};s.answers[q.id]=input.value.trim().slice(0,12000);s.idx++;
+    window.IGCSE_MOCK_ENGINE.saveActive(s);input.disabled=true;area.querySelector('[data-act=essay-check]').disabled=true;
+    area.querySelector('.q-feedback').textContent='回答已保存；交卷后查看参考要点，开放题不自动判分。';
+    const next=document.createElement('button');next.dataset.act='next-q';next.className='mock-action';next.textContent=s.idx>=s.total?'交卷并查看报告':'下一题';next.onclick=nextQuestion;area.append(next);renderMockEntry();
 }
 function showEssaySelfCheck(q, area){
     const input = area.querySelector('#essayInput');
@@ -752,11 +765,13 @@ function finishPractice(){
     if(s.mode === 'mock'){
         const usedSec = s.timedOut ? s.timeLimitSec : Math.floor((Date.now() - s.startedAt) / 1000);
         headTitle = '📝 模拟考交卷';
-        subInfo = '共 ' + total + ' 题 · 答对 ' + correct + ' 题（' + rate + '%） · 用时 ' + Math.floor(usedSec/60) + ' 分 ' + (usedSec % 60) + ' 秒' + (s.timedOut ? '（超时自动交卷）' : '');
+        const scored=window.IGCSE_MOCK_ENGINE.score(s,(s.order||[]).map(id=>findQuestion(id)).filter(Boolean));
+        subInfo = '共 ' + total + ' 题 · 客观检查 ' + scored.correct + '/' + scored.objectiveTotal + '（' + (scored.accuracy===null?'无客观总分':scored.accuracy+'%') + '） · 开放回答 ' + scored.openAnswered + '/' + scored.openTotal + ' · 用时 ' + Math.floor(usedSec/60) + ' 分 ' + (usedSec % 60) + ' 秒' + (s.timedOut ? '（超时自动交卷）' : '');
         subNote = '错题已自动入库，明日起进入 SRS 间隔复习';
     } else if(s.mode === 'paper'){
         headTitle = '📄 模拟卷完成';
-        subInfo = '共 ' + total + ' 题 · 答对 ' + correct + ' 题（' + rate + '%）';
+        const scored=window.IGCSE_MOCK_ENGINE.score(s,(s.order||[]).map(id=>findQuestion(id)).filter(Boolean));
+        subInfo = '共 '+total+' 题 · 客观检查 '+scored.correct+'/'+scored.objectiveTotal+' · 开放／自评 '+scored.openAnswered+'/'+scored.openTotal+' · 准备任务 '+scored.preparationAnswered+'/'+scored.preparationTotal;
     } else if(s.mode === 'srs'){
         headTitle = '🔂 SRS 复习完成';
         subInfo = '本轮复习 ' + total + ' 题，通过 ' + correct + ' 题';
@@ -766,7 +781,7 @@ function finishPractice(){
         subInfo = '重练 ' + total + ' 题，通过 ' + correct + ' 题';
         subNote = '答对的题已自动移出错题本';
     }
-    area.innerHTML = '<div class="border rounded-lg p-6 text-center bg-slate-50"><div class="text-3xl mb-1">' + '★'.repeat(stars) + '☆'.repeat(3 - stars) + '</div>'
+    area.innerHTML = '<div class="border rounded-lg p-6 text-center bg-slate-50"><div class="text-3xl mb-1">' + (['mock','paper'].includes(s.mode)?'':'★'.repeat(stars)+'☆'.repeat(3-stars)) + '</div>'
         + '<div class="text-lg font-bold">' + headTitle + '</div>'
         + '<p class="text-gray-600 mt-1">' + subInfo + '</p>'
         + '<p class="text-sm text-gray-500 mt-1">' + subNote + '</p>'
@@ -1432,12 +1447,13 @@ function renderMockEntry(){
     const el = document.getElementById('mockEntry');
     if(!el) return;
     const saved=userState.mockExams?.activePractice;
-    if(saved){el.innerHTML='<div class="mock-preflight"><h3>有一场模拟考尚未交卷</h3><p>已记录 '+Object.keys(saved.outcomes||{}).length+' / '+saved.total+' 题。刷新不会重置计时。</p><button id="resumeMock" class="mock-action">继续考试</button></div>';document.getElementById('resumeMock').onclick=resumeMock;return;}
+    if(saved){el.innerHTML='<div class="mock-preflight"><h3>有一场模拟考尚未交卷</h3><p>已记录 '+new Set([...Object.keys(saved.outcomes||{}),...Object.keys(saved.answers||{})]).size+' / '+saved.total+' 题。刷新不会重置计时。</p><button id="resumeMock" class="mock-action">继续考试</button></div>';document.getElementById('resumeMock').onclick=resumeMock;return;}
     let html = '<div class="bg-slate-50 border border-slate-200 rounded-lg p-3 flex flex-wrap gap-2 items-center">'
         + '<span class="text-sm font-semibold text-gray-700">🧪 模拟考：</span><label>范围 <select id="mockSchoolScope"><option value="all">全部本站 IGCSE · 可能含未教内容</option><option value="taught">当前与已教章节测验</option></select></label><p>以下组卷均为本站 IGCSE 练习，不能替代 AS/A Level 或完整官方试卷。</p>';
     ['math','physics','chemistry','dt','business','computer_science','english'].forEach(sub => {
         html += '<button data-mock="' + sub + '" class="px-2 py-1 rounded border text-xs bg-white hover:border-indigo-400">' + (SUBJECT_NAMES[sub]||sub) + ' · 最多30题</button>';
     });
+    html += '<div class="w-full db-actions">'+['math','physics','chemistry','business','computer_science','english'].map(sub=>'<button data-structured="'+sub+'">'+esc(SUBJECT_NAMES[sub])+' · 多题型练习测验</button>').join('')+'</div>';
     html += '<button data-mock="mixed" class="px-2 py-1 rounded border text-xs bg-white hover:border-indigo-400">🌐 全科混合 30题/30分钟</button>';
     const MP = window.IGCSE_MOCKPAPERS || {};
     const keys = Object.keys(MP);
@@ -1450,22 +1466,23 @@ function renderMockEntry(){
     }
     html += mockExamsEntryHtml();
     const records=(window.userState&&userState.mockExams&&userState.mockExams.records)||[];
-    if(records.length){ const last=records[0]; const rep=window.IGCSE_MOCK_ENGINE&&window.IGCSE_MOCK_ENGINE.report(last); if(rep) html += '<div class="w-full text-xs text-gray-600 mt-2">上次模拟考：<b>'+rep.accuracy+'%</b> · 薄弱项 '+rep.weakTopics.slice(0,2).map(x=>esc(x.topic)).join('、')+'</div>'; }
+    if(records.length){ const last=records[0]; const rep=window.IGCSE_MOCK_ENGINE&&window.IGCSE_MOCK_ENGINE.report(last); if(rep) html += '<div class="w-full text-xs text-gray-600 mt-2">上次模拟考：<b>'+(rep.accuracy===null?'开放／准备任务':rep.accuracy+'%')+'</b> · 薄弱项 '+rep.weakTopics.slice(0,2).map(x=>esc(x.topic)).join('、')+'</div>'; }
     html += records.slice(0,5).map(r=>'<button class="mock-action" data-view-report="'+esc(r.id)+'">查看报告 · '+esc(SUBJECT_NAMES[r.subject]||r.subject)+' · '+esc(String(r.finishedAt||'').slice(0,10))+'</button>').join('');
     html += '</div>';
     el.innerHTML = html;
     el.querySelectorAll('[data-view-report]').forEach(b=>b.onclick=()=>{practiceSession=null;stopMockTimer();document.getElementById('questionArea').innerHTML='';renderMockReport(b.dataset.viewReport,document.getElementById('questionArea'));});
 
+    el.querySelectorAll('[data-structured]').forEach(b=>b.onclick=()=>prepareMock(b.dataset.structured,true));
     el.querySelectorAll('[data-mock]').forEach(b => { b.onclick = () => prepareMock(b.dataset.mock); });
     el.querySelectorAll('[data-paper]').forEach(b => { b.onclick = () => startMockPaper(b.dataset.paper); });
     el.querySelectorAll('[data-mockexam]').forEach(b => { b.onclick = () => startMockExam(parseInt(b.dataset.mockexam, 10)); });
 }
-function prepareMock(subject){
+function prepareMock(subject,structured=false){
     const mockScope=document.getElementById('mockSchoolScope')?.value||'all';
-    const qs=window.IGCSE_MOCK_ENGINE.selectQuestions(subject,30,mockScope);
+    const qs=structured?window.IGCSE_MOCK_ENGINE.selectStructured(subject,mockScope):window.IGCSE_MOCK_ENGINE.selectQuestions(subject,30,mockScope);
     const el=document.getElementById('mockEntry');
-    el.innerHTML='<div class="mock-preflight"><h3>'+(mockScope==='taught'?'已教范围测验':'本站 IGCSE 模拟考')+'准备 · '+esc(SUBJECT_NAMES[subject]||'全科混合')+'</h3><p>'+qs.length+' 道客观题 · 30 分钟 · '+new Set(qs.map(q=>q.subject+'::'+q.topicId)).size+' 个主题</p><p>'+(mockScope==='taught'?'只抽取当前与已教章节。':'包含本站全部主题，可能涉及学校尚未教学的内容。')+'原创练习组卷，按题数计分。英语包含文字与策略练习，不评估真实听说能力或完整作文。交卷后显示解析与薄弱主题；不作为官方成绩预测。刷新后可继续，计时仍从原开始时间计算。</p><div class="mock-controls"><button id="confirmMock" '+(!qs.length?'disabled':'')+'>开始计时</button><button id="cancelMock">返回选择</button></div></div>';
-    document.getElementById('confirmMock').onclick=()=>{if(subject!=='mixed')setCurrentSubjectSafe(subject);startSessionFromIds(qs.map(q=>q.id),'mock',{subject,label:'模拟考 · '+(SUBJECT_NAMES[subject]||'全科混合'),timeLimitSec:1800});};
+    el.innerHTML='<div class="mock-preflight"><h3>'+(mockScope==='taught'?'已教范围测验':'本站 IGCSE 模拟考')+'准备 · '+esc(SUBJECT_NAMES[subject]||'全科混合')+'</h3><p>'+qs.length+(structured?' 道任务（计算／选择＋开放回答）':' 道客观题')+' · 30 分钟 · '+new Set(qs.map(q=>q.subject+'::'+q.topicId)).size+' 个主题</p><p>'+(mockScope==='taught'?'只抽取当前与已教章节。':'包含本站全部主题，可能涉及学校尚未教学的内容。')+'原创练习组卷，客观题单独计正确率，开放回答交卷后对照参考要点，不自动判分。英语包含文字与策略练习，不评估真实听说能力或完整作文。交卷后显示解析与薄弱主题；不作为官方成绩预测。刷新后可继续，计时仍从原开始时间计算。</p><div class="mock-controls"><button id="confirmMock" '+(!qs.length?'disabled':'')+'>开始计时</button><button id="cancelMock">返回选择</button></div></div>';
+    document.getElementById('confirmMock').onclick=()=>{if(subject!=='mixed')setCurrentSubjectSafe(subject);startSessionFromIds(qs.map(q=>q.id),'mock',{subject,label:(structured?'多题型练习测验 · ':'模拟考 · ')+(SUBJECT_NAMES[subject]||'全科混合'),timeLimitSec:1800});};
     document.getElementById('cancelMock').onclick=renderMockEntry;
 }
 function startMock(subject){prepareMock(subject);}
@@ -1480,7 +1497,7 @@ function renderMockReport(id,area){
     const record=(userState.mockExams?.records||[]).find(r=>r.id===id);if(!record)return;
     const report=window.IGCSE_MOCK_ENGINE.report(record);
     const box=document.createElement('section');box.className='mock-report';box.id='mockDetailedReport';
-    box.innerHTML='<h3>模拟考诊断 · '+report.accuracy+'%</h3><p>'+report.correct+'/'+report.total+' 题正确 · '+report.unanswered+' 题未答</p><p>'+esc(report.recommendation)+'</p><h4>优先复习主题</h4><ul>'+report.weakTopics.filter(t=>t.accuracy<85).map(t=>{const topic=contentData.find(x=>x.topicId===t.topic);return '<li>'+esc(topic?.title||t.topic)+' · '+t.correct+'/'+t.total+(topic?' <button class="mock-action" data-report-topic="'+esc(t.topic)+'">针对练习</button>':'')+'</li>';}).join('')+'</ul>';
+    box.innerHTML='<h3>客观题样例检查 · '+(report.accuracy===null?'没有客观总分':report.accuracy+'%')+'</h3>'+(report.legacy?'<p>旧报告保留生成时的统计口径，未重新分类为客观能力。</p>':'')+'<p>'+(report.legacy?'原统计 ':'客观检查 ')+report.correct+'/'+report.objectiveTotal+' 题正确 · '+report.unanswered+' 题未答</p><p>开放回答已保存 '+report.openAnswered+'/'+report.openTotal+'，需要自查或独立评价；准备任务已答 '+report.preparationAnswered+'/'+report.preparationTotal+'。不计入客观正确率。</p><p>'+esc(report.recommendation)+'</p><h4>优先复习主题</h4><ul>'+report.weakTopics.filter(t=>t.accuracy<85).map(t=>{const topic=contentData.find(x=>x.topicId===t.topic);return '<li>'+esc(topic?.title||t.topic)+' · '+t.correct+'/'+t.total+(topic?' <button class="mock-action" data-report-topic="'+esc(t.topic)+'">针对练习</button>':'')+'</li>';}).join('')+'</ul>';
     box.innerHTML+='<details><summary>查看逐题答案与解析</summary>'+record.questionIds.map(id=>{const q=findQuestion(id);if(!q)return '';const raw=record.answers?.[id],picked=raw===undefined?'未作答':q.options?.[raw]??raw;return '<article class="mt-4"><b>'+esc(q.question)+'</b><p>你的答案：'+esc(picked)+'</p><p>参考答案：'+esc(q.answer)+'</p><p>'+esc(q.explain||'')+'</p></article>';}).join('')+'</details>';
     area.append(box);box.querySelectorAll('[data-report-topic]').forEach(b=>b.onclick=()=>gotoTopicPractice(b.dataset.reportTopic));
 }
@@ -1923,6 +1940,7 @@ document.addEventListener('DOMContentLoaded',function(){
 <script src="data/material_study_plan.js"></script>
 <script src="data/learning_dashboard.js"></script>
 <script src="data/progress_view.js"></script>
+<script src="data/learning_backup.js"></script>
 <script src="data/material_library.js"></script>
 <script src="data/study_resources.js"></script>
 <script src="data/study_resource_browser.js"></script>

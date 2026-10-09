@@ -28,3 +28,5 @@ Business 默认显示新版 0264 的 29 个小节样例。选择 0450／2026 档
 - English ESL 0510：https://www.cambridgeinternational.org/Images/721337-2027-2029-syllabus.pdf
 
 后续深化：新增 48 道分层检查题，现合计 152 个单元、1196 道题目／任务。补充先修建议和阶段检查，见 [学习路径说明](LEARNING_PATH_GUIDE.md)。
+
+多题型深化：后续新增六科 12 个原创多部分开放任务；当前累计 152 个单元、1208 道题目／任务。参考要点采用自查，不给官方分数，见 RELEASE_GUIDE.md。
