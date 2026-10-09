@@ -68,3 +68,6 @@ Tailwind styles are precompiled and committed as `data/tailwind.css`. CI rebuild
 ## Remaining product depth
 
 Bullet-level official-objective audits for all seven subjects, further CS/English depth, authentic listening/speaking assessment, and externally marked full-paper mocks remain content/product work. Current automated tests establish the implemented local learning flows, not pedagogical validation of every legacy question or official assessment equivalence.
+
+
+教材与作业：七个科目均可在「我的教材与作业」上传资料、读取文字、保存章节关联并进入练习。详见 [资料库与 AI 使用说明](MATERIALS_GUIDE.md)。资料附件保存在浏览器中，不包含于学习记录备份。AI 分析需要配置服务端凭据。

@@ -45,6 +45,9 @@
 #mainNav{display:flex;flex-wrap:nowrap;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;white-space:nowrap;touch-action:pan-x}#mainNav::-webkit-scrollbar{display:none}.nav-btn{min-height:44px;flex:0 0 auto;touch-action:manipulation}.btn,button{min-height:44px;touch-action:manipulation;-webkit-tap-highlight-color:transparent}.btn:active,button:active{transform:translateY(1px)}input,select,textarea{font-size:16px;min-height:44px;max-width:100%;box-sizing:border-box}@media (max-width:768px){body{font-size:15px}.page{padding-left:10px;padding-right:10px}.grid,.cards,.stats-grid{grid-template-columns:1fr!important}.table-wrap,.overflow-x-auto{overflow-x:auto;-webkit-overflow-scrolling:touch}.opt-btn{text-align:left;min-height:52px;padding:12px}.modal,.dialog{width:calc(100vw - 20px)!important;max-width:none!important}.toast{max-width:calc(100vw - 24px)}}@media (max-width:430px){h1{font-size:1.55rem}h2{font-size:1.25rem}.nav-btn{font-size:14px;padding:8px 10px}.btn{width:100%;max-width:100%}.page section,.card{border-radius:12px}}button:focus-visible,a:focus-visible,select:focus-visible{outline:3px solid var(--ig-primary);outline-offset:3px}
 </style>
 <link rel="stylesheet" href="data/product.css">
+<style>
+#materialUpload{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}#materialUpload label{display:flex;flex-direction:column;gap:6px}#page-materials input,#page-materials select,#page-materials textarea{max-width:100%;border:1px solid #cbd5e1;border-radius:8px;padding:10px;font-size:16px}#materialText{width:100%}.material-topics{display:grid;gap:12px;margin:14px 0}.material-topics label{display:flex;align-items:center;gap:8px;min-height:44px}.material-topics input{min-width:20px;min-height:20px}#materialPreview img{max-width:100%;max-height:500px}#materialDetail{overflow-wrap:anywhere}#materialDetail button,#materialSave,.material-entry{min-height:44px;padding:10px 14px;background:#eef2ff;border-radius:8px;margin:6px 0}#materialAnalysis blockquote{border-left:3px solid #6366f1;padding-left:12px}#materialAnalysis article{margin:16px 0}#materialFile{width:100%;min-width:0}
+</style>
 </head>
 <body class="bg-slate-100 min-h-screen">
 
@@ -942,7 +945,7 @@ function setEnglishMode(on){
     });
 }
 document.getElementById('subjectSelect').onchange = function(){
-    if(this.value === 'english' && !document.getElementById('page-dashboard')?.classList.contains('active')){
+    if(this.value === 'english' && !['page-dashboard','page-materials','page-progress'].some(id=>document.getElementById(id)?.classList.contains('active'))){
         setEnglishMode(false);
         currentSubject = 'english';
         userState.lastSciSubject = 'english';
@@ -1898,6 +1901,7 @@ document.addEventListener('DOMContentLoaded',function(){
 <script src="data/learning_progress.js"></script>
 <script src="data/learning_dashboard.js"></script>
 <script src="data/progress_view.js"></script>
+<script src="data/material_library.js"></script>
 
 <script>
 // Use existing navigation handlers so history restores page-specific views too.

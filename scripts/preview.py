@@ -10,7 +10,20 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--no-browser', action='store_true')
 args = parser.parse_args()
 root = pathlib.Path(__file__).resolve().parents[1]
-handler = lambda *a, **kw: http.server.SimpleHTTPRequestHandler(*a, directory=str(root), **kw)
+class Handler(http.server.SimpleHTTPRequestHandler):
+    def __init__(self, *a, **kw):
+        super().__init__(*a, directory=str(root), **kw)
+    def do_POST(self):
+        if self.path == '/api/materials/analyse':
+            payload = '{"error":"AI 服务尚未启用，请配置服务端凭据并启动 AI 预览服务；上传与手动关联仍可使用。"}'.encode()
+            self.send_response(503)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Content-Length', str(len(payload)))
+            self.end_headers()
+            self.wfile.write(payload)
+        else:
+            self.send_error(405)
+handler = Handler
 try:
     server = http.server.ThreadingHTTPServer(('127.0.0.1', 4173), handler)
 except OSError:

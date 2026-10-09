@@ -1,2 +1,6 @@
 node_modules/
 test-results/
+
+# Generated, pinned document readers are bundled in release artifacts.
+vendor/*.mjs
+vendor/mammoth.browser.min.js

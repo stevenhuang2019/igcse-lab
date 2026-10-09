@@ -12,8 +12,9 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
       - run: npm ci --ignore-scripts
+      - run: node scripts/build_material_assets.cjs
       - run: npm test
       - run: npm run build:css
       - run: git diff --exit-code -- data/tailwind.css
@@ -25,3 +26,15 @@ jobs:
           name: browser-screenshots
           path: test-results/
           if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        with:
+          name: learner-preview
+          path: |
+            index.html
+            data/
+            vendor/
+            scripts/preview.py
+            start-local.command
+            server/material_ai.cjs
+            USER_GUIDE.md
+            MATERIALS_GUIDE.md
