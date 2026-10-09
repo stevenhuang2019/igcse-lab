@@ -1,3 +1,5 @@
+> 小范围免费部署请优先阅读 [FREE_PILOT_GUIDE.md](FREE_PILOT_GUIDE.md)：环境邀请名单、无需磁盘、保留 AI；内存额度重启会重置。以下持久磁盘方案仍为可选扩展。
+
 # IGCSE Personal Learning OS
 
 A static learning application with seven subject catalogues, topic practice, a shared local learner state, a daily plan and timed mock practice. Serve this directory over HTTP and open `index.html`. No account or backend is required.

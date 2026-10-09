@@ -1,3 +1,5 @@
+> 小范围免费部署请优先阅读 [FREE_PILOT_GUIDE.md](FREE_PILOT_GUIDE.md)：环境邀请名单、无需磁盘、保留 AI；内存额度重启会重置。以下持久磁盘方案仍为可选扩展。
+
 # 邀请制私人测试版：部署与验收
 
 代码仓库仍使用 GitHub；私人服务需要支持 Node.js 22、HTTPS 与持久磁盘的托管环境。本轮提供邀请登录与部署候选配置，尚无实际线上地址。GitHub Pages 是静态托管；组织的私有 Pages 需要 GitHub Enterprise Cloud，不适合作为这个个人仓库的普通服务端 AI 入口。依据：https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages 和 https://docs.github.com/en/enterprise-cloud@latest/pages/getting-started-with-github-pages/changing-the-visibility-of-your-github-pages-site 。

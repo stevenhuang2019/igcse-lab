@@ -6,7 +6,8 @@ module.exports=async(browser,width,results)=>{
  const users=['student1','student2'].map(id=>({id,salt:'22'.repeat(16),hash:hashPassword(password,'22'.repeat(16)),enabled:true}));fs.writeFileSync(userFile,JSON.stringify(users));initialiseQuota(usageFile);
  const cert=path.join(dir,'cert.pem'),key=path.join(dir,'key.pem');execFileSync('openssl',['req','-x509','-newkey','rsa:2048','-nodes','-keyout',key,'-out',cert,'-days','1','-subj','/CN=127.0.0.1'],{stdio:'ignore'});
  let pilot;const server=https.createServer({key:fs.readFileSync(key),cert:fs.readFileSync(cert)},(req,res)=>pilot.emit('request',req,res));await new Promise(r=>server.listen(0,'127.0.0.1',r));const origin='https://127.0.0.1:'+server.address().port;
- pilot=createPilot({origin,userFile,usageFile,aiEnabled:false});
+ const freeMode=width===390;
+ pilot=createPilot({origin,userFile,usageFile,aiEnabled:false,freeMode,usersJSON:JSON.stringify(users)});
  // The only ignored certificate is this ephemeral local test fixture; production still requires trusted HTTPS.
  const context=await browser.newContext({viewport:{width,height:900},ignoreHTTPSErrors:true}),page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
  await context.route('**/*',route=>route.request().url().startsWith(origin+'/')?route.continue():route.abort());
@@ -23,6 +24,6 @@ module.exports=async(browser,width,results)=>{
   await page.locator('#pilotLogout').click();await page.locator('[name=username]').waitFor();await login('student1');assert.equal(await page.evaluate(()=>userState.questionStats.objective_math_boundarea.correct),1);await page.locator('#writing-nav').click();assert.equal(await page.locator('#writingDraft').inputValue(),'Student one private draft.');
   await page.locator('#materials-nav').click();await page.locator('#subjectSelect').selectOption('math');assert.equal(await page.evaluate(async()=> (await IGCSE_MATERIALS.list('math')).length),1);await page.locator('[data-material]').waitFor();assert.equal(await page.locator('[data-material]').count(),1);
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);await page.screenshot({path:path.join(results,'pilot-authorized-'+width+'.png'),fullPage:true});
-  users[0].enabled=false;fs.writeFileSync(userFile,JSON.stringify(users));assert.equal(await page.evaluate(async()=> (await fetch('/api/pilot/status')).status),401);await page.reload();await page.locator('[name=username]').waitFor();assert.deepEqual(errors,[]);console.log('[ok] '+width+'px: invited login, secure cookie, materials/draft separation, logout and live revocation');
+  users[0].enabled=false;fs.writeFileSync(userFile,JSON.stringify(users));if(freeMode)pilot=createPilot({origin,freeMode:true,usersJSON:JSON.stringify(users),aiEnabled:false});assert.equal(await page.evaluate(async()=> (await fetch('/api/pilot/status')).status),401);await page.reload();await page.locator('[name=username]').waitFor();if(freeMode){await page.locator('[name=username]').fill('student1');await page.locator('[name=password]').fill(password);await page.getByRole('button',{name:'登录学习平台'}).click();await page.getByText('账号或密码不正确，或授权已撤销').waitFor();}assert.deepEqual(errors,[]);console.log('[ok] '+width+'px: invited login, secure cookie, materials/draft separation, logout and live revocation');
  }finally{await context.close();server.closeAllConnections();await new Promise(r=>server.close(r));fs.rmSync(dir,{recursive:true});}
 };

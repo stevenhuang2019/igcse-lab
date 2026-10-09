@@ -1,0 +1,27 @@
+# Free single-instance pilot; no disk or database is provisioned.
+services:
+  - type: web
+    name: igcse-private-pilot
+    runtime: node
+    plan: free
+    buildCommand: npm ci --ignore-scripts && node scripts/build_material_assets.cjs
+    startCommand: node server/private_pilot.cjs
+    envVars:
+      - key: NODE_VERSION
+        value: 22
+      - key: IGCSE_PUBLIC_ORIGIN
+        sync: false
+      - key: IGCSE_PILOT_STORAGE
+        value: environment
+      - key: IGCSE_PILOT_USERS_JSON
+        sync: false
+      - key: IGCSE_PILOT_AI_ENABLED
+        value: "true"
+      - key: IGCSE_PILOT_USER_DAILY_LIMIT
+        value: 20
+      - key: IGCSE_PILOT_GLOBAL_DAILY_LIMIT
+        value: 60
+      - key: IGCSE_AI_PROVIDER
+        value: deepseek
+      - key: DEEPSEEK_API_KEY
+        sync: false

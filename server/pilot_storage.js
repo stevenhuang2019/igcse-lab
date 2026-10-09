@@ -13,6 +13,6 @@
   return originalFetch(input,options);
  };
  window.addEventListener('DOMContentLoaded',()=>{
-  const check=async()=>{try{const r=await fetch('/api/pilot/status');if(r.status===401||r.status===403){location.replace('/login');return;}if(r.ok){const v=await r.json();document.getElementById('pilotQuota').textContent=v.aiEnabled?' · AI 今日可用 '+Math.min(v.quota.userRemaining,v.quota.globalRemaining)+' 次':' · AI 暂未启用';}}catch{}};check();setInterval(check,60000);
+  const check=async()=>{try{const r=await fetch('/api/pilot/status');if(r.status===401||r.status===403){location.replace('/login');return;}if(r.ok){const v=await r.json();document.getElementById('pilotQuota').textContent=v.aiEnabled?' · AI '+(v.quota.persistent?'今日可用 ':'本次运行可用 ')+Math.min(v.quota.userRemaining,v.quota.globalRemaining)+' 次'+(v.quota.persistent?'':'（重启会重置）'):' · AI 暂未启用';}}catch{}};check();setInterval(check,60000);
   document.getElementById('pilotLogout').onclick=async()=>{try{const r=await fetch('/auth/logout',{method:'POST'});if(r.ok)location.replace('/login');else alert('退出失败，请重试');}catch{alert('连接失败，请重试退出');}};});
 })();

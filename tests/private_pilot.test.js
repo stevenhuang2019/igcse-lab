@@ -56,3 +56,18 @@ test('login attempts are rate limited before repeated password verification',asy
   assert.equal((await s.login()).status,429);
  }finally{await s.close();fs.rmSync(f.dir,{recursive:true});}
 });
+
+test('environment invitations work without disk, block disabled users and bound AI within each runtime',async()=>{
+ const salt='33'.repeat(16),users=[{id:'student1',salt,hash:hashPassword(password,salt),enabled:true}];
+ let calls=0;const opts={origin,freeMode:true,usersJSON:JSON.stringify(users),key:'fixture',aiEnabled:true,userLimit:1,globalLimit:1,topicsFor:()=>[],fetcher:async()=>{calls++;return {ok:true,json:async()=>response};}};
+ let s=await start(opts);try{
+  let cookie=(await s.login()).headers.get('set-cookie').split(';')[0];
+  const headers=()=>({Cookie:cookie,Origin:origin,'X-IGCSE-User':'student1','Content-Type':'application/json'});
+  const send=()=>s.request('/api/writing/coach',{method:'POST',headers:headers(),body:JSON.stringify(coachBody)});
+  const status=await (await s.request('/api/pilot/status',{headers:headers()})).json();assert.equal(status.quota.persistent,false);assert.equal(status.aiEnabled,true);
+  assert.equal((await send()).status,200);assert.equal((await send()).status,429);assert.equal(calls,1);
+  await s.close();s=await start(opts);assert.equal((await s.request('/api/pilot/status',{headers:headers()})).status,401);cookie=(await s.login()).headers.get('set-cookie').split(';')[0];assert.equal((await send()).status,200);assert.equal(calls,2);
+  await s.close();users[0].enabled=false;s=await start({...opts,usersJSON:JSON.stringify(users)});assert.equal((await s.login()).status,401);
+  assert.throws(()=>createPilot({...opts,usersJSON:'invalid'}));assert.throws(()=>createPilot({...opts,usersJSON:'[]'}));
+ }finally{await s.close();}
+});
