@@ -1,5 +1,6 @@
 const assert=require('node:assert/strict'),path=require('node:path');
 module.exports=async(page,width,results)=>{
+ await page.evaluate(()=>{userState.curriculum.subjects={};IGCSE_CURRICULUM.changed();});
  await page.locator('#dashboard-nav').click();await page.locator('[data-db-subject="math"]').click();await page.locator('#dbCurriculum').click();
  assert.equal(await page.locator('#page-curriculum.active').count(),1);
  await page.locator('#curriculumYear').selectOption('10');await page.locator('#curriculumExamYear').fill('2027');await page.locator('#curriculumQualification').selectOption('IGCSE');

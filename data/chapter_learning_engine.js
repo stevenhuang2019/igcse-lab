@@ -68,6 +68,7 @@
     function knowledge(){
       const t=(contentData||[]).find(x=>x.topicId===topic); if(!t)return '<p>请选择知识主题。</p>';
       return '<div class="border rounded-xl p-5"><div class="text-xs text-indigo-600 font-bold">'+esc(t.chapter)+' · '+esc(t.topicId)+'</div><h3 class="text-2xl font-bold mt-1">'+esc(t.title)+'</h3><div class="mt-4 prose max-w-none">'+(t.knowledge||'暂无知识说明')+'</div>'+
+        (t.depthNotes?.length?'<section class="db-panel"><h3>应用与综合训练</h3>'+t.depthNotes.map(x=>'<p>'+esc(x)+'</p>').join('')+'</section>':'')+
         (t.workedExample?'<section class="db-panel"><h3>例题与推理</h3><p>'+esc(t.workedExample)+'</p><p>关联细目：'+esc((t.objectiveRefs||[]).join('、'))+' · '+esc(t.tier)+'</p><ul>'+(t.checklist||[]).map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul><p>原创教学样例，不是完整考纲。</p></section>':'')+
         (t.formulas?.length?'<div class="mt-4 p-4 rounded-xl bg-indigo-50"><b>核心公式 / 关系</b>'+t.formulas.map(f=>'<div class="mt-2">'+f+'</div>').join('')+'</div>':'')+
         '<div class="mt-4 p-4 rounded-xl bg-amber-50 border border-amber-200"><b>⚠ 常见错误</b><p class="mt-1 text-sm">'+esc(t.commonMistake||'暂无')+'</p></div>'+

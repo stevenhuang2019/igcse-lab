@@ -8,7 +8,7 @@ Start a local preview with `python3 scripts/preview.py` or double-click `start-l
 
 ## Current coverage
 
-- 1148 questions/tasks across 152 local topics (including retained legacy editions) and seven subjects.
+- 1196 questions/tasks across 152 local topics (including retained legacy editions) and seven subjects.
 - 62 new original questions: 50 Physics questions spanning 25 course-map sections, plus two each for Math, Chemistry, D&T, Business, CS and English.
 - Every local topic has linked questions. This is **local catalogue coverage**, not proof of full official syllabus coverage, exam readiness or a predicted grade. CS and English still have comparatively shallow banks.
 - The legacy `phy0625_4_6` ID is retained for saved progress, while its display/reference uses official 4.5 subdivisions (induction 4.5.1, generator 4.5.2, transformer 4.5.6), not a nonexistent official 4.6.
@@ -75,3 +75,5 @@ Bullet-level official-objective audits for all seven subjects, further CS/Englis
 英语写作：五类 ESL 原创范文、提纲、写作提示和逐条语法修改，见 [写作学习说明](WRITING_GUIDE.md)。
 
 Six-subject content expansion: 55 original worked lessons and 110 checks/open tasks, with Business 0264 edition isolation and reviewed Math/Physics/Chemistry objective references. See [CONTENT_EXPANSION_GUIDE.md](CONTENT_EXPANSION_GUIDE.md). D&T expansion is paused.
+
+Add 48 staged checks and advisory prerequisites, with school-scoped, resumable sample diagnostics and first-response isolation. These are partial sample checks, not formal examinations; English checks remain preparation. See [LEARNING_PATH_GUIDE.md](LEARNING_PATH_GUIDE.md).

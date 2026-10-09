@@ -1,6 +1,6 @@
 # 六科内容补充记录
 
-本轮新增 55 个原创学习单元、110 道检查／开放任务。全库累计 152 个单元、1148 道题目，包含保留的旧版内容；这些总数不是完整官方考纲覆盖证明。D&T 本轮未新增内容。
+本轮新增 55 个原创学习单元、110 道检查／开放任务。上一轮全库累计 152 个单元、1148 道题目，包含保留的旧版内容；这些总数不是完整官方考纲覆盖证明。D&T 本轮未新增内容。
 
 | 科目 | 新增单元 | 新增任务 | 内容 |
 |---|---:|---:|---|
@@ -26,3 +26,5 @@ Business 默认显示新版 0264 的 29 个小节样例。选择 0450／2026 档
 - Chemistry 0620：https://www.cambridgeinternational.org/Images/697205-2026-2028-syllabus.pdf
 - Computer Science 0478：https://www.cambridgeinternational.org/Images/697167-2026-2028-syllabus.pdf
 - English ESL 0510：https://www.cambridgeinternational.org/Images/721337-2027-2029-syllabus.pdf
+
+后续深化：新增 48 道分层检查题，现合计 152 个单元、1196 道题目／任务。补充先修建议和阶段检查，见 [学习路径说明](LEARNING_PATH_GUIDE.md)。

@@ -308,6 +308,7 @@
 <script src="data/igcse_questions_depth.js"></script>
 <script src="data/igcse_foundation.js"></script>
 <script src="data/igcse_curriculum_expansion.js"></script>
+<script src="data/igcse_skill_depth.js"></script>
 <script src="data/learning_catalog.js"></script>
 <script>
 /* ===================== 用户状态管理 ===================== */
@@ -469,6 +470,7 @@ function openTopic(topic){
         bodyHtml += '<div class="mb-3 p-3 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-sm">English content is being expanded for this topic. Bilingual content is shown as a temporary learning fallback.</div>';
     }
     bodyHtml += L.body || '';
+    if(topic.depthNotes?.length){bodyHtml+='<section class="db-panel"><h3>应用与综合训练</h3>'+topic.depthNotes.map(x=>'<p>'+esc(x)+'</p>').join('')+'</section>';}
     if(topic.workedExample){bodyHtml+='<section class="db-panel"><h3>例题与推理</h3><p>'+esc(topic.workedExample)+'</p><p>学习目标：'+(topic.objectives||[]).map(esc).join('；')+'</p><p>关联细目：'+(topic.objectiveRefs||[]).map(esc).join('、')+' · '+esc(topic.tier||'未分层')+'</p><ul>'+(topic.checklist||[]).map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul><p>原创教学样例，尚不代表全部考纲细目。<a href="'+esc(topic.sourceUrl)+'" target="_blank" rel="noopener">官方考纲</a></p></section>';}
     if(topic.formulas && topic.formulas.length){
         bodyHtml += '<div class="my-3 bg-slate-50 border border-slate-200 rounded p-3"><strong>Formula / Key relationships</strong>';
@@ -547,6 +549,7 @@ function startSessionFromIds(qids, mode, opts){
     renderMockEntry();
     startMockTimerIfNeeded();
     renderQuestion();
+    return practiceSession.id;
 }
 function gotoTopicPractice(topicId){
     const topic = contentData.find(t => t.topicId === topicId);
@@ -678,7 +681,7 @@ function markAnswered(q, isCorrect, area){
     saveUserState(userState);
     const paperMode = !!q.pastPaper || s.mode === 'mock' || s.mode === 'paper';
     const sessionAccuracy = s.idx ? Math.round((s.correct / s.idx) * 100) : (isCorrect ? 100 : 0);
-    window.dispatchEvent(new CustomEvent('igcse-answer-recorded',{detail:{topicId:q.topicId,qid:q.id,subject:subj,correct:isCorrect,srs:s.mode==='srs',pastPaper:paperMode,pastPaperType:(q.pastPaperType||((s.mode==='paper'&&q.pastPaper)?'official':'mock')),accuracy:sessionAccuracy,mode:s.mode,question:q}}));
+    window.dispatchEvent(new CustomEvent('igcse-answer-recorded',{detail:{topicId:q.topicId,qid:q.id,subject:subj,correct:isCorrect,srs:s.mode==='srs',pastPaper:paperMode,pastPaperType:(q.pastPaperType||((s.mode==='paper'&&q.pastPaper)?'official':'mock')),accuracy:sessionAccuracy,mode:s.mode,sessionId:s.id,question:q}}));
     checkBadges();
     const fb = area.querySelector('.q-feedback');
     if(s.mode==='mock'&&q.type==='choice'){
@@ -1912,6 +1915,7 @@ document.addEventListener('DOMContentLoaded',function(){
 <script src="data/curriculum_expansion_map.js"></script>
 <script src="data/syllabus_audit.js"></script>
 <script src="data/curriculum_plan.js"></script>
+<script src="data/learning_path.js"></script>
 <script src="data/srs_engine.js"></script>
 <script src="data/error_diagnosis.js"></script>
 <script src="data/mock_exam_engine.js"></script>
