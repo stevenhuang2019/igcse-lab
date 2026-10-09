@@ -24,6 +24,7 @@ const server=http.createServer((req,res)=>{
    assert.ok(performance.domReadyMs<5000,'startup budget '+width);assert.ok(performance.localAssetBytes<3*1024*1024,'local asset budget '+width);metrics.push({width,...performance});
    await require('./material_browser_flows.cjs')(page,width,results);
    await require('./material_plan_browser.cjs')(page);
+   await require('./study_resources_browser.cjs')(page,width,results);
    assert.equal(await page.locator('.page.active').count(),1);
    assert.equal(await page.locator('#dashboard-nav').getAttribute('aria-current'),'page');
    assert.equal(await page.evaluate(()=>userState===window.userState),true);
