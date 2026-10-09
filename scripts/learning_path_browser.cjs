@@ -1,7 +1,7 @@
 const assert=require('node:assert/strict'),path=require('node:path');
 module.exports=async(page,width,results)=>{
  await page.evaluate(()=>{IGCSE_CURRICULUM.setProfile('math',{qualification:'IGCSE',code:'0580',examYear:2027});IGCSE_CURRICULUM.setTopic('math','course_math_fractions','current',1);IGCSE_CURRICULUM.setTopic('math','course_math_reverse','current',2);});
- await page.locator('#dashboard-nav').click();await page.locator('[data-db-subject="math"]').click();await page.locator('#dbPath').click();
+ await page.locator('#dashboard-nav').click();await page.locator('[data-dashboard-view="map"]').click();await page.locator('[data-map-subject="math"]').click();await page.locator('#dbPath').click();
  assert.equal(await page.locator('[data-path-topic]').count(),2);assert.match(await page.locator('[data-path-topic="course_math_reverse"]').textContent(),/建议先补/);
  await page.locator('[data-path-topic="course_math_reverse"] [data-path-learn="course_math_fractions"]').click();assert.match(await page.locator('#topicTitle').textContent(),/分数/);
  await page.locator('#path-nav').click();await page.locator('#pathStart').click();
@@ -28,9 +28,9 @@ module.exports=async(page,width,results)=>{
  assert.equal(await page.evaluate(()=>IGCSE_LEARNING_PATH.start('math')),false);assert.equal(await page.evaluate(()=>userState.mockExams.activePractice.id),mockId);
  await page.locator('#mockSubmitEarly').click();
  await page.evaluate(()=>{IGCSE_CURRICULUM.setProfile('english',{qualification:'IGCSE',code:'0510',examYear:2028});IGCSE_CURRICULUM.setTopic('english','course_english_revision','current',1);});
- await page.locator('#dashboard-nav').click();await page.locator('[data-db-subject="english"]').click();await page.locator('#dbPath').click();assert.match(await page.locator('#pathDiagnostic').textContent(),/准备性/);await page.locator('#pathStart').click();
+ await page.locator('#dashboard-nav').click();await page.locator('[data-dashboard-view="map"]').click();await page.locator('[data-map-subject="english"]').click();await page.locator('#dbPath').click();assert.match(await page.locator('#pathDiagnostic').textContent(),/准备性/);await page.locator('#pathStart').click();
  for(let i=0;i<2;i++){const option=await page.evaluate(()=>{const q=findQuestion(practiceSession.order[practiceSession.idx]);return q.options.indexOf(q.answer);});await page.locator('.opt-btn').nth(option).click();if(i===0)await page.locator('[data-act=next-q]').click();}
  await page.locator('#path-nav').click();assert.match(await page.locator('#pathResult').textContent(),/已答 2\/2，正确 2/);assert.equal(await page.evaluate(()=>getTopicMasteryEvidence('course_english_revision','english').objectiveAttempts),0);
  // Deepened lesson prose is visible in the learner's course, not just metadata.
- await page.locator('#dashboard-nav').click();await page.locator('[data-db-subject="business"]').click();await page.locator('[data-db-learn="course_business_ratios"]').first().click();assert.match(await page.locator('#topicBody').textContent(),/ROCE.*速动比率/s);
+ await page.locator('#dashboard-nav').click();await page.locator('[data-dashboard-view="map"]').click();await page.locator('[data-map-subject="business"]').click();await page.locator('#dashboardMapChapter').selectOption('');await page.locator('[data-db-learn="course_business_ratios"]').first().click();assert.match(await page.locator('#topicBody').textContent(),/ROCE.*速动比率/s);
 };

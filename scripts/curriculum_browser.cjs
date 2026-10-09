@@ -1,7 +1,7 @@
 const assert=require('node:assert/strict'),path=require('node:path');
 module.exports=async(page,width,results)=>{
  await page.evaluate(()=>{userState.curriculum.subjects={};IGCSE_CURRICULUM.changed();});
- await page.locator('#dashboard-nav').click();await page.locator('[data-db-subject="math"]').click();await page.locator('#dbCurriculum').click();
+ await page.locator('#dashboard-nav').click();await page.locator('[data-dashboard-view="map"]').click();await page.locator('[data-map-subject="math"]').click();await page.locator('#dbCurriculum').click();
  assert.equal(await page.locator('#page-curriculum.active').count(),1);
  await page.locator('#curriculumYear').selectOption('10');await page.locator('#curriculumExamYear').fill('2027');await page.locator('#curriculumQualification').selectOption('IGCSE');
  await page.getByRole('button',{name:'保存学习安排',exact:true}).click();
@@ -16,7 +16,7 @@ module.exports=async(page,width,results)=>{
  await page.locator('[data-page="page-practice"]').click();assert.equal(await page.locator('[data-start-topic]').count(),2);
  await page.locator('#practiceSchoolScope').selectOption('all');assert.equal(await page.locator('[data-start-topic]').count(),15);
  await page.locator('#practiceSchoolScope').selectOption('taught');
- await page.locator('#mockSchoolScope').selectOption('taught');await page.locator('[data-mock="math"]').click();
+ await page.locator('[data-practice-tab="mock"]').click();await page.locator('#mockSchoolScope').selectOption('taught');await page.locator('[data-mock="math"]').click();
  assert.match(await page.locator('.mock-preflight').textContent(),/已教范围测验/);await page.locator('#confirmMock').click();
  assert.ok(await page.evaluate(()=>practiceSession.order.every(id=>['math_transform_01','math_algebra_01'].includes(findQuestion(id).topicId))));
  await page.locator('#mockSubmitEarly').click();
