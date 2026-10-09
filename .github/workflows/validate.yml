@@ -18,6 +18,10 @@ jobs:
       - run: npm test
       - run: npm run build:css
       - run: git diff --exit-code -- data/tailwind.css
+      - name: Use reachable Ubuntu mirror for browser dependencies
+        run: |
+          sudo sed -i 's|http://azure.archive.ubuntu.com/ubuntu|https://archive.ubuntu.com/ubuntu|g' /etc/apt/apt-mirrors.txt
+          printf 'Acquire::http::Timeout "15";\nAcquire::https::Timeout "15";\nAcquire::Retries "1";\n' | sudo tee /etc/apt/apt.conf.d/99-igcse-timeouts
       - run: npx playwright install --with-deps chromium
       - run: npm run test:browser
       - uses: actions/upload-artifact@v4
