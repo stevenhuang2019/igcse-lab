@@ -22,10 +22,14 @@ node scripts/pilot_users.cjs add learner02 /私有目录/pilot/users.json
 
 撤销时运行 disable 命令，将更新后的 users.json 复制回平台并重新部署。免费配置模式的撤销在新部署生效后完成，旧会话随服务替换失效；不能收回已经阅读或下载的资料。更换密码可在名单中更新该账号的盐和哈希，保留原 ID 以保留本机学习记录。
 
+## 部署依赖
+
+构建时安装文档解析与开发工具，校验并复制本地 PDF/DOCX 解析资源后，用 npm prune --omit=dev --ignore-scripts 移除全部开发依赖。在线 Node 服务使用内置模块，不需要 node_modules。此步骤减少部署运行环境中的依赖；构建依赖本身的审计提示仍需后续升级处理，不代表完整依赖审计通过。本机在清理开发依赖后再次运行邀请登录、资源保护与 AI 接口测试；同样的 CI 步骤待具备 workflow 修改权限后加入。
+
 ## Render 上线步骤
 
 1. 登录自己的 Render 账号，连接 GitHub 仓库。选择 Node Web Service 和 Free 方案，不添加磁盘、数据库、付费实例或自定义域名。也可用根目录 render.yaml Blueprint；文件显式指定 free。
-2. 使用包含本轮改动的分支／提交。构建命令为 npm ci --ignore-scripts && node scripts/build_material_assets.cjs，启动命令为 node server/private_pilot.cjs，Node 22。Blueprint 中的私有变量在平台填写，不能提交真实值。
+2. 使用包含本轮改动的分支／提交。构建命令为 npm ci --ignore-scripts && npm run build:pilot，启动命令为 node server/private_pilot.cjs，Node 22。Blueprint 中的私有变量在平台填写，不能提交真实值。
 3. 按 deploy/free-pilot.env.example 配置。Render 会自动提供 RENDER_EXTERNAL_URL；当 RENDER=true 且未设置 IGCSE_PUBLIC_ORIGIN 时直接使用该地址，无需猜测网址。自定义域名则填写精确 HTTPS origin，无路径和结尾斜杠。不要扩大 Host 校验来绕过。依据：https://render.com/docs/environment-variables 。
 4. IGCSE_PILOT_STORAGE=environment；填完整邀请名单、IGCSE_PILOT_AI_ENABLED=true、IGCSE_AI_PROVIDER=deepseek、私有 DEEPSEEK_API_KEY。可选 IGCSE_AI_MODEL 对应已有供应商适配。不要把密钥填进前端，未执行任何真实 AI 付费调用。
 5. 使用一个小型合成练习材料完成管理员 AI 验收，再将网址及个人账号交给学员。核实未登录不能加载课程／AI，账号记录不串用，手机上传／阅读、模拟考恢复、重启后重新登录及浏览器学习记录仍在。线上验收尚待实际账号和服务。

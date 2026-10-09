@@ -4,7 +4,7 @@ services:
     name: igcse-private-pilot
     runtime: node
     plan: free
-    buildCommand: npm ci --ignore-scripts && node scripts/build_material_assets.cjs
+    buildCommand: npm ci --ignore-scripts && npm run build:pilot
     startCommand: node server/private_pilot.cjs
     envVars:
       - key: NODE_VERSION
