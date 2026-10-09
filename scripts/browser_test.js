@@ -58,7 +58,7 @@ const server=http.createServer((req,res)=>{
    assert.ok(await page.evaluate(()=>userState.learnedTopics.includes('cs0478_8_files')));
    await page.locator('#dashboard-nav').click();await page.locator('#dbSyllabusAudit summary').click();
    await page.getByRole('button',{name:'练习 8.3',exact:true}).click();
-   assert.equal(await page.evaluate(()=>practiceSession.order.length),8);
+   assert.equal(await page.evaluate(()=>practiceSession.order.length),10);
    assert.ok(await page.evaluate(()=>practiceSession.order.every(id=>{const q=findQuestion(id);return q.syllabus==='0478'&&q.syllabusYear==='2026-2028'&&q.syllabusRef==='8.3';})));
    const fileQuestionType=await page.evaluate(()=>findQuestion(practiceSession.order[practiceSession.idx]).type);
    if(fileQuestionType==='choice')await page.locator('#questionArea .opt-btn').first().click();
@@ -169,6 +169,7 @@ const server=http.createServer((req,res)=>{
    await require('./content_expansion_browser.cjs')(page,width,results);
    await require('./learning_path_browser.cjs')(page,width,results);
    await require('./release_browser.cjs')(page,width,results);
+   await require('./objective_browser.cjs')(page,width,results);
    await require('./curriculum_browser.cjs')(page,width,results);
    assert.deepEqual(errors,[],'browser errors '+width);assert.equal(expectedHTTP.size,0,'expected error fixtures observed');
    console.log('[ok] '+width+'px: dashboard, seven subjects, task completion, storage, navigation, mock resume/submit/timeout/report, curriculum pacing/stages/export; '+(Date.now()-started)+'ms');

@@ -8,7 +8,7 @@ Start a local preview with `python3 scripts/preview.py` or double-click `start-l
 
 ## Current coverage
 
-- 1208 questions/tasks across 152 local topics (including retained legacy editions) and seven subjects.
+- 1232 questions/tasks across 152 local topics (including retained legacy editions) and seven subjects.
 - 62 new original questions: 50 Physics questions spanning 25 course-map sections, plus two each for Math, Chemistry, D&T, Business, CS and English.
 - Every local topic has linked questions. This is **local catalogue coverage**, not proof of full official syllabus coverage, exam readiness or a predicted grade. CS and English still have comparatively shallow banks.
 - The legacy `phy0625_4_6` ID is retained for saved progress, while its display/reference uses official 4.5 subdivisions (induction 4.5.1, generator 4.5.2, transformer 4.5.6), not a nonexistent official 4.6.
