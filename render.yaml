@@ -9,8 +9,6 @@ services:
     envVars:
       - key: NODE_VERSION
         value: 22
-      - key: IGCSE_PUBLIC_ORIGIN
-        sync: false
       - key: IGCSE_PILOT_STORAGE
         value: environment
       - key: IGCSE_PILOT_USERS_JSON

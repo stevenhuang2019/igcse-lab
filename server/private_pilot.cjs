@@ -95,8 +95,9 @@ function createPilot({origin,userFile,usageFile,provider='deepseek',key,model,fe
   }catch{if(!res.headersSent)json(res,503,{error:'私人测试服务暂时不可用，请联系管理员'});else res.end();}
  });server.requestTimeout=30000;server.headersTimeout=15000;server.keepAliveTimeout=5000;return server;
 }
+function deploymentOrigin(env){return env.IGCSE_PUBLIC_ORIGIN||(env.RENDER==='true'?env.RENDER_EXTERNAL_URL:undefined);}
 if(require.main===module){try{
- const c=config(),server=createPilot({origin:process.env.IGCSE_PUBLIC_ORIGIN,freeMode:process.env.IGCSE_PILOT_STORAGE==='environment',usersJSON:process.env.IGCSE_PILOT_USERS_JSON,userFile:process.env.IGCSE_PILOT_USERS_FILE,usageFile:process.env.IGCSE_PILOT_USAGE_FILE,...c,userLimit:process.env.IGCSE_PILOT_USER_DAILY_LIMIT,globalLimit:process.env.IGCSE_PILOT_GLOBAL_DAILY_LIMIT,aiEnabled:process.env.IGCSE_PILOT_AI_ENABLED==='true'});
+ const c=config(),server=createPilot({origin:deploymentOrigin(process.env),freeMode:process.env.IGCSE_PILOT_STORAGE==='environment',usersJSON:process.env.IGCSE_PILOT_USERS_JSON,userFile:process.env.IGCSE_PILOT_USERS_FILE,usageFile:process.env.IGCSE_PILOT_USAGE_FILE,...c,userLimit:process.env.IGCSE_PILOT_USER_DAILY_LIMIT,globalLimit:process.env.IGCSE_PILOT_GLOBAL_DAILY_LIMIT,aiEnabled:process.env.IGCSE_PILOT_AI_ENABLED==='true'});
  const port=boundedInt(process.env.PORT,4174,65535);server.listen(port,'0.0.0.0',()=>console.log('IGCSE 私人测试服务已启动；需 HTTPS 网关与受邀账号'));server.on('error',()=>{console.error('私人测试服务启动失败');process.exitCode=1;});
 }catch{console.error('私人测试配置无效，请核对 HTTPS 地址、授权名单和配额文件；未开放服务');process.exitCode=1;}}
-module.exports={createPilot,hashPassword,loadUsers,quotaStore};
+module.exports={createPilot,hashPassword,loadUsers,quotaStore,deploymentOrigin};

@@ -71,3 +71,10 @@ test('environment invitations work without disk, block disabled users and bound 
   assert.throws(()=>createPilot({...opts,usersJSON:'invalid'}));assert.throws(()=>createPilot({...opts,usersJSON:'[]'}));
  }finally{await s.close();}
 });
+
+test('deployment origin uses trusted Render environment only and explicit origin takes priority',()=>{
+ const {deploymentOrigin}=require('../server/private_pilot.cjs');
+ assert.equal(deploymentOrigin({RENDER:'true',RENDER_EXTERNAL_URL:'https://allocated.onrender.com'}),'https://allocated.onrender.com');
+ assert.equal(deploymentOrigin({RENDER_EXTERNAL_URL:'https://untrusted.example'}),undefined);
+ assert.equal(deploymentOrigin({IGCSE_PUBLIC_ORIGIN:origin,RENDER:'true',RENDER_EXTERNAL_URL:'https://allocated.onrender.com'}),origin);
+});
