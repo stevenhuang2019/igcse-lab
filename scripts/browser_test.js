@@ -174,6 +174,7 @@ const server=http.createServer((req,res)=>{
    assert.deepEqual(errors,[],'browser errors '+width);assert.equal(expectedHTTP.size,0,'expected error fixtures observed');
    console.log('[ok] '+width+'px: dashboard, seven subjects, task completion, storage, navigation, mock resume/submit/timeout/report, curriculum pacing/stages/export; '+(Date.now()-started)+'ms');
    await context.close();
+   await require('./pilot_browser.cjs')(browser,width,results);
   }
   fs.writeFileSync(path.join(results,'performance.json'),JSON.stringify(metrics,null,2));console.log('[ok] startup budgets: '+JSON.stringify(metrics));
  }finally{if(browser)await browser.close();server.close();}

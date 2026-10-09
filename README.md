@@ -79,3 +79,5 @@ Six-subject content expansion: 55 original worked lessons and 110 checks/open ta
 Add 48 staged checks and advisory prerequisites, with school-scoped, resumable sample diagnostics and first-response isolation. These are partial sample checks, not formal examinations; English checks remain preparation. See [LEARNING_PATH_GUIDE.md](LEARNING_PATH_GUIDE.md).
 
 Six-subject structured practice mixes numerical/choice checks and saved open responses. Mock reports exclude preparation and self-assessment from objective accuracy. Learning JSON restoration validates and previews records, protects active exams, retains a recovery snapshot and preserves separate material/draft stores. See [RELEASE_GUIDE.md](RELEASE_GUIDE.md) and [ROADMAP_STATUS.md](ROADMAP_STATUS.md).
+
+Private invited pilot deployment: see PRIVATE_PILOT_GUIDE.md. Uses server-side authentication and persistent daily AI request quotas; not deployed by enabling GitHub Pages.

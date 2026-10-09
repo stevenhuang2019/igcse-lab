@@ -5,7 +5,8 @@
   "scripts": {
     "test": "node scripts/integration_smoke.js && node --test tests/*.test.js",
     "test:browser": "node scripts/browser_test.js",
-    "build:css": "tailwindcss -i data/tailwind.input.css -o data/tailwind.css --minify"
+    "build:css": "tailwindcss -i data/tailwind.input.css -o data/tailwind.css --minify",
+    "test:pilot": "node scripts/pilot_browser_test.cjs"
   },
   "devDependencies": {
     "jszip": "3.10.1",
