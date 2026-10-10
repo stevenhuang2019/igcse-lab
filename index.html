@@ -619,6 +619,7 @@ function renderQuestion(){
     html += '</div>';
     if(s.mode==='mock') html += '<div class="mock-controls"><button id="mockSubmitEarly">提前交卷</button></div>';
     area.innerHTML = html;
+    window.IGCSE_TOPIC_WORKSPACE?.bindWritten(q,area,s);
     area.dataset.examPrompt=String(s.mode==='mock'||s.mode==='paper');
     if(!s.noHints)window.IGCSE_DISCOVERY?.attachHint(area,q,s.mode,(id,level)=>{s.hints=s.hints||{};s.hints[id]=level;});
     const early=document.getElementById('mockSubmitEarly');if(early)early.onclick=()=>{finishPractice();};
@@ -754,6 +755,8 @@ function saveMockWritten(q,area){
 function showEssaySelfCheck(q, area){
     const input = area.querySelector('#essayInput');
     if(!input || !input.value.trim()){ showToast('请先写下你的回答'); return; }
+    practiceSession.answers=practiceSession.answers||{};practiceSession.answers[q.id]=input.value;
+    window.IGCSE_TOPIC_WORKSPACE?.saveWritten(q,input.value);
     const fb = area.querySelector('.q-feedback');
     fb.innerHTML = '<div class="border border-slate-200 bg-slate-50 rounded-lg p-3 text-sm">'
         + '<div class="font-semibold mb-1">'+(q.rubric?'原创参考要点 · 自评，非官方评分':'参考答案 / Mark Scheme')+'</div>'
@@ -1584,8 +1587,9 @@ try { langMode = localStorage.getItem('igcseLangMode') || 'learn'; } catch(e){}
 if(langMode !== 'learn' && langMode !== 'exam') langMode = 'learn';
 
 function questionStemHtml(q){
-    if(q && q.en)return '<span data-stem-en data-no-translate>'+esc(q.en)+'</span>'+(q.zh?'<span data-stem-zh data-no-translate class="text-xs text-gray-400 mt-1 font-normal block">'+esc(q.zh)+'</span>':'');
-    return '<span data-no-translate>'+((q&&q.question)||'')+'</span>';
+    const context=(q?.stimulus?'<details class="question-stimulus" open><summary>Reading / Task text</summary><p data-no-translate lang="en">'+esc(q.stimulus)+'</p></details>':'')+(q?.code?'<pre class="question-code" data-no-translate>'+esc(q.code)+'</pre>':'');
+    if(q && q.en)return context+'<span data-stem-en data-no-translate>'+esc(q.en)+'</span>'+(q.zh?'<span data-stem-zh data-no-translate class="text-xs text-gray-400 mt-1 font-normal block">'+esc(q.zh)+'</span>':'');
+    return context+'<span data-no-translate>'+((q&&q.question)||'')+'</span>';
 }
 
 function applyLangToggleLabel(){

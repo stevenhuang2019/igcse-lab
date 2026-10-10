@@ -1,5 +1,14 @@
 /* Authored interface translations. Learning material and learner text remain separate. */
 window.IGCSE_INTERFACE_STRINGS=[
+ ["普通练习草稿自动保存在本机；最多保留最近100题，每题一份。","Practice drafts are saved locally: the latest draft for up to 100 questions."],
+ ["练习草稿已保存；完整学习备份包含此回答。","Practice draft saved; the full learning backup includes this response."],
+ ["草稿尚未保存，请下载回答并检查浏览器存储。","Draft not saved. Download the response and check browser storage."],
+ ["下载本题回答","Download this response"],
+ ["示范追踪 · 未执行代码","Worked dry run · code is not executed"],
+ ["重新追踪","Restart trace"],
+ ["查看下一步","Reveal next step"],
+ ["追踪完成","Trace complete"],
+ ["追踪记录","Trace rows"],
  ["分层学习要点","Staged study notes"],
  ["自查任务","Self-check task"],
  ["基础巩固","Foundations"],

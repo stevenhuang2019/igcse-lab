@@ -12,6 +12,7 @@
   for(const name of ['learnedTopics','mistakes','badges','assessmentRecords','homeworkRecords','vocabMistakes'])if(s[name]!==undefined&&!Array.isArray(s[name]))fail();
   if(s.openedTopics!==undefined&&(!Array.isArray(s.openedTopics)||!s.openedTopics.every(x=>typeof x==='string')))fail();
   if(!s.learnedTopics.every(x=>typeof x==='string'))fail();
+  if(s.writtenPractice!==undefined){if(!object(s.writtenPractice)||Object.keys(s.writtenPractice).length>100)fail();for(const [id,r] of Object.entries(s.writtenPractice))if(id.length>200||!object(r)||typeof r.answer!=='string'||r.answer.length>12000||!Number.isInteger(r.updatedAt)||r.updatedAt<0)fail();}
   for(const name of ['topicStats','dailyPlan','subjectStats','progress','mastery','srs','assessments','mockExams','achievements','errorDiagnosis','englishMaster','activityByDay','curriculum','learningPath','advancedLearning','hintReviews'])if(s[name]!==undefined&&!object(s[name]))fail();
   function counts(r,answerKey='answered',correctKey='correct'){if(!object(r))fail();for(const key of [answerKey,correctKey])if(r[key]!==undefined&&(!Number.isInteger(r[key])||r[key]<0))fail();if((r[correctKey]||0)>(r[answerKey]||0))fail();}
   for(const key of ['level','xp','xpNextLevel','schemaVersion'])if(s[key]!==undefined&&(typeof s[key]!=='number'||s[key]<0))fail();

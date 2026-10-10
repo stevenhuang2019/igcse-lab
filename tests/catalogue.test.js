@@ -86,8 +86,8 @@ test('authored depth has meaningful unique prompts and balanced answer positions
   for(const q of added){assert.equal(q.source,'original');assert.equal(q.pastPaper,false);assert.ok(q.syllabusRef);counts[q.options.indexOf(q.answer)]++;}
   assert.ok(Math.max(...counts)-Math.min(...counts)<=1);
  }
- assert.equal(window.IGCSE_CATALOG.questions.filter(q=>q.subject==='computer_science').length,142);
- assert.equal(window.IGCSE_CATALOG.questions.filter(q=>q.subject==='english').length,94);
+ assert.equal(window.IGCSE_CATALOG.questions.filter(q=>q.subject==='computer_science').length,148);
+ assert.equal(window.IGCSE_CATALOG.questions.filter(q=>q.subject==='english').length,106);
 });
 
 test('section progress counts unique answered samples separately from preparation',()=>{
@@ -106,7 +106,7 @@ test('section progress counts unique answered samples separately from preparatio
 test('foundation chapters have edition-linked samples and new lessons retain all legacy topics',()=>{
  const {window:w,run}=load();run('syllabus_registry.js');run('syllabus_audit.js');
  assert.equal(w.IGCSE_FOUNDATION_CONTENT.length,9);assert.equal(w.IGCSE_FOUNDATION_QUESTIONS.length,42);
- assert.equal(w.IGCSE_CATALOG.topics.length,152);assert.equal(w.IGCSE_CATALOG.questions.length,1304);
+ assert.equal(w.IGCSE_CATALOG.topics.length,152);assert.equal(w.IGCSE_CATALOG.questions.length,1322);
  assert.equal(new Set(w.IGCSE_FOUNDATION_QUESTIONS.map(q=>q.question)).size,42);
  for(const [subject,n] of [['math',9],['chemistry',12]]){
   const a=w.getIGCSESyllabusAudit(subject);assert.equal(a.sampled,n);

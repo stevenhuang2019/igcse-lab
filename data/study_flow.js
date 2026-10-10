@@ -7,6 +7,18 @@
  const levels={basic:'基础巩固',application:'应用迁移',integrated:'综合推理'};
  function practiceFor(t,level){const qs=window.IGCSE_CATALOG.questionsFor(t.subject,t.topicId);return level?qs.filter(q=>q.practiceLevel===level):qs;}
  const sub=()=>document.getElementById('subjectSelect').value;
+ function saveWritten(q,value){
+  const s=window.userState;if(!s.writtenPractice||typeof s.writtenPractice!=='object'||Array.isArray(s.writtenPractice))s.writtenPractice={};s.writtenPractice[q.id]={answer:String(value).slice(0,12000),updatedAt:Date.now()};
+  const ids=Object.keys(s.writtenPractice).reverse().sort((a,b)=>(s.writtenPractice[b]?.updatedAt||0)-(s.writtenPractice[a]?.updatedAt||0));for(const id of ids.slice(100))delete s.writtenPractice[id];
+  try{localStorage.setItem('igcseUserState',JSON.stringify(s));return true;}catch{return false;}
+ }
+ function bindWritten(q,area,session){
+  if(['mock','paper'].includes(session.mode)||q.type!=='essay')return;const input=area.querySelector('#essayInput');if(!input)return;
+  const saved=window.userState.writtenPractice?.[q.id];if(typeof saved?.answer==='string')input.value=saved.answer;
+  const status=document.createElement('p');status.className='ws-count';status.setAttribute('role','status');status.textContent='普通练习草稿自动保存在本机；最多保留最近100题，每题一份。';input.after(status);
+  input.addEventListener('input',()=>{session.answers=session.answers||{};session.answers[q.id]=input.value;status.textContent=saveWritten(q,input.value)?'练习草稿已保存；完整学习备份包含此回答。':'草稿尚未保存，请下载回答并检查浏览器存储。';});
+  const download=document.createElement('button');download.type='button';download.textContent='下载本题回答';download.onclick=()=>window.IGCSE_STUDY_SUPPORT.download('igcse-response-'+q.id+'.txt',new Blob([[q.stimulus,q.code,q.question,'Your response:',input.value].filter(v=>typeof v==='string'&&v.length).join('\n\n')],{type:'text/plain;charset=utf-8'}));status.after(download);
+ }
  function reading(t,complete=false){const s=window.userState;s.openedTopics=s.openedTopics||[];if(!s.openedTopics.includes(t.topicId))s.openedTopics.push(t.topicId);let fresh=false;if(complete&&!s.learnedTopics.includes(t.topicId)){s.learnedTopics.push(t.topicId);fresh=true;}window.saveUserState(s);if(fresh)window.addXp?.(3);return fresh;}
  function stateLabel(t){const s=window.userState,pending=(s.mistakes||[]).some(m=>!m.mastered&&window.IGCSE_CATALOG.question(m.questionId||m.qid||m.id)?.topicId===t.topicId)||Object.values(s.hintReviews||{}).some(r=>r.status==='pending'&&r.topicId===t.topicId);if(pending)return '待复习';const evidence=window.getTopicMasteryEvidence?.(t.topicId,t.subject);if(evidence?.objectiveAttempts)return '已练习';return s.learnedTopics.includes(t.topicId)?'已读':s.openedTopics?.includes(t.topicId)?'已打开':'未开始';}
  function pageCurriculum(){
@@ -25,11 +37,16 @@
   const batch=page.querySelector('#schoolPlanText')?.closest('.db-panel');if(batch){const d=document.createElement('details');d.className='ws-unit';d.innerHTML='<summary>高级操作 · 批量文本导入</summary>';while(batch.firstChild)d.append(batch.firstChild);batch.append(d);}
  }
  function openRoute(id){switchPage(id);const b=document.querySelector('#mainNav [data-page="'+id+'"]');b?.click();}
+ function addTrace(parent,trace){
+  const box=document.createElement('section');box.className='guided-trace';const table=document.createElement('table'),caption=document.createElement('caption');caption.textContent='示范追踪 · 未执行代码';table.append(caption);const head=document.createElement('thead'),row=document.createElement('tr');for(const title of trace.columns){const th=document.createElement('th');th.scope='col';th.textContent=title;row.append(th);}head.append(row);table.append(head);const body=document.createElement('tbody');table.append(body);box.append(table);const status=document.createElement('p');status.setAttribute('role','status');const next=document.createElement('button'),reset=document.createElement('button');next.type=reset.type='button';reset.textContent='重新追踪';box.append(status,next,reset);parent.append(box);let shown=0;
+  function reveal(){if(shown>=trace.rows.length)return;const r=document.createElement('tr');for(const value of trace.rows[shown++]){const cell=document.createElement('td');cell.textContent=String(value);r.append(cell);}body.append(r);const done=shown===trace.rows.length;status.textContent=done?trace.output:shown+' / '+trace.rows.length+' · 追踪记录';next.textContent=done?'追踪完成':'查看下一步';next.disabled=done;}
+  next.onclick=reveal;reset.onclick=()=>{body.replaceChildren();shown=0;reveal();};reveal();
+ }
  function opened(t){reading(t);document.getElementById('topicWorkspace')?.remove();const box=document.createElement('section');box.id='topicWorkspace';box.className='topic-workspace';box.innerHTML='<p id="topicStudyState" role="status"></p><div class="ws-tabs" aria-label="主题学习步骤">'+[['knowledge','讲解'],['example','例题'],['practice','练习'],['review','错题'],['vocab','词汇'],['materials','资料']].map(([v,n])=>'<button data-topic-view="'+v+'">'+n+'</button>').join('')+'</div><div id="topicWorkspacePanel"></div><button id="markTopicRead">标记已读</button>';document.getElementById('topicTitle').after(box);box.querySelector('#markTopicRead').onclick=()=>{reading(t,true);refreshState();};const body=document.getElementById('topicBody'),panel=box.querySelector('#topicWorkspacePanel');
   function refreshState(){box.querySelector('#topicStudyState').textContent=t.title+' · '+stateLabel(t)+' · 学校状态 '+window.IGCSE_CURRICULUM.labels[window.IGCSE_CURRICULUM.status(t.subject,t.topicId)];box.querySelector('#markTopicRead').disabled=window.userState.learnedTopics.includes(t.topicId);}
   let ticket=0;
   function view(id){const request=++ticket;views[t.subject+':'+t.topicId]=id;try{localStorage.setItem('igcseTopicViews',JSON.stringify(views));}catch{}body.hidden=id!=='knowledge';panel.hidden=id==='knowledge';box.querySelectorAll('[data-topic-view]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.topicView===id)));panel.replaceChildren();if(id==='example'){
-    if(t.stagedStudy?.examples?.length){panel.innerHTML='<h4>例题与推理</h4>'+t.stagedStudy.examples.map(e=>'<details name="'+esc('stage-example-'+t.topicId)+'" class="ws-unit staged-example" '+(e.level==='basic'?'open':'')+'><summary>'+levels[e.level]+' · <span data-no-translate>'+esc(e.title)+'</span></summary><p data-no-translate lang="en">'+esc(e.steps)+'</p><details class="lang-zh"><summary>查看中文解释</summary><p data-no-translate>'+esc(e.zh)+'</p></details></details>').join('');}
+    if(t.stagedStudy?.examples?.length){panel.innerHTML='<h4>例题与推理</h4>'+t.stagedStudy.examples.map((e,i)=>'<details data-example-index="'+i+'" name="'+esc('stage-example-'+t.topicId)+'" class="ws-unit staged-example" '+(e.level==='basic'?'open':'')+'><summary>'+levels[e.level]+' · <span data-no-translate>'+esc(e.title)+'</span></summary><p data-no-translate lang="en">'+esc(e.steps)+'</p><details class="lang-zh"><summary>查看中文解释</summary><p data-no-translate>'+esc(e.zh)+'</p></details></details>').join('');for(const [i,e] of t.stagedStudy.examples.entries())if(e.trace)addTrace(panel.querySelector('[data-example-index="'+i+'"]'),e.trace);}
     else panel.innerHTML='<h4>例题与推理</h4><p data-no-translate>'+esc(t.reinforcement?.example||t.workedExample||'当前主题暂无独立例题，可先查看讲解或进行练习。')+'</p>';
    }
    if(id==='practice'){
@@ -58,5 +75,5 @@
   window.addEventListener('igcse-curriculum-rendered',()=>queueMicrotask(pageCurriculum));window.addEventListener('igcse-browse-filtered',e=>{if(e.detail.id==='page-curriculum'&&document.getElementById('schoolStatusFilter'))document.getElementById('page-curriculum')?._paginateSchool?.();});
   window.addEventListener('igcse-page-change',e=>{if(e.detail.id==='page-practice')syncPractice(typeof practiceSession!=='undefined'?practiceSession:null);});
  }
- window.IGCSE_TOPIC_WORKSPACE={opened,reading,stateLabel,sessionTopic,syncPractice,practiceFor};if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',build);else build();
+ window.IGCSE_TOPIC_WORKSPACE={opened,reading,stateLabel,sessionTopic,syncPractice,practiceFor,saveWritten,bindWritten};if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',build);else build();
 })();

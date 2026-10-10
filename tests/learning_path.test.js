@@ -13,7 +13,7 @@ test('48 distinct staged tasks inherit reviewed editions and all prerequisite re
  function visit(t,stack=new Set()){assert.ok(!stack.has(t.topicId),'Prerequisite cycle');const next=new Set([...stack,t.topicId]);for(const id of t.prerequisites||[]){assert.ok(byId.has(id),id);visit(byId.get(id),next);}}
  for(const t of w.IGCSE_EXPANSION_CONTENT)visit(t);
  for(const q of qs){const t=byId.get(q.topicId);assert.equal(q.syllabus,t.syllabus);assert.equal(q.syllabusYear,t.syllabusYear);if(q.type==='choice'){assert.equal(new Set(q.options).size,4);assert.ok(q.options.includes(q.answer));}else assert.ok(Number.isFinite(Number(q.answer)));}
- assert.equal(w.IGCSE_CATALOG.questions.length,1304);
+ assert.equal(w.IGCSE_CATALOG.questions.length,1322);
 });
 test('new multi-step calculations use independently checked results and writing preparation remains excluded',()=>{
  const {w}=setup(),q=(id,n)=>w.IGCSE_CATALOG.question('course_'+id+'_depth_'+n);
