@@ -41,10 +41,11 @@
         .toast { animation: toastIn .25s ease; }
         @keyframes toastIn { from { transform:translateY(12px); opacity:0; } to { transform:none; opacity:1; } }
         .ms-block { white-space:pre-wrap; }
-    
+
 #mainNav{display:flex;flex-wrap:nowrap;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;white-space:nowrap;touch-action:pan-x}#mainNav::-webkit-scrollbar{display:none}.nav-btn{min-height:44px;flex:0 0 auto;touch-action:manipulation}.btn,button{min-height:44px;touch-action:manipulation;-webkit-tap-highlight-color:transparent}.btn:active,button:active{transform:translateY(1px)}input,select,textarea{font-size:16px;min-height:44px;max-width:100%;box-sizing:border-box}@media (max-width:768px){body{font-size:15px}.page{padding-left:10px;padding-right:10px}.grid,.cards,.stats-grid{grid-template-columns:1fr!important}.table-wrap,.overflow-x-auto{overflow-x:auto;-webkit-overflow-scrolling:touch}.opt-btn{text-align:left;min-height:52px;padding:12px}.modal,.dialog{width:calc(100vw - 20px)!important;max-width:none!important}.toast{max-width:calc(100vw - 24px)}}@media (max-width:430px){h1{font-size:1.55rem}h2{font-size:1.25rem}.nav-btn{font-size:14px;padding:8px 10px}.btn{width:100%;max-width:100%}.page section,.card{border-radius:12px}}button:focus-visible,a:focus-visible,select:focus-visible{outline:3px solid var(--ig-primary);outline-offset:3px}
 </style>
 <link rel="stylesheet" href="data/product.css">
+<link rel="stylesheet" href="data/learning_workspace.css">
 <style>
 #materialUpload{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}#materialUpload label{display:flex;flex-direction:column;gap:6px}#page-materials input,#page-materials select,#page-materials textarea{max-width:100%;border:1px solid #cbd5e1;border-radius:8px;padding:10px;font-size:16px}#materialText{width:100%}.material-topics{display:grid;gap:12px;margin:14px 0}.material-topics label{display:flex;align-items:center;gap:8px;min-height:44px}.material-topics input{min-width:20px;min-height:20px}#materialPreview img{max-width:100%;max-height:500px}#materialDetail{overflow-wrap:anywhere}#materialDetail button,#materialSave,.material-entry{min-height:44px;padding:10px 14px;background:#eef2ff;border-radius:8px;margin:6px 0}#materialAnalysis blockquote{border-left:3px solid #6366f1;padding-left:12px}#materialAnalysis article{margin:16px 0}#materialFile{width:100%;min-width:0}
 </style>
@@ -74,9 +75,9 @@
             </div>
         </div>
         <nav aria-label="学习平台主导航" id="mainNav" class="max-w-7xl mx-auto mt-3 flex flex-wrap gap-2">
-            <button data-page="page-home" aria-current="page" class="nav-btn px-3 py-1 rounded bg-indigo-700">今日学习</button>
-            <button data-page="page-textbook" class="nav-btn px-3 py-1 rounded bg-indigo-700">教材学习</button>
-            <button data-page="page-practice" class="nav-btn px-3 py-1 rounded bg-indigo-700">习题练习</button>
+            <button data-page="page-home" aria-current="page" class="nav-btn px-3 py-1 rounded bg-indigo-700">今日任务</button>
+            <button data-page="page-textbook" class="nav-btn px-3 py-1 rounded bg-indigo-700">学习中心</button>
+            <button data-page="page-practice" class="nav-btn px-3 py-1 rounded bg-indigo-700">练习与测评</button>
             <button data-page="page-assessment" class="nav-btn px-3 py-1 rounded bg-indigo-700">📝 测评</button>
             <button data-page="page-mistake" class="nav-btn px-3 py-1 rounded bg-indigo-700">错题复盘</button>
             <button data-page="page-quickref" class="nav-btn px-3 py-1 rounded bg-indigo-700">📇 速查卡</button>
@@ -124,7 +125,9 @@
         <!-- 教材学习页 -->
         <div id="page-textbook" class="page">
             <div class="bg-white rounded-xl shadow p-6">
-                <h2 class="text-2xl font-bold mb-4">教材知识点</h2>
+                <h2 class="text-2xl font-bold mb-4">学习中心</h2>
+                <div id="learningCenterTools"></div>
+                <div id="learningToday"></div>
                 <div id="topicList" class="grid gap-3 mb-6"></div>
                 <div id="topicContent" class="border-t pt-4 hidden">
                     <h3 id="topicTitle" class="text-xl font-semibold"></h3>
@@ -140,7 +143,9 @@
         <!-- 习题练习页 -->
         <div id="page-practice" class="page">
             <div class="bg-white rounded-xl shadow p-6">
-                <h2 class="text-2xl font-bold mb-4">习题练习</h2>
+                <h2 class="text-2xl font-bold mb-4">练习与测评</h2>
+                <div id="practiceHub"></div>
+                <div id="practiceAssessment" hidden></div>
                 <div id="mockEntry" class="mb-4"></div>
                 <div id="mockTimerBar" class="hidden mb-3 rounded-lg p-2 text-center text-sm font-semibold"></div>
                 <div id="practiceTopicSelect" class="mb-4"></div>
@@ -162,7 +167,7 @@
         <div id="page-english" class="page">
             <div class="bg-white rounded-xl shadow p-4 mb-4">
                 <div class="flex items-center justify-between gap-3 flex-wrap">
-                    <div><h2 class="text-2xl font-bold">🇬🇧 English Learning Center</h2><p class="text-sm text-gray-500 mt-1">IGCSE ESL + CET/Academic English + 学科英语统一学习数据层</p></div>
+                    <div><h2 class="text-2xl font-bold">🇬🇧 英语技能中心</h2><p class="text-sm text-gray-500 mt-1">课程学习 · 专项训练 · 分级写作 · 词汇游戏</p></div>
                     <button id="englishBackBtn" class="bg-indigo-600 text-white px-4 py-2 rounded text-sm">← 返回 IGCSE</button>
                 </div>
                 <div id="englishDashboard" class="grid grid-cols-2 md:grid-cols-3 gap-3 mt-4"></div>
@@ -170,11 +175,11 @@
             <div class="bg-white rounded-xl shadow p-3">
                 <div class="flex flex-wrap gap-2 mb-4">
                     <button class="eng-tab px-3 py-2 rounded border text-sm" data-eng-tab="learn">📚 ESL课程</button>
-                    <button class="eng-tab px-3 py-2 rounded border text-sm" data-eng-tab="vocab">🔤 英语词汇</button>
+                    <button id="englishWordGames" class="px-3 py-2 rounded border text-sm">🎧 词汇与听音游戏</button>
                     <button class="eng-tab px-3 py-2 rounded border text-sm" data-eng-tab="commands">🎯 Command Words</button>
                     <button class="eng-tab px-3 py-2 rounded border text-sm" data-eng-tab="writing">✍️ 写作工作室</button>
                     <button class="eng-tab px-3 py-2 rounded border text-sm" data-eng-tab="practice">📝 练习</button>
-                    <button class="eng-tab px-3 py-2 rounded border text-sm" data-eng-tab="master">🧠 Master Database</button>
+                    <button class="eng-tab px-3 py-2 rounded border text-sm" data-eng-tab="master">📊 学习记录</button>
                 </div>
                 <div id="englishCenterContent"></div>
             </div>
@@ -219,7 +224,7 @@
         <!-- 公式速查卡页 -->
         <div id="page-quickref" class="page">
             <div class="bg-white rounded-xl shadow p-6">
-                <h2 class="text-2xl font-bold mb-2">📇 公式速查卡</h2>
+                <h2 class="text-2xl font-bold mb-2">📇 公式、术语与语法速查</h2>
                 <p class="text-sm text-gray-600 mb-4">按科目汇总核心公式与要点，考前快速翻阅。</p>
                 <div id="quickrefContent"></div>
             </div>
@@ -300,6 +305,7 @@
 <script src="data/igcse_quickref.js"></script>
 <script src="data/igcse_mockpapers.js"></script>
 <script src="data/vocab.js"></script>
+<script src="data/learning_extensions_data.js"></script>
 <script src="data/english_master_database.js"></script>
 <script src="data/mock-exams.js"></script>
 
@@ -312,6 +318,8 @@
 <script src="data/structured_tasks.js"></script>
 <script src="data/objective_coverage.js"></script>
 <script src="data/igcse_release_depth.js"></script>
+<script src="data/igcse_gap_depth.js"></script>
+<script src="data/igcse_stage_practice.js"></script>
 <script src="data/learning_catalog.js"></script>
 <script>
 /* ===================== 用户状态管理 ===================== */
@@ -416,8 +424,11 @@ const pages = document.querySelectorAll('.page');
 const navBtns = document.querySelectorAll('.nav-btn');
 let restoringRoute = false;
 function switchPage(id){
+    const requested=id;
+    if(window.IGCSE_WORKSPACE){if(id==='page-home')id='page-textbook';if(id==='page-assessment')id='page-practice';}
     const target = document.getElementById(id);
     if(!target || !target.classList.contains('page')) return;
+    window.dispatchEvent(new CustomEvent('igcse-before-page-change',{detail:{from:document.querySelector('.page.active')?.id,to:id}}));
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     target.classList.add('active');
     document.querySelectorAll('#mainNav .nav-btn').forEach(b => {
@@ -431,7 +442,9 @@ function switchPage(id){
     document.getElementById('pageLocation').textContent = '学习工作台 / ' + label;
     document.title = label + ' · IGCSE Personal Learning OS';
     window.dispatchEvent(new CustomEvent('igcse-page-change',{detail:{id}}));
-    if(!restoringRoute && location.hash !== '#' + id) history.pushState(null, '', '#' + id);
+    if(requested==='page-assessment')window.IGCSE_WORKSPACE?.practiceTab('assessment');
+    if(restoringRoute && requested!==id)history.replaceState(null,'','#'+id);
+    else if(!restoringRoute && location.hash !== '#' + id) history.pushState(null, '', '#' + id);
 }
 navBtns.forEach(btn => { btn.onclick = () => { switchPage(btn.dataset.page); const pg = btn.dataset.page; if(pg === 'page-mistake') renderMistakePage(); else if(pg === 'page-homework') renderHomeworkRecords(); else if(pg === 'page-profile') renderProfile(); else if(pg === 'page-assessment') renderAssessmentPage(); else if(pg === 'page-quickref') renderQuickrefPage(); else if(pg === 'page-vocab') renderVocabPage(); else if(pg === 'page-resources') renderMyResources(); else if(pg === 'page-home') renderTodayCards(); else if(pg === 'page-practice'){ if(practiceSession&&practiceSession.mode==='mock'){renderQuestion();startMockTimerIfNeeded();}else{renderPracticeTopicSelect();} renderMockEntry(); } else if(practiceSession?.mode!=='mock'){ stopMockTimer(); } }; });
 
@@ -447,21 +460,12 @@ let practiceSession = null; // { topicId, order[], idx, combo, correct, total }
 
 /* ===================== 教材模块 ===================== */
 function renderTopicList(){
+    if(window.IGCSE_WORKSPACE){window.IGCSE_WORKSPACE.renderLearning();return;}
     const container = document.getElementById('topicList');
-    const filterTopics = window.IGCSE_CURRICULUM?.ordered(currentSubject)||contentData.filter(item => item.subject === currentSubject);
-    if(!filterTopics.length){ container.innerHTML = '<p class="text-gray-500 text-sm">该科目内容正在整理中，敬请期待。</p>'; return; }
-    const learnedAll = filterTopics.every(t => userState.learnedTopics.includes(t.topicId));
-    container.innerHTML = '';
-    filterTopics.forEach(topic => {
-        const isLearned = userState.learnedTopics.includes(topic.topicId);
-        const div = document.createElement('div');
-        div.className = 'p-4 border rounded-lg hover:bg-slate-50 cursor-pointer topic-card ' + (isLearned ? 'learned' : '');
-        div.innerHTML = '<h3 class="font-semibold flex items-center justify-between">' + esc(topic.title) + (isLearned ? '<span class="text-green-600 text-sm">已学</span>' : '') + '</h3><p class="text-sm text-gray-600">' + esc(topic.chapter) + '</p><small>' + esc(window.IGCSE_CURRICULUM?.profile(currentSubject)?window.IGCSE_CURRICULUM.labels[window.IGCSE_CURRICULUM.status(currentSubject,topic.topicId)]:'尚未设置教学进度') + '</small>';
-        div.onclick = () => openTopic(topic);
-        container.appendChild(div);
-    });
+    const topics = window.IGCSE_CURRICULUM?.ordered(currentSubject)||contentData.filter(t=>t.subject===currentSubject);
+    container.replaceChildren();
+    topics.forEach(topic=>{const button=document.createElement('button');button.className='topic-card';button.textContent=topic.title;button.onclick=()=>openTopic(topic);container.append(button);});
     document.getElementById('topicContent').classList.add('hidden');
-    if(learnedAll) checkBadges();
 }
 function openTopic(topic){
     document.getElementById('materialLearningNext')?.remove();
@@ -469,10 +473,12 @@ function openTopic(topic){
     const L = window.getTopicLanguage ? window.getTopicLanguage(topic) : {title:topic.title,body:topic.knowledge||''};
     document.getElementById('topicTitle').innerText = L.title;
     let bodyHtml = '<p class="curriculum-edition">'+esc(window.IGCSE_CURRICULUM?.edition(topic.subject).message||'')+'</p>';
-    if(L.fallback && (window.IGCSE_GLOBAL_LANG||'learn') === 'exam'){
-        bodyHtml += '<div class="mb-3 p-3 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-sm">English content is being expanded for this topic. Bilingual content is shown as a temporary learning fallback.</div>';
+    if(L.fallback){
+        bodyHtml += '<div class="content-fallback-note mb-3 p-3 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-sm">原文暂无英文译文；当前保留中文内容。</div>';
     }
     bodyHtml += L.body || '';
+    if(topic.reinforcement){const r=topic.reinforcement;bodyHtml+='<section class="db-panel"><h3>本轮深化 · Selected objectives</h3><div data-no-translate lang="en">'+esc(r.en)+'</div><details class="lang-zh"><summary>查看中文解释</summary><p data-no-translate>'+esc(r.zh)+'</p></details><h4>Worked example</h4><p data-no-translate>'+esc(r.example)+'</p><p>'+esc(r.refs.join(' / '))+' · <a href="'+esc(topic.sourceUrl)+'#page='+r.page+'" target="_blank" rel="noopener">官方考纲依据</a> · 样例深化，非完整覆盖</p></section>'; }
+    if(topic.stagedStudy){const r=topic.stagedStudy;bodyHtml+='<section class="db-panel"><h3>分层学习要点</h3><p data-no-translate lang="en">'+esc(r.en)+'</p><details class="lang-zh"><summary>查看中文解释</summary><p data-no-translate>'+esc(r.zh)+'</p></details><p>'+esc(r.refs.join(' / '))+' · <a href="'+esc(topic.sourceUrl)+'#page='+r.page+'" target="_blank" rel="noopener">官方考纲依据</a> · 样例深化，非完整覆盖</p></section>'; }
     if(topic.depthNotes?.length){bodyHtml+='<section class="db-panel"><h3>应用与综合训练</h3>'+topic.depthNotes.map(x=>'<p>'+esc(x)+'</p>').join('')+'</section>';}
     if(topic.workedExample){bodyHtml+='<section class="db-panel"><h3>例题与推理</h3><p>'+esc(topic.workedExample)+'</p><p>学习目标：'+(topic.objectives||[]).map(esc).join('；')+'</p><p>关联细目：'+(topic.objectiveRefs||[]).map(esc).join('、')+' · '+esc(topic.tier||'未分层')+'</p><ul>'+(topic.checklist||[]).map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul><p>原创教学样例，尚不代表全部考纲细目。<a href="'+esc(topic.sourceUrl)+'" target="_blank" rel="noopener">官方考纲</a></p></section>';}
     if(topic.formulas && topic.formulas.length){
@@ -485,12 +491,19 @@ function openTopic(topic){
         bodyHtml += '<div class="bg-amber-50 border-l-4 border-amber-400 p-3 mt-4"><strong>' + ((window.IGCSE_GLOBAL_LANG||'learn')==='exam'?'Common mistake:':'常见误区：') + '</strong>' + esc(topic.commonMistake) + '</div>';
     }
     if(topic.subject==='english'&&(/Writing/i.test(topic.chapter||topic.examSkill||'')||String(topic.syllabusRef||'').startsWith('W'))){bodyHtml+='<button id="topicWritingStudio" class="material-entry">进入写作工作室：范文与 AI 辅助</button>';}
+    if(topic.subject==='english')bodyHtml+='<button id="topicVocabEntry" class="material-entry">学习本章节词汇与词汇游戏</button>';
     document.getElementById('topicBody').innerHTML = bodyHtml;
+    const vocabEntry=document.getElementById('topicVocabEntry');if(vocabEntry)vocabEntry.onclick=()=>{switchPage('page-vocab');window.IGCSE_WORKSPACE.setVocabRange(topic.chapter);};
     const writingEntry=document.getElementById('topicWritingStudio');if(writingEntry)writingEntry.onclick=()=>window.IGCSE_WRITING.open();
     if(window.renderMathInElement) renderMathInElement(document.getElementById('topicBody'), { delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}] });
     document.getElementById('topicContent').classList.remove('hidden');
-    if(!userState.learnedTopics.includes(topic.topicId)){ userState.learnedTopics.push(topic.topicId); saveUserState(userState); }
-    addXp(3);
+    document.getElementById('topicList').hidden = true;
+    document.getElementById('learningToday').hidden = true;
+    window.IGCSE_WORKSPACE?.rememberTopic(topic);
+    document.getElementById('topicTitle').tabIndex = -1;
+    document.getElementById('topicTitle').focus({preventScroll:true});
+    document.getElementById('page-textbook').scrollIntoView({block:'start'});
+    window.IGCSE_TOPIC_WORKSPACE?.opened(topic);
 }
 
 document.getElementById('backTopicList').onclick = renderTopicList;
@@ -503,6 +516,7 @@ document.getElementById('startPracticeBtn').onclick = () => {
 
 /* ===================== 习题模块：逐题作答 + 判分 ===================== */
 function renderPracticeTopicSelect(){
+    if(window.IGCSE_WORKSPACE){window.IGCSE_WORKSPACE.renderPractice();return;}
     const el = document.getElementById('practiceTopicSelect');
     const cp=window.IGCSE_CURRICULUM, scope=cp?.profile(currentSubject)?(cp.profile(currentSubject).scope||'taught'):'all';
     const topics = cp?cp.practiceTopics(currentSubject,scope):contentData.filter(t => t.subject === currentSubject);
@@ -523,10 +537,11 @@ function renderPracticeTopicSelect(){
 }
 function startPractice(topicId){
     if(userState.mockExams?.activePractice){showToast('请先继续或交卷当前模拟考');renderMockEntry();return;}
+    window.IGCSE_WORKSPACE?.practiceTab('chapters');
     currentTopicId = topicId;
     const qs = questionData.filter(q => q.subject === currentSubject && q.topicId === topicId);
     if(!qs.length){ document.getElementById('questionArea').innerHTML = '<p class="text-gray-500 text-sm">该主题暂无习题。</p>'; return; }
-    practiceSession = { topicId, order: shuffle(qs.map(q => q.id)), idx: 0, combo: 0, correct: 0, total: qs.length, mode: 'normal', label: '', startedAt: Date.now(), timeLimitSec: 0, timedOut: false };
+    practiceSession = { subject:currentSubject, topicId, order: shuffle(qs.map(q => q.id)), idx: 0, combo: 0, correct: 0, total: qs.length, mode: 'normal', label: '', startedAt: Date.now(), timeLimitSec: 0, timedOut: false };
     renderPracticeTopicSelect();
     renderQuestion();
 }
@@ -540,11 +555,12 @@ function startSessionFromIds(qids, mode, opts){
         topicId: opts.topicId || null,
         order: opts.noShuffle ? valid.slice() : shuffle(valid.slice()),
         idx: 0, combo: 0, correct: 0, total: valid.length,
-        mode: mode || 'normal', label: opts.label || '',
+        mode: mode || 'normal', noHints:!!opts.noHints, label: opts.label || '',
         id: 'session_'+Date.now()+'_'+Math.random().toString(36).slice(2),
         startedAt: Date.now(), timeLimitSec: opts.timeLimitSec || 0, timedOut: false, subject: opts.subject || currentSubject
     };
     switchPage('page-practice');
+    if(mode==='mock')window.IGCSE_WORKSPACE?.practiceTab('mock');
     navBtns.forEach(b => b.classList.toggle('active', b.dataset.page === 'page-practice'));
     if(mode === 'normal' && opts.topicId){ renderPracticeTopicSelect(); }
     else { document.getElementById('practiceTopicSelect').innerHTML = '<div class="text-sm font-semibold text-indigo-700 mb-2">' + esc(opts.label || '') + '</div>'; }
@@ -577,6 +593,7 @@ function findQuestion(id){
 function renderQuestion(){
     if(!practiceSession){ return; }
     const s = practiceSession;
+    window.IGCSE_TOPIC_WORKSPACE?.syncPractice(s);
     if(s.mode==='mock'&&Date.now()-s.startedAt>=s.timeLimitSec*1000){s.timedOut=true;finishPractice();return;}
     const q = findQuestion(s.order[s.idx]);
     if(!q){ finishPractice(); return; }
@@ -584,6 +601,7 @@ function renderQuestion(){
     document.getElementById('practiceResult').classList.add('hidden');
     let html = '<div class="border rounded-lg p-4 mb-3">';
     html += '<div class="flex items-center justify-between mb-2"><span class="text-xs font-semibold text-indigo-600">第 ' + (s.idx + 1) + ' / ' + s.total + ' 题</span><span class="text-xs text-gray-500">主题：' + esc((contentData.find(t=>t.topicId===q.topicId)||{}).title || '') + '</span></div>';
+    if(q.practiceLevel&&!['mock','paper'].includes(s.mode)){const level={basic:'基础巩固',application:'应用迁移',integrated:'综合推理'}[q.practiceLevel];if(level)html+='<p class="practice-level-label">'+esc(level)+(q.tier&&q.tier!=='unclassified'?' · '+esc(q.tier):'')+(q.type==='essay'?' · 自查任务':'')+'</p>'; }
     html += '<div class="font-medium mb-3 q-body">' + questionStemHtml(q) + '</div>';
     if(q.type === 'choice'){
         html += '<div class="grid gap-2 q-opts">';
@@ -601,6 +619,9 @@ function renderQuestion(){
     html += '</div>';
     if(s.mode==='mock') html += '<div class="mock-controls"><button id="mockSubmitEarly">提前交卷</button></div>';
     area.innerHTML = html;
+    window.IGCSE_TOPIC_WORKSPACE?.bindWritten(q,area,s);
+    area.dataset.examPrompt=String(s.mode==='mock'||s.mode==='paper');
+    if(!s.noHints)window.IGCSE_DISCOVERY?.attachHint(area,q,s.mode,(id,level)=>{s.hints=s.hints||{};s.hints[id]=level;});
     const early=document.getElementById('mockSubmitEarly');if(early)early.onclick=()=>{finishPractice();};
     if(window.renderMathInElement){
         renderMathInElement(area, { delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}] });
@@ -623,6 +644,7 @@ function markAnswered(q, isCorrect, area){
     if(!s || Object.prototype.hasOwnProperty.call(s.outcomes||{},q.id)) return;
     s.outcomes = s.outcomes || {};
     s.outcomes[q.id] = !!isCorrect;
+    const hintButton=area.querySelector('[data-hint-button]');if(hintButton)hintButton.disabled=true;
     s.idx++;
     if(s.mode==='mock')window.IGCSE_MOCK_ENGINE.saveActive(s);
     userState.globalStats.totalAnswered++;
@@ -662,7 +684,7 @@ function markAnswered(q, isCorrect, area){
         }
     }
     /* 复习模式：答对后的 SRS 流转 / 错题重练直接掌握 */
-    if(isCorrect && (s.mode === 'srs' || s.mode === 'mistake-review')){
+    if(isCorrect && !s.hints?.[q.id] && (s.mode === 'srs' || s.mode === 'mistake-review')){
         const existing = userState.mistakes.find(m => mistakeQid(m) === q.id);
         if(existing){
             existing.reviewedCount = (existing.reviewedCount || 0) + 1;
@@ -686,7 +708,7 @@ function markAnswered(q, isCorrect, area){
     saveUserState(userState);
     const paperMode = !!q.pastPaper || s.mode === 'mock' || s.mode === 'paper';
     const sessionAccuracy = s.idx ? Math.round((s.correct / s.idx) * 100) : (isCorrect ? 100 : 0);
-    window.dispatchEvent(new CustomEvent('igcse-answer-recorded',{detail:{topicId:q.topicId,qid:q.id,subject:subj,correct:isCorrect,srs:s.mode==='srs',pastPaper:paperMode,pastPaperType:(q.pastPaperType||((s.mode==='paper'&&q.pastPaper)?'official':'mock')),accuracy:sessionAccuracy,mode:s.mode,sessionId:s.id,question:q}}));
+    window.dispatchEvent(new CustomEvent('igcse-answer-recorded',{detail:{topicId:q.topicId,qid:q.id,subject:subj,correct:isCorrect,assisted:!!s.hints?.[q.id],srs:s.mode==='srs',pastPaper:paperMode,pastPaperType:(q.pastPaperType||((s.mode==='paper'&&q.pastPaper)?'official':'mock')),accuracy:sessionAccuracy,mode:s.mode,sessionId:s.id,question:q}}));
     checkBadges();
     const fb = area.querySelector('.q-feedback');
     if(s.mode==='mock'){
@@ -733,6 +755,8 @@ function saveMockWritten(q,area){
 function showEssaySelfCheck(q, area){
     const input = area.querySelector('#essayInput');
     if(!input || !input.value.trim()){ showToast('请先写下你的回答'); return; }
+    practiceSession.answers=practiceSession.answers||{};practiceSession.answers[q.id]=input.value;
+    window.IGCSE_TOPIC_WORKSPACE?.saveWritten(q,input.value);
     const fb = area.querySelector('.q-feedback');
     fb.innerHTML = '<div class="border border-slate-200 bg-slate-50 rounded-lg p-3 text-sm">'
         + '<div class="font-semibold mb-1">'+(q.rubric?'原创参考要点 · 自评，非官方评分':'参考答案 / Mark Scheme')+'</div>'
@@ -828,6 +852,7 @@ function mistakeStatusBadge(m){
     return '<span class="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">待重练 · Stage' + st + (due ? ' · 今日到期' : '') + '</span>';
 }
 function renderMistakePage(){
+    if(window.IGCSE_DISCOVERY){window.IGCSE_DISCOVERY.renderReviews();return;}
     const container = document.getElementById('mistakeList');
     const stats = document.getElementById('mistakeStats');
     const subjectMistakes = userState.mistakes.filter(m => subjectMatchesMistake(m, currentSubject));
@@ -912,6 +937,7 @@ function renderHomeworkRecords(){
 
 /* ===================== 成长档案 ===================== */
 function renderProfile(){
+    if(window.IGCSE_WORKSPACE){window.IGCSE_WORKSPACE.renderGrowth();return;}
     const p = document.getElementById('profileContent');
     const g = userState.globalStats;
     const rate = g.totalAnswered ? Math.round(g.totalCorrect / g.totalAnswered * 100) : 0;
@@ -982,8 +1008,7 @@ document.getElementById('subjectSelect').onchange = function(){
         currentSubject = 'english';
         userState.lastSciSubject = 'english';
         saveUserState(userState);
-        renderEnglishPage();
-        switchPage('page-english');
+        renderTopicList();
         return;
     }
     setEnglishMode(false);
@@ -1024,8 +1049,8 @@ let englishPracticeIndex = 0;
 function renderEnglishPage(tab){
     const dash=document.getElementById('englishDashboard'), c=document.getElementById('englishCenterContent');
     if(!dash||!c) return;
-    const topics=window.IGCSE_ENGLISH_CONTENT||[];
-    const qs=questionData.filter(q=>q.subject==='english');
+    const topics=(window.IGCSE_ENGLISH_CONTENT||[]).filter(t=>!window.englishSkillFilter||String(t.chapter).toLowerCase().includes(window.englishSkillFilter));
+    const qs=questionData.filter(q=>q.subject==='english'&&(!window.englishSkillFilter||String(q.chapter).toLowerCase().includes(window.englishSkillFilter)));
     const st=userState.subjectStats.english||{answered:0,correct:0};
     const rate=st.answered?Math.round(st.correct/st.answered*100):0;
     const em=userState.englishMaster||{vocab:{},grammar:{},sentences:{},commandWords:{}};
@@ -1034,14 +1059,14 @@ function renderEnglishPage(tab){
     dash.innerHTML=[
       ['📚','课程主题',topics.length+' 个学习模块'],
       ['🎯','英语正确率',st.answered?rate+'%':'尚未开始'],
-      ['🔤','Vocabulary Mastery',vMaster+'%'],
+
       ['📐','Grammar Mastery',gMaster+'%'],
-      ['💬','Sentence Mastery',sMaster+'%'],
-      ['🎯','Command Word Mastery',cMaster+'%'],
-      ['🧠','学习路径','Learn → Practice → SRS → Mastery'],
-      ['🚀','下一步',rate<70?'优先完成基础诊断':'进入考试技能训练']
+
+
+
+
     ].map(x=>'<div class="border rounded-xl p-4 bg-slate-50"><div class="text-2xl">'+x[0]+'</div><div class="font-semibold mt-1">'+x[1]+'</div><div class="text-sm text-gray-600 mt-1">'+x[2]+'</div></div>').join('');
-    const active=tab||'learn';
+    const active=tab||'learn';window.englishCenterTab=active;
     if(active==='writing'&&window.IGCSE_WRITING?.open){window.IGCSE_WRITING.open();return;}
     document.querySelectorAll('.eng-tab').forEach(b=>{b.classList.toggle('bg-indigo-600',b.dataset.engTab===active);b.classList.toggle('text-white',b.dataset.engTab===active);});
     if(active==='master'){
@@ -1079,14 +1104,14 @@ function renderEnglishPage(tab){
       b.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open();}};
       b.setAttribute('tabindex','0');
     });
-    c.querySelectorAll('[data-tts]').forEach(b=>b.onclick=()=>{if(window.speechSynthesis){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(b.dataset.tts);u.lang='en-US';speechSynthesis.speak(u);}});
+    c.querySelectorAll('[data-tts]').forEach(b=>b.onclick=()=>window.speakIGCSE(b.dataset.tts));
 }
 function openEnglishTopic(t){
     const c=document.getElementById('englishCenterContent');
     c.innerHTML='<div class="border rounded-xl p-5"><button id="engBackLearn" class="text-sm text-indigo-600 mb-3">← 返回英语课程</button><h3 class="text-xl font-bold">'+esc(t.title)+'</h3><p class="mt-3 text-gray-700">'+esc(t.knowledge)+'</p><h4 class="font-semibold mt-5 mb-2">Learning Objectives</h4><ul class="list-disc ml-5 text-sm">'+(t.objectives||[]).map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul><h4 class="font-semibold mt-5 mb-2">Common Mistake</h4><div class="bg-amber-50 border border-amber-200 rounded p-3 text-sm">'+esc(t.commonMistake)+'</div><button id="engTopicPractice" class="mt-4 bg-indigo-600 text-white px-4 py-2 rounded">练习本模块</button></div>';
     if(/Writing/i.test(t.chapter||t.examSkill||'')){const b=document.createElement('button');b.textContent='进入写作工作室：范文与 AI 辅助';b.className='material-entry';b.onclick=()=>window.IGCSE_WRITING.open();c.append(b);}
     document.getElementById('engBackLearn').onclick=()=>renderEnglishPage('learn');
-    document.getElementById('engTopicPractice').onclick=()=>{const qids=questionData.filter(q=>q.subject==='english'&&q.topicId===t.topicId).map(q=>q.id);if(qids.length)startSessionFromIds(qids,'normal',{topicId:t.topicId,label:'English · '+t.title});else showToast('该模块题库准备中');};
+    document.getElementById('engTopicPractice').onclick=()=>{const qids=questionData.filter(q=>q.subject==='english'&&q.topicId===t.topicId).map(q=>q.id);if(qids.length){setCurrentSubjectSafe('english');startSessionFromIds(qids,'normal',{subject:'english',topicId:t.topicId,label:'English · '+t.title});}else showToast('该模块题库准备中');};
 }
 function answerEnglish(q,idx){
     const picked=(q.options||[])[idx], correct=picked===q.answer;
@@ -1512,6 +1537,7 @@ function startMockPaper(key){
 }
 /* 公式速查卡 */
 function renderQuickrefPage(){
+    if(window.IGCSE_WORKSPACE){window.IGCSE_WORKSPACE.renderQuickref();return;}
     const area = document.getElementById('quickrefContent');
     if(!area) return;
     const QR = window.IGCSE_QUICKREF || [];
@@ -1561,20 +1587,18 @@ try { langMode = localStorage.getItem('igcseLangMode') || 'learn'; } catch(e){}
 if(langMode !== 'learn' && langMode !== 'exam') langMode = 'learn';
 
 function questionStemHtml(q){
-    if(q && q.en){
-        if(langMode === 'learn'){
-            return esc(q.en) + (q.zh ? '<div class="text-xs text-gray-400 mt-1 font-normal">' + esc(q.zh) + '</div>' : '');
-        }
-        return esc(q.en);
-    }
-    return (q && q.question) ? q.question : '';
+    const context=(q?.stimulus?'<details class="question-stimulus" open><summary>Reading / Task text</summary><p data-no-translate lang="en">'+esc(q.stimulus)+'</p></details>':'')+(q?.code?'<pre class="question-code" data-no-translate>'+esc(q.code)+'</pre>':'');
+    if(q && q.en)return context+'<span data-stem-en data-no-translate>'+esc(q.en)+'</span>'+(q.zh?'<span data-stem-zh data-no-translate class="text-xs text-gray-400 mt-1 font-normal block">'+esc(q.zh)+'</span>':'');
+    return context+'<span data-no-translate>'+((q&&q.question)||'')+'</span>';
 }
+
 function applyLangToggleLabel(){
     const b = document.getElementById('langToggle');
     if(b) b.textContent = langMode === 'learn' ? '🌐 学习模式·中英' : '🌐 考试模式·英文';
 }
 function setLangMode(mode){
-    langMode = (mode === 'exam') ? 'exam' : 'learn';
+    if(window.setIGCSEGlobalLang){window.setIGCSEGlobalLang(mode);return;}
+    langMode = (mode === 'exam') ? 'exam' : 'bilingual';
     try { localStorage.setItem('igcseLangMode', langMode); } catch(e){}
     applyLangToggleLabel();
     showToast(langMode === 'learn' ? '已切换：中英对照学习模式' : '已切换：纯英文题干考试模式（答案解析仍为中文）');
@@ -1626,6 +1650,7 @@ function getVocab(){ return window.SUBJECT_VOCAB || []; }
 function noteSentences(body){ return String(body || '').split(/(?<=[。！？．.!?\n])/).map(s => s.trim()).filter(Boolean); }
 
 function renderVocabPage(){
+    if(window.IGCSE_WORKSPACE){window.IGCSE_WORKSPACE.renderVocab();return;}
     const browse = document.getElementById('vocabBrowse');
     const rows = getVocab().filter(v => v.subject === currentSubject);
     if(!browse) return;
@@ -1652,25 +1677,26 @@ function renderVocabPage(){
 }
 
 let vocabGame = null;
-function startVocabGame(mode){
-    const rows = getVocab().filter(v => v.subject === currentSubject);
-    if(rows.length < 4){ showToast('词汇量不足 4 个，无法出题'); return; }
-    vocabGame = { mode: mode, pool: rows.slice(), idx: 0, combo: 0, right: 0, _answered: false, _opts: null, _answer: null };
+function startVocabGame(mode, reviewWord){
+    const rows = reviewWord?[reviewWord]:(window.IGCSE_WORKSPACE?window.IGCSE_WORKSPACE.gamePool():getVocab().filter(v => v.subject === currentSubject));
+    if(!reviewWord&&rows.length < 4){ showToast('词汇量不足 4 个，无法出题'); return; }
+    vocabGame = { review:!!reviewWord, distractors:reviewWord?getVocab().filter(v=>v.subject===reviewWord.subject):rows, mode: mode, pool: rows.slice(), idx: 0, combo: 0, right: 0, limit: Math.min(10,rows.length), missed: [], _answered: false, _opts: null, _answer: null };
     nextVocabQuestion();
 }
 function nextVocabQuestion(){
     const g = vocabGame;
     if(!g) return;
     const ga = document.getElementById('vocabGameArea');
-    if(g.idx >= g.pool.length){
-        ga.innerHTML = '<div class="bg-green-50 border border-green-200 text-green-800 rounded-lg p-3 text-sm">本局结束：答对 ' + g.right + ' / ' + g.pool.length + ' 词。</div>';
+    if(g.idx >= (g.limit || g.pool.length)){
+        ga.innerHTML = '<div class="bg-green-50 border border-green-200 text-green-800 rounded-lg p-3 text-sm">本局结束：答对 ' + g.right + ' / ' + (g.limit||g.pool.length) + ' 词。</div>';
         const meta = document.getElementById('vocabGameMeta');
-        if(meta) meta.textContent = '本局 ' + g.right + '/' + g.pool.length;
+        if(meta) meta.textContent = '本局 ' + g.right + '/' + (g.limit||g.pool.length);
+        if(g.missed?.length)ga.innerHTML+='<details class="ws-unit" open><summary>本局错词回顾（'+g.missed.length+'）</summary>'+g.missed.map(v=>'<p>'+esc(v.en)+' · '+esc(v.zh)+'</p>').join('')+'</details>';
         vocabGame = null;
         return;
     }
     const answer = g.pool[g.idx];
-    const others = shuffle(g.pool.filter(v => v !== answer).slice()).slice(0, 3);
+    const others = shuffle((g.distractors||g.pool).filter(v => v !== answer && v.en !== answer.en && v.zh !== answer.zh).slice()).slice(0, 3);
     const opts = shuffle(others.concat([answer]));
     g._opts = opts; g._answer = answer;
     const isListen = g.mode === 'listen2zh' || g.mode === 'listen2en';
@@ -1701,6 +1727,7 @@ function answerVocab(i, btn){
     ga.querySelectorAll('[data-vopt]').forEach(b => b.classList.add('disabled'));
     if(correct){
         g.right++; g.combo++;
+        if(g.review){const record=userState.vocabMistakes.find(m=>m.key===g._answer.subject+'::'+g._answer.en);if(record){record.srsStage=Math.min(3,(record.srsStage||0)+1);record.reviewedCount=(record.reviewedCount||0)+1;record.mastered=record.srsStage>=3;record.nextReviewAt=new Date(Date.now()+[1,3,7,14][record.srsStage]*864e5).toISOString();saveUserState(userState);window.IGCSE_SHELL?.refreshVocabReview();}}
         addXp(5);
         if(g.combo === 3) showToast('🎉 连对 3 词！');
         else if(g.combo === 5) showToast('🔥 连对 5 词！');
@@ -1708,7 +1735,7 @@ function answerVocab(i, btn){
         btn.classList.add('correct');
         fb.innerHTML = '<span class="text-green-700">✅ 正确 +5 XP</span>';
     } else {
-        g.combo = 0;
+        g.combo = 0;g.missed?.push(g._answer);
         btn.classList.add('wrong');
         ga.querySelectorAll('[data-vopt]').forEach(b => {
             if(g._opts[parseInt(b.dataset.vopt, 10)] === g._answer) b.classList.add('correct');
@@ -1716,13 +1743,13 @@ function answerVocab(i, btn){
         fb.innerHTML = '<span class="text-red-600">❌ 正确答案：' + esc(g._answer.en + ' = ' + g._answer.zh) + '</span>';
         recordVocabMistake(g._answer);
     }
-    setTimeout(() => { g._answered = false; g.idx++; nextVocabQuestion(); }, correct ? 700 : 1400);
+    const next=document.createElement('button');next.className='ws-primary';next.textContent=g.idx+1>=g.limit?'查看本局结果':'下一词';next.onclick=()=>{if(vocabGame!==g)return;g._answered=false;g.idx++;nextVocabQuestion();};ga.append(next);
 }
 function recordVocabMistake(v){
     userState.vocabMistakes = userState.vocabMistakes || [];
     const key = (v.subject || '') + '::' + v.en;
     const ex = userState.vocabMistakes.find(m => m.key === key);
-    if(ex){ ex.wrongCount = (ex.wrongCount || 0) + 1; ex.nextReviewAt = new Date(Date.now() + 864e5).toISOString(); }
+    if(ex){ex.mastered=false;ex.srsStage=0; ex.wrongCount = (ex.wrongCount || 0) + 1; ex.nextReviewAt = new Date(Date.now() + 864e5).toISOString(); }
     else {
         userState.vocabMistakes.push({ key: key, subject: v.subject, en: v.en, zh: v.zh, chapter: v.chapter || '', wrongCount: 1, srsStage: 0, nextReviewAt: new Date(Date.now() + 864e5).toISOString() });
     }
@@ -1909,23 +1936,8 @@ document.addEventListener('DOMContentLoaded',function(){
   document.querySelectorAll('.mltab').forEach(function(x){x.onclick=function(){document.querySelectorAll('.mltab').forEach(function(y){y.className='mltab bg-slate-100 px-3 py-2 rounded-lg'});x.className='mltab bg-indigo-600 text-white px-3 py-2 rounded-lg';if(x.dataset.t==='learn')learn();if(x.dataset.t==='english')english();if(x.dataset.t==='practice')practice();if(x.dataset.t==='boss')boss();};});
   draw();learn();
 });
-</script><script src="data/igcse_language_pack.js"></script><script src="data/language_engine.js"></script>
-<script>
-(function(){
-  function languageBar(){
-    if(document.getElementById('igcse-language-bar')) return;
-    var bar=document.createElement('div');bar.id='igcse-language-bar';bar.className='fixed bottom-3 left-1/2 -translate-x-1/2 z-50 bg-white border shadow-lg rounded-full px-2 py-1 flex gap-1 text-xs';
-    bar.innerHTML='<span class="px-2 py-1 text-slate-500">学习语言</span><button data-lang-mode="learn" class="px-2 py-1 rounded-full">中英学习</button><button data-lang-mode="bilingual" class="px-2 py-1 rounded-full">中英对照</button><button data-lang-mode="exam" class="px-2 py-1 rounded-full">English Only</button>';
-    document.body.appendChild(bar);
-    bar.querySelectorAll('[data-lang-mode]').forEach(function(b){b.onclick=function(){window.setIGCSEGlobalLang(b.dataset.langMode);highlight();rerender();};});
-    function highlight(){var m=window.IGCSE_GLOBAL_LANG||'learn';bar.querySelectorAll('[data-lang-mode]').forEach(function(b){b.classList.toggle('bg-indigo-600',b.dataset.langMode===m);b.classList.toggle('text-white',b.dataset.langMode===m);});}
-    function rerender(){if(typeof renderTopicList==='function'&&document.getElementById('page-learn')&&document.getElementById('page-learn').classList.contains('active')){if(currentTopicId){var t=contentData.find(function(x){return x.topicId===currentTopicId});if(t&&typeof openTopic==='function')openTopic(t);}else renderTopicList();}if(typeof renderQuestion==='function'&&practiceSession&&document.getElementById('page-practice')&&document.getElementById('page-practice').classList.contains('active'))renderQuestion();if(typeof renderVocabPage==='function'&&document.getElementById('page-vocab')&&document.getElementById('page-vocab').classList.contains('active'))renderVocabPage();}
-    highlight();
-  }
-  window.addEventListener('DOMContentLoaded',languageBar);
-  window.addEventListener('igcse-language-change',function(){});
-})();
-</script><script src="data/chapter_learning_engine.js"></script>
+</script><script src="data/igcse_language_pack.js"></script><script src="data/speech_audio.js"></script><script src="data/language_engine.js"></script>
+<script src="data/chapter_learning_engine.js"></script>
 
 <script src="data/mastery_engine.js"></script>
 <script src="data/user_state_schema.js"></script>
@@ -1950,8 +1962,22 @@ document.addEventListener('DOMContentLoaded',function(){
 <script src="data/study_resources.js"></script>
 <script src="data/study_resource_browser.js"></script>
 <script src="data/writing_examples.js"></script>
+<script src="data/writing_path.js"></script>
 <script src="data/writing_studio.js"></script>
 
+<script src="data/learning_workspace.js"></script>
+<script src="data/learning_discovery.js"></script>
+<script src="data/interface_strings.js"></script>
+<script src="data/arcade_rewards.js"></script>
+<script src="data/cet_vocabulary.js"></script>
+<script src="data/subject_sentences.js"></script>
+<script src="data/vocabulary_arcade.js"></script>
+<script src="data/grammar_training.js"></script>
+<script src="data/english_center.js"></script>
+<script src="data/product_shell.js"></script>
+<script src="data/study_flow.js"></script>
+<script src="data/study_support.js"></script>
+<script src="data/full_backup.js"></script>
 <script>
 // Use existing navigation handlers so history restores page-specific views too.
 function restoreLearningRoute(){

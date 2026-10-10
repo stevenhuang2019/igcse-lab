@@ -19,6 +19,7 @@
   function schedule(topicId,subject,correct,meta){
     if(!topicId)return null;
     const c=getCard(topicId,subject,meta&&meta.qid);
+    if(meta?.assisted){c.assistedReviews=(c.assistedReviews||0)+1;c.dueAt=addDays(null,1);c.lastAssistedAt=new Date().toISOString();if(window.saveUserState)window.saveUserState(state());return c;}
     c.reviews++;
     if(correct){
       c.correct++;
@@ -46,7 +47,7 @@
   }
   function upsertFromAnswer(d){
     if(!d||!d.topicId)return;
-    const card=schedule(d.topicId,d.subject,!!d.correct,{source:d.pastPaper?'past-paper':(d.mode||'practice'),qid:d.qid});
+    const card=schedule(d.topicId,d.subject,!!d.correct,{source:d.pastPaper?'past-paper':(d.mode||'practice'),qid:d.qid,assisted:!!d.assisted});
     // Scheduling every answer is useful, but ordinary practice must not overwrite
     // the retention measured by actual SRS reviews in the mastery engine.
     return card;

@@ -13,7 +13,7 @@
   const recent=Array.isArray(st.recentResults)?st.recentResults.slice(-5):[];
   const dimensions=[
    {id:'initial',label:'起点评估',weight:20,score:st.initialAssessment==null?null:clamp(st.initialAssessment)},
-   {id:'practice',label:'累计练习',weight:30,score:answered?clamp(correct/answered*100):null},
+   {id:'practice',label:'累计练习（含提示）',weight:30,score:answered?clamp(correct/answered*100):null},
    {id:'recent',label:'最近作答',weight:20,score:recent.length?clamp(recent.filter(Boolean).length/recent.length*100):null},
    {id:'pastPaper',label:'官方试题记录',weight:20,score:Number(st.pastPaperAttempts)>0?clamp(st.pastPaperAccuracy):null},
    {id:'srs',label:'间隔复习',weight:10,score:Number(st.srsReviews)>0?clamp(st.srsRetention):null}
@@ -23,12 +23,13 @@
   const qs=window.IGCSE_CATALOG?window.IGCSE_CATALOG.questionsFor(subject,id):[];
   const records=state().questionStats||{},objective=qs.filter(q=>q.type!=='essay'&&q.assessmentMode!=='preparation');
   const attempts=q=>Math.max(0,Number(records[q.id]?.answered)||0);
-  const unique=objective.filter(q=>attempts(q)>0).length,objectiveAttempts=objective.reduce((n,q)=>n+attempts(q),0);
+  const independent=q=>Math.max(0,attempts(q)-(Number(records[q.id]?.assistedAnswered)||0));
+  const unique=objective.filter(q=>independent(q)>0).length,objectiveAttempts=objective.reduce((n,q)=>n+independent(q),0),assisted=qs.reduce((n,q)=>n+(Number(records[q.id]?.assistedAnswered)||0),0);
   const selfAssessed=qs.filter(q=>q.type==='essay').reduce((n,q)=>n+attempts(q),0);
   const preparation=qs.filter(q=>q.assessmentMode==='preparation').reduce((n,q)=>n+attempts(q),0);
   // A high score from one item remains visibly provisional. Small local pools are disclosed.
   const established=score>=85&&objective.length>0&&unique>=Math.min(5,objective.length)&&objectiveAttempts>=5;
-  return {score,answered,dimensions,knownWeight,objectiveUnique:unique,objectiveAttempts,objectivePool:objective.length,selfAssessed,preparation,established,
+  return {score,answered,dimensions,knownWeight,objectiveUnique:unique,objectiveAttempts,objectivePool:objective.length,assisted,selfAssessed,preparation,established,
    band:!observed.length?'尚未开始':established?'练习表现稳固':objectiveAttempts<5?'样本有限':'继续巩固'};
  }
  function calc(id,subject){
@@ -54,7 +55,7 @@
    const n=Number(st.pastPaperAttempts||0)+1;
    st.pastPaperAccuracy=(Number(st.pastPaperAccuracy||0)*(n-1)+(correct?100:0))/n;st.pastPaperAttempts=n;
   }
-  if(meta.srs){
+  if(meta.srs&&!meta.assisted){
    st.srsRetention=Number(st.srsReviews)>0?clamp(Number(st.srsRetention)*.6+(correct?40:0)):(correct?100:0);
    st.srsReviews=Number(st.srsReviews||0)+1;
   }

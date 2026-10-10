@@ -22,7 +22,7 @@
  function ordered(subject){return catalog().topicsFor(subject).filter(t=>topicAllowed(subject,t)).slice().sort((a,b)=>(profile(subject)?.order?.[a.topicId]??9999)-(profile(subject)?.order?.[b.topicId]??9999));}
  function eligible(subject,id){if(!topicAllowed(subject,catalog().topic(subject,id)||{}))return false;const p=profile(subject);if(!p)return !advanced(subject);return (!advanced(subject)&&edition(subject).matches||p.foundation===true)&&status(subject,id)!=='unstarted';}
  function priority(subject,id){return ({current:0,review:1,taught:2,unstarted:3})[status(subject,id)];}
- function practiceTopics(subject,scope){const p=profile(subject);if(advanced(subject)&&!p?.foundation)return [];return ordered(subject).filter(t=>scope==='all'||(!p&&!advanced(subject))||status(subject,t.topicId)!=='unstarted');}
+ function practiceTopics(subject,scope='all'){return ordered(subject).filter(t=>scope!=='taught'||status(subject,t.topicId)!=='unstarted');}
  function changed(){
   const s=window.userState;Object.values(s.dailyPlan||{}).forEach(d=>{d.tasks=null;d.pendingTask=null;});
   window.saveUserState?.(s);window.dispatchEvent?.(new CustomEvent('igcse-curriculum-change'));
@@ -42,11 +42,16 @@
   const rank=Number(order);if(!Number.isInteger(rank)||rank<1||rank>999)throw new Error('Invalid teaching order');
   p.statuses=p.statuses||{};p.order=p.order||{};p.statuses[id]=value;p.order[id]=rank;changed();
  }
+ function setTopics(subject,items){
+  const p=profile(subject);if(!p||!Array.isArray(items)||!items.length)throw new Error('Save exam profile and select topics first');
+  const seen=new Set();for(const item of items){if(seen.has(item.id)||!catalog().topic(subject,item.id)||!labels[item.status]||!Number.isInteger(Number(item.order))||Number(item.order)<1||Number(item.order)>999)throw new Error('Invalid chapter selection');seen.add(item.id);}
+  p.statuses=p.statuses||{};p.order=p.order||{};for(const item of items){p.statuses[item.id]=item.status;p.order[item.id]=Number(item.order);}changed();
+ }
  function matrix(subject){
   const audit=window.getIGCSESyllabusAudit(subject);
   return {subject,priorityObjectiveAudit:window.getIGCSEObjectiveAudit?.(subject)||null,targetProfile:profile(subject),edition:edition(subject),scope:'outline-samples-not-exhaustive-objectives',sourceUrl:audit.sourceUrl,registeredCode:audit.code,registeredEdition:audit.year,sections:audit.sections.map(section=>({ref:section.ref,label:section.label,status:section.status,practiceCount:section.practiceCount,preparationCount:section.preparationCount,questionIds:section.questionIds,lessons:section.topicIds.map(id=>{const t=catalog().topic(subject,id);return {topicId:id,title:t.title,schoolStatus:status(subject,id),objectives:t.objectives||[],objectiveRefs:t.objectiveRefs||[t.syllabusRef||section.ref],tier:t.tier||'unclassified',prerequisites:t.prerequisites||[],practiceLevels:t.practiceLevels||[],reviewStatus:t.reviewStatus||'not-fully-audited'};})}))};
  }
- window.IGCSE_CURRICULUM={state,profile,status,advanced,edition,ordered,eligible,priority,practiceTopics,setProfile,setTopic,labels,changed,matrix,questionAllowed};
+ window.IGCSE_CURRICULUM={state,profile,status,advanced,edition,ordered,eligible,priority,practiceTopics,setProfile,setTopic,setTopics,labels,changed,matrix,questionAllowed};
  function build(){
   const nav=document.getElementById('mainNav'),main=document.querySelector('main');if(!nav||!main)return;
   const b=document.createElement('button');b.id='curriculum-nav';b.dataset.page='page-curriculum';b.className='nav-btn px-3 py-1 rounded';b.textContent='教学安排';nav.append(b);
@@ -61,7 +66,7 @@
    page.querySelector('#curriculumExport').onclick=()=>{const url=URL.createObjectURL(new Blob([JSON.stringify(matrix(subject),null,2)],{type:'application/json'}));const link=document.createElement('a');link.href=url;link.download='igcse-curriculum-'+subject+'.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
    page.querySelector('#curriculumForm').onsubmit=e=>{e.preventDefault();try{setProfile(subject,{qualification:page.querySelector('#curriculumQualification').value,code:page.querySelector('#curriculumCode').value,examYear:page.querySelector('#curriculumExamYear').value,foundation:page.querySelector('#curriculumFoundation').checked});s.yearGroup=+page.querySelector('#curriculumYear').value;s.term=+page.querySelector('#curriculumTerm').value;changed();render();page.querySelector('#curriculumMessage').textContent='已保存。请继续标记学校正在学习的章节。';}catch(err){page.querySelector('#curriculumMessage').textContent=err.message;}};
    page.querySelector('#curriculumQualification').onchange=e=>{const choices=codeOptions(e.target.value);page.querySelector('#curriculumCode').innerHTML=opts(choices,choices[0][0]);};
-   page.querySelectorAll('[data-curriculum-save]').forEach(button=>button.onclick=()=>{const row=button.closest('[data-curriculum-topic]');try{setTopic(subject,row.dataset.curriculumTopic,row.querySelector('select').value,row.querySelector('input').value);render();}catch(err){page.querySelector('#curriculumMessage').textContent=err.message;}});
+   page.querySelectorAll('[data-curriculum-save]').forEach(button=>button.onclick=()=>{const row=button.closest('[data-curriculum-topic]');try{setTopic(subject,row.dataset.curriculumTopic,row.querySelector('select').value,row.querySelector('[data-curriculum-order]').value);render();}catch(err){page.querySelector('#curriculumMessage').textContent=err.message;}});
    window.dispatchEvent(new CustomEvent('igcse-curriculum-rendered'));
   }
   window.addEventListener('igcse-page-change',e=>{if(e.detail.id==='page-curriculum')render();});

@@ -110,7 +110,8 @@
       p.querySelector('#dbMaterials').onclick=()=>switchPage('page-materials');
       p.querySelector('#dbProgress').onclick=()=>switchPage('page-progress');
       p.querySelector('#dbMistakes').onclick=()=>{switchPage('page-mistake');renderMistakePage();};
-      p.querySelector('#dbMock').onclick=()=>{switchPage('page-practice');renderPracticeTopicSelect();renderMockEntry();};
+      p.querySelector('#dbMock').onclick=()=>{switchPage('page-practice');renderPracticeTopicSelect();renderMockEntry();window.IGCSE_WORKSPACE?.practiceTab('mock');};
+      window.IGCSE_WORKSPACE?.enhanceDashboard();
     }
     b.onclick=()=>switchPage('page-dashboard');
     window.addEventListener('igcse-page-change',e=>{if(e.detail.id==='page-dashboard')render();});

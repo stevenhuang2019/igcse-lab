@@ -1,6 +1,6 @@
 const assert=require('node:assert/strict'),path=require('node:path');
 module.exports=async(page,width,results)=>{
- await page.locator('#dashboard-nav').click();await page.locator('[data-db-subject="business"]').click();await page.locator('#dbMock').click();await page.locator('[data-structured="business"]').click();
+ await page.locator('#dashboard-nav').click();await page.locator('[data-dashboard-view="map"]').click();await page.locator('[data-map-subject="business"]').click();await page.locator('#dbMock').click();await page.locator('[data-structured="business"]').click();
  assert.match(await page.locator('.mock-preflight').textContent(),/开放回答/);await page.locator('#confirmMock').click();assert.ok(await page.evaluate(()=>practiceSession.order.some(id=>findQuestion(id).type==='essay')));await page.locator('#mockSubmitEarly').click();
  // Fixed task order isolates numeric scoring and writing storage from random selection.
  const ids=['course_business_ratios_depth_1','course_business_ratios_structured'];

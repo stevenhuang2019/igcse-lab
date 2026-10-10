@@ -748,9 +748,11 @@
   const registry=window.getIGCSERegistry?.(subject),edition=editions[subject];
   if(!registry||!edition||registry.code!==edition[0]||registry.year!==edition[1])return null;
   return {subject,code:edition[0],year:edition[1],sourceUrl:registry.sourceUrl,checkedOn:'2026-10-09',scope:'selected-priority-objectives-not-full-inventory',fullInventoryReviewed:false,rows:rows.filter(r=>r.subject===subject).map(r=>{
-   const evidence=r.questionIds.concat((window.IGCSE_RELEASE_DEPTH_QUESTIONS||[]).filter(q=>q.objectiveAuditId===r.id).map(q=>q.id)).map(id=>window.IGCSE_CATALOG.question(id)).filter(q=>q&&q.subject===subject&&q.syllabus===edition[0]&&q.syllabusYear===edition[1]);
+   const extra=(window.IGCSE_GAP_DEPTH?.questions||[]).filter(q=>q.topicId===r.topicId&&q.objectiveAuditIds?.includes(r.id)).map(q=>q.id);
+   const evidence=r.questionIds.concat(extra,(window.IGCSE_STAGE_PRACTICE?.questions||[]).filter(q=>q.objectiveAuditId===r.id).map(q=>q.id),(window.IGCSE_RELEASE_DEPTH_QUESTIONS||[]).filter(q=>q.objectiveAuditId===r.id).map(q=>q.id)).map(id=>window.IGCSE_CATALOG.question(id)).filter(q=>q&&q.subject===subject&&q.syllabus===edition[0]&&q.syllabusYear===edition[1]);
    const objective=evidence.filter(q=>q.type!=='essay'&&q.assessmentMode!=='preparation'),open=evidence.filter(q=>q.type==='essay'),preparation=evidence.filter(q=>q.assessmentMode==='preparation');
-   return {...r,remaining:r.id==='math_surds'&&objective.length?'已补有理化讲解与两道样题；仍需更多根式组合及独立解答':r.id==='computer_science_sql'&&evidence.length?'已补筛选、排序与完整手工查询；真实 SQL 执行验证仍待建设':r.remaining,questionIds:evidence.map(q=>q.id),objectiveCount:objective.length,openCount:open.length,preparationCount:preparation.length,status:objective.length?'partial':evidence.length?'preparation':'gap'};
+   const staged=(window.IGCSE_STAGE_PRACTICE?.questions||[]).some(q=>q.objectiveAuditId===r.id);const updated=staged?{english_select:'已补225词篇章与目的选取；仍需正式长度阅读与笔记任务',english_infer:'已补篇章证据与不确定性推断；仍需正式长度篇章与更多隐含意义',english_register:'已补完整邮件范本、提纲与修改训练；仍需不同题型完整作文及独立评价'}[r.id]:null;
+   return {...r,remaining:updated||(r.id==='math_surds'&&objective.length?'已补有理化讲解与两道样题；仍需更多根式组合及独立解答':r.id==='computer_science_sql'&&evidence.length?'已补筛选、排序与完整手工查询；真实 SQL 执行验证仍待建设':r.remaining),questionIds:evidence.map(q=>q.id),objectiveCount:objective.length,openCount:open.length,preparationCount:preparation.length,status:objective.length?'partial':evidence.length?'preparation':'gap'};
   })};
  };
 })();
