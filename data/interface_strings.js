@@ -2823,3 +2823,5 @@ window.IGCSE_INTERFACE_STRINGS=[
   "About "
  ]
 ];
+
+window.IGCSE_INTERFACE_STRINGS.push(['选择英语学习任务','Choose an English mission'],['ESL课程','ESL courses'],['按技能和主题探索','Explore skills and topics'],['专项练习','Skill practice'],['开始学习 →','Start learning →'],['开始专项练习 →','Start practice →'],['本主题英文讲解待补，当前保留原文。','English notes for this topic are pending; the source text is shown.']);

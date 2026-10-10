@@ -13,7 +13,7 @@ const server=http.createServer((req,res)=>{
  let browser;
  try{
   await new Promise(r=>server.listen(0,'127.0.0.1',r));const base='http://127.0.0.1:'+server.address().port;
-  browser=await chromium.launch({headless:true,...(process.env.CHROME_PATH?{executablePath:process.env.CHROME_PATH}:{})});
+  browser=await chromium.launch({headless:true,args:['--use-fake-device-for-media-stream','--use-fake-ui-for-media-stream'],...(process.env.CHROME_PATH?{executablePath:process.env.CHROME_PATH}:{})});
   for(const width of [1280,768,390]){
    const context=await browser.newContext({viewport:{width,height:900}}),page=await context.newPage(),errors=[],expectedHTTP=new Set();
    page.on('pageerror',e=>errors.push(e.stack));page.on('response',r=>{if(r.url().startsWith(base)&&r.status()>=400){const label=r.status()+' '+r.url();if(!expectedHTTP.delete(label))errors.push(label);}});
@@ -24,6 +24,7 @@ const server=http.createServer((req,res)=>{
    assert.ok(performance.domReadyMs<5000,'startup budget '+width);assert.ok(performance.localAssetBytes<3*1024*1024,'local asset budget '+width);metrics.push({width,...performance});
    await require('./vocabulary_arcade_browser.cjs')(page,width,results);
    await require('./english_center_browser.cjs')(page,width,results);
+   await require('./english_media_browser.cjs')(page,width,results);
    await require('./grammar_chapters_browser.cjs')(page,width,results,expectedHTTP);
    await require('./full_backup_browser.cjs')(page,width,results);
    await require('./study_flow_browser.cjs')(page,width,results);
