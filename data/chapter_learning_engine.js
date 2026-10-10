@@ -8,7 +8,7 @@
   function topics(sub,chapter){return (window.IGCSE_CURRICULUM?.ordered(sub)||(contentData||[]).filter(x=>x.subject===sub)).filter(x=>!chapter||x.chapter===chapter);}
   function qs(sub,chapter,topicId){const ids=new Set(topics(sub,chapter).map(t=>t.topicId));return (questionData||[]).filter(q=>q.subject===sub&&ids.has(q.topicId)&&(!topicId||q.topicId===topicId)&&(!window.IGCSE_CURRICULUM||window.IGCSE_CURRICULUM.practiceTopics(sub,'all').some(t=>t.topicId===q.topicId)));}
   function chapters(sub){return [...new Set(topics(sub).map(x=>x.chapter))];}
-  function label(s){return ({math:'数学 Math',physics:'物理 Physics',chemistry:'化学 Chemistry',dt:'设计 DT',business:'商业 Business',english:'英语 English'})[s]||s;}
+  function label(s){return ({math:'数学 Math',physics:'物理 Physics',chemistry:'化学 Chemistry',dt:'设计 DT',business:'商业 Business',english:'英语 English',computer_science:'计算机 Computer Science'})[s]||s;}
   function command(q){
     if(q.command)return q.command;
     const t=(q.tags||[]).join(' ').toLowerCase();
@@ -36,17 +36,17 @@
       '<div id="ceControls" class="grid md:grid-cols-3 gap-2 mt-5"></div><div id="ceTabs" class="flex flex-wrap gap-2 mt-4"></div><div id="ceBody" class="mt-4"></div></div>';
     main.appendChild(p);
     b.onclick=()=>{switchPage('page-chapters');b.classList.add('active');render();};
-    let sub=currentSubject||'math',ch='',topic='',mode='overview',session=null;
+    let sub=currentSubject||'math',ch='',topic='',mode='overview',session=null,viewPage=0,statusFilter='',search='';
     const control=(id,html)=>'<select id="'+id+'" class="border rounded-lg p-2 w-full">'+html+'</select>';
     function renderControls(){
-      const chs=chapters(sub); if(!chs.includes(ch))ch=chs[0]||'';
+      const chs=chapters(sub); if(ch&&!chs.includes(ch))ch='';
       const ts=topics(sub,ch); if(!ts.some(x=>x.topicId===topic))topic=ts[0]?.topicId||'';
       document.getElementById('ceControls').innerHTML=
         control('ceSub',subjects().map(s=>'<option value="'+s+'" '+(s===sub?'selected':'')+'>'+label(s)+'</option>').join(''))+
-        control('ceCh',chs.map(x=>'<option value="'+esc(x)+'" '+(x===ch?'selected':'')+'>'+esc(x)+'</option>').join(''))+
+        control('ceCh','<option value="">全部章节 · 全科地图</option>'+chs.map(x=>'<option value="'+esc(x)+'" '+(x===ch?'selected':'')+'>'+esc(x)+'</option>').join(''))+
         control('ceTopic',ts.map(x=>'<option value="'+x.topicId+'" '+(x.topicId===topic?'selected':'')+'>'+esc(x.title)+'</option>').join(''));
-      ceSub.onchange=()=>{sub=ceSub.value;setCurrentSubjectSafe(sub);ch='';topic='';mode='overview';render();};
-      ceCh.onchange=()=>{ch=ceCh.value;topic='';mode='overview';render();};
+      ceSub.onchange=()=>{sub=ceSub.value;setCurrentSubjectSafe(sub);ch='';topic='';viewPage=0;mode='overview';render();};
+      ceCh.onchange=()=>{ch=ceCh.value;topic='';viewPage=0;mode='overview';render();};
       ceTopic.onchange=()=>{topic=ceTopic.value;mode='knowledge';render();};
     }
     function renderTabs(){
@@ -56,23 +56,26 @@
     }
     function progress(){
       const all=topics(sub,ch), qq=qs(sub,ch), answered=all.filter(t=>(userState.topicStats?.[sub+'::'+t.topicId]||userState.topicStats?.[t.topicId])?.answered).length;
-      ceProgress.innerHTML='<span class="px-3 py-2 rounded-lg bg-indigo-50 text-indigo-700">'+esc(window.IGCSE_CURRICULUM?.edition(sub).message||'')+'<br>本章 '+all.length+' 个主题 · '+qq.length+' 道题 · 已练 '+answered+' 个主题</span>';
+      ceProgress.innerHTML='<span class="px-3 py-2 rounded-lg bg-indigo-50 text-indigo-700">'+esc(window.IGCSE_CURRICULUM?.edition(sub).message||'')+'<br>'+(ch?'本章 ':'全部章节 ')+all.length+' 个主题 · '+qq.length+' 道题 · 已练 '+answered+' 个主题</span>';
     }
     function overview(){
-      const all=topics(sub,ch);
-      return '<div class="grid md:grid-cols-2 gap-3">'+all.map(t=>{
-        const n=qs(sub,ch,t.topicId).length, st=userState.topicStats?.[sub+'::'+t.topicId]||userState.topicStats?.[t.topicId]||{}, rate=st.answered?Math.round(st.correct/st.answered*100):0;
-        return '<button data-topic="'+t.topicId+'" class="text-left border rounded-xl p-4 hover:bg-indigo-50"><div class="flex justify-between gap-2"><b>'+esc(t.title)+'</b><span class="text-xs '+(rate>=80?'text-green-600':'text-slate-500')+'">'+(st.answered?rate+'%':'未开始')+'</span></div><div class="text-xs text-slate-500 mt-1">'+esc(t.topicId)+' · '+esc(window.IGCSE_CURRICULUM?.labels[window.IGCSE_CURRICULUM.status(sub,t.topicId)]||'自主学习')+' · '+n+' 题</div><div class="text-sm text-slate-600 mt-2">'+esc((t.knowledge||'').slice(0,150))+'…</div></button>';
-      }).join('')+'</div>';
+      const full=topics(sub),learned=new Set(userState.learnedTopics||[]),stat=t=>userState.topicStats?.[sub+'::'+t.topicId]||userState.topicStats?.[t.topicId]||{},taught=t=>window.IGCSE_CURRICULUM?.status(sub,t.topicId)||'unstarted';
+      const list=topics(sub,ch).filter(t=>(!search||(t.title+' '+t.chapter+' '+t.topicId).toLowerCase().includes(search.toLowerCase()))&&(!statusFilter||(statusFilter==='practiced'?stat(t).answered>0:taught(t)===statusFilter)));
+      const pages=Math.max(1,Math.ceil(list.length/8));viewPage=Math.min(viewPage,pages-1);const shown=list.slice(viewPage*8,(viewPage+1)*8),count=full.filter(t=>stat(t).answered>0).length;
+      const audit=window.IGCSE_CURRICULUM?.matrix(sub),missing=(audit?.sections||[]).filter(x=>!x.lessons.length);
+      return '<div class="chapter-journey"><h3>🧭 学习探险地图 · '+label(sub)+'</h3><p>已练 '+count+' / '+full.length+' 个本站主题 · 可自由预习所有未教章节</p><progress max="'+Math.max(1,full.length)+'" value="'+count+'" aria-label="已练主题比例"></progress><p>教学状态与练习记录分开；地图进度表示参与，不代表掌握或考纲完成。</p><div class="chapter-stations">'+chapters(sub).map((c,i)=>'<button data-ce-chapter="'+esc(c)+'" aria-pressed="'+(c===ch)+'">📍 '+(i+1)+' '+esc(c)+' <small>'+topics(sub,c).length+' 主题</small></button>').join('')+'</div></div><div class="ws-filters"><label>查看状态<select id="ceStatusFilter"><option value="">全部状态</option><option value="unstarted">未教</option><option value="current">正在学</option><option value="taught">已教</option><option value="review">学校安排复习</option><option value="practiced">已练习</option></select></label><label>查找主题<input id="ceSearch" maxlength="150" value="'+esc(search)+'" placeholder="主题、章节或编号"></label><button id="ceSearchButton">查找</button></div><p>找到 '+list.length+' 个主题 · 第 '+(viewPage+1)+' / '+pages+' 页</p><div class="grammar-map">'+shown.map((t,i)=>{
+        const n=qs(sub,ch,t.topicId).length,st=stat(t),rate=st.answered?Math.round(st.correct/st.answered*100):null;
+        return '<button data-topic="'+esc(t.topicId)+'" class="grammar-island chapter-node"><span class="grammar-island-number">'+(viewPage*8+i+1)+'</span><b>'+esc(t.title)+'</b><p>'+esc(t.chapter)+'</p><div class="chapter-status"><span>'+esc(window.IGCSE_CURRICULUM?.labels[taught(t)]||'未教')+'</span><span>'+(st.answered?'✓ 已练习':'尚未练习')+'</span>'+(learned.has(t.topicId)?'<span>📖 已阅读</span>':'')+'</div><p>'+n+' 道本站题 · '+(rate===null?'等待首次探索':'累计答对（含自评） '+rate+'%')+'</p><small>点击阅读与练习；未教也可进入</small></button>';
+      }).join('')+'</div>'+(!list.length?'<p>没有匹配主题，可取消状态或搜索筛选。</p>':'')+'<div class="ws-actions"><button id="cePrevious" '+(!viewPage?'disabled':'')+'>上一页</button><button id="ceMore" '+(viewPage>=pages-1?'disabled':'')+'>下一页</button><button id="ceAllChapters">返回全科地图</button></div><details class="english-summary"><summary>资料覆盖与待补章节 · '+missing.length+' 个登记章节暂无主题</summary><p>已同步全部 '+full.length+' 个本站可用主题；登记章节不等于完整官方考纲。D&T 暂缓补充。</p>'+missing.map(x=>'<p>待补：'+esc(x.label)+'</p>').join('')+'<button id="ceSchoolPlan">查看教学安排与考纲清单</button></details>';
     }
     function knowledge(){
-      const t=(contentData||[]).find(x=>x.topicId===topic); if(!t)return '<p>请选择知识主题。</p>';
+      const t=(contentData||[]).find(x=>x.topicId===topic&&x.subject===sub); if(!t)return '<p>请选择知识主题。</p>';
       return '<div class="border rounded-xl p-5"><div class="text-xs text-indigo-600 font-bold">'+esc(t.chapter)+' · '+esc(t.topicId)+'</div><h3 class="text-2xl font-bold mt-1">'+esc(t.title)+'</h3><div class="mt-4 prose max-w-none">'+(t.knowledge||'暂无知识说明')+'</div>'+
         (t.depthNotes?.length?'<section class="db-panel"><h3>应用与综合训练</h3>'+t.depthNotes.map(x=>'<p>'+esc(x)+'</p>').join('')+'</section>':'')+
         (t.workedExample?'<section class="db-panel"><h3>例题与推理</h3><p>'+esc(t.workedExample)+'</p><p>关联细目：'+esc((t.objectiveRefs||[]).join('、'))+' · '+esc(t.tier)+'</p><ul>'+(t.checklist||[]).map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul><p>原创教学样例，不是完整考纲。</p></section>':'')+
         (t.formulas?.length?'<div class="mt-4 p-4 rounded-xl bg-indigo-50"><b>核心公式 / 关系</b>'+t.formulas.map(f=>'<div class="mt-2">'+f+'</div>').join('')+'</div>':'')+
         '<div class="mt-4 p-4 rounded-xl bg-amber-50 border border-amber-200"><b>⚠ 常见错误</b><p class="mt-1 text-sm">'+esc(t.commonMistake||'暂无')+'</p></div>'+
-        '<div class="mt-4 flex flex-wrap gap-2"><button id="ceStartTopic" class="bg-indigo-600 text-white px-4 py-2 rounded-lg">开始本主题练习</button><button id="ceStartTest" class="border px-4 py-2 rounded-lg">完成本章测试</button></div></div>';
+        '<p class="chapter-access-note">教学状态：'+esc(window.IGCSE_CURRICULUM?.labels[window.IGCSE_CURRICULUM.status(sub,topic)]||'未教')+' · 所有教学状态均可自主练习。</p><div class="mt-4 flex flex-wrap gap-2"><button id="ceStartTopic" class="bg-indigo-600 text-white px-4 py-2 rounded-lg">开始本主题练习</button><button id="ceStartTest" class="border px-4 py-2 rounded-lg">完成本章测试</button></div></div>';
     }
     function start(ids,title){
       if(!ids.length){ceBody.innerHTML='<div class="p-5 bg-slate-50 rounded-xl">这个范围目前还没有足够的练习题。</div>';return;}
@@ -140,7 +143,7 @@
     function finish(){const rate=Math.round(session.correct/session.ids.length*100);ceBody.innerHTML='<div class="text-center p-8 bg-slate-50 rounded-2xl"><div class="text-4xl">🏆</div><h3 class="text-2xl font-bold mt-2">'+esc(session.title)+'完成</h3><p class="mt-2 text-slate-600">正确（含开放题自评） '+session.correct+' / '+session.ids.length+'（'+rate+'%）</p><p class="text-sm mt-2">错题已经进入原有错题/SRS系统，可继续复习。</p><button id="ceAgain" class="mt-4 bg-indigo-600 text-white px-4 py-2 rounded-lg">再练一次</button></div>';ceAgain.onclick=()=>start(session.ids,session.title);}
     function practice(){const t=topic||topics(sub,ch)[0]?.topicId;const ids=qs(sub,ch,t).map(q=>q.id);start(ids,'主题练习');}
     function chapterTest(){start(qs(sub,ch).map(q=>q.id),'章节综合测试');}
-    function unitTest(){const cs=chapters(sub).slice(0,Math.max(1,chapters(sub).indexOf(ch)+1));start(qs(sub).filter(q=>cs.includes(window.IGCSE_CATALOG.topic(sub,q.topicId)?.chapter)).map(q=>q.id),'综合单元测试 · 已学章节');}
+    function unitTest(){const cs=ch?chapters(sub).slice(0,Math.max(1,chapters(sub).indexOf(ch)+1)):chapters(sub);start(qs(sub).filter(q=>cs.includes(window.IGCSE_CATALOG.topic(sub,q.topicId)?.chapter)).map(q=>q.id),'综合单元测试 · 所选章节范围');}
     function exam(){
       const pool=qs(sub,ch); const ranked=[...pool].sort((a,b)=>{const sa=(a.type==='essay'?2:1)+(skill(a)==='Calculation'?1:0),sb=(b.type==='essay'?2:1)+(skill(b)==='Calculation'?1:0);return sb-sa;});
       start(ranked.map(q=>q.id).slice(0,Math.min(12,ranked.length)),'考点模拟 · '+ch);
@@ -152,14 +155,16 @@
       else if(mode==='chapterTest')chapterTest();
       else if(mode==='unitTest')unitTest();
       else if(mode==='exam')exam();
+      if(mode==='overview'){const filter=ceBody.querySelector('#ceStatusFilter');filter.value=statusFilter;filter.onchange=()=>{statusFilter=filter.value;viewPage=0;render();};ceBody.querySelector('#ceSearchButton').onclick=()=>{search=ceBody.querySelector('#ceSearch').value.trim();viewPage=0;render();};ceBody.querySelector('#ceSearch').onkeydown=e=>{if(e.key==='Enter')ceBody.querySelector('#ceSearchButton').click();};ceBody.querySelector('#cePrevious').onclick=()=>{viewPage--;render();};ceBody.querySelector('#ceMore').onclick=()=>{viewPage++;render();};ceBody.querySelector('#ceAllChapters').onclick=()=>{ch='';statusFilter='';search='';viewPage=0;render();};ceBody.querySelector('#ceSchoolPlan').onclick=()=>document.querySelector('[data-page=page-curriculum]').click();ceBody.querySelectorAll('[data-ce-chapter]').forEach(b=>b.onclick=()=>{ch=b.dataset.ceChapter;topic='';viewPage=0;render();});}
       if(mode==='overview')ceBody.querySelectorAll('[data-topic]').forEach(x=>x.onclick=()=>{topic=x.dataset.topic;mode='knowledge';render();});
       const st=document.getElementById('ceStartTopic'); if(st)st.onclick=()=>{mode='practice';render();};
       const ct=document.getElementById('ceStartTest'); if(ct)ct.onclick=()=>{mode='chapterTest';render();};
     }
     function render(){renderControls();renderTabs();progress();renderBody();window.IGCSE_DISCOVERY?.enhancePage('page-chapters');}
-    window.addEventListener('igcse-subject-change',e=>{if(e.detail?.subject){sub=e.detail.subject;ch='';topic='';mode='overview';render();}});
+    window.addEventListener('igcse-subject-change',e=>{if(e.detail?.subject){sub=e.detail.subject;ch='';topic='';viewPage=0;mode='overview';render();}});
     const ss=document.getElementById('subjectSelect');
-    if(ss) ss.addEventListener('change',()=>{sub=ss.value;ch='';topic='';mode='overview';render();});
+    if(ss) ss.addEventListener('change',()=>{sub=ss.value;ch='';topic='';viewPage=0;mode='overview';render();});
+    window.addEventListener('igcse-curriculum-change',()=>{if(mode==='overview'||mode==='knowledge')render();});
     render();
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',build);else setTimeout(build,0);

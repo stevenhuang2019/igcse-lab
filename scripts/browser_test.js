@@ -24,6 +24,7 @@ const server=http.createServer((req,res)=>{
    assert.ok(performance.domReadyMs<5000,'startup budget '+width);assert.ok(performance.localAssetBytes<3*1024*1024,'local asset budget '+width);metrics.push({width,...performance});
    await require('./vocabulary_arcade_browser.cjs')(page,width,results);
    await require('./english_center_browser.cjs')(page,width,results);
+   await require('./grammar_chapters_browser.cjs')(page,width,results);
    await require('./full_backup_browser.cjs')(page,width,results);
    await require('./study_flow_browser.cjs')(page,width,results);
    await require('./stage_practice_browser.cjs')(page,width,results);
