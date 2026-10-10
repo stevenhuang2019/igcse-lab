@@ -3,7 +3,8 @@ module.exports=async(page,width,results)=>{
  for(const [subject,key] of [['business','technology'],['math','reverse'],['physics','heat'],['chemistry','chromatography'],['computer_science','filetask'],['english','revision']]){
   const id='course_'+subject+'_'+key;
   const beforeSelf=await page.evaluate(({id,subject})=>getTopicMasteryEvidence(id,subject).selfAssessed,{id,subject});
-  await page.locator('#dashboard-nav').click();await page.locator('[data-db-subject="'+subject+'"]').click();
+  await page.locator('#dashboard-nav').click();await page.locator('[data-dashboard-view="map"]').click();await page.locator('[data-map-subject="'+subject+'"]').click();
+  await page.locator('#dashboardMapChapter').selectOption('');
   await page.locator('[data-db-learn="'+id+'"]').first().click();assert.match(await page.locator('#topicBody').textContent(),/例题与推理/);
   assert.match(await page.locator('#topicBody').textContent(),/原创教学样例/);
   if(subject==='business')await page.screenshot({path:path.join(results,'business-0264-lesson-'+width+'.png'),fullPage:true});
@@ -20,12 +21,12 @@ module.exports=async(page,width,results)=>{
   const evidence=await page.evaluate(({id,subject})=>getTopicMasteryEvidence(id,subject),{id,subject});assert.equal(evidence.established,false);assert.equal(evidence.selfAssessed,beforeSelf+1);
   if(subject==='english')assert.equal(evidence.objectiveAttempts,0);
  }
- await page.locator('#dashboard-nav').click();await page.locator('[data-db-subject="business"]').click();assert.match(await page.locator('#dbSyllabusAudit').textContent(),/0264.*2027-2029/s);
+ await page.locator('#dashboard-nav').click();await page.locator('[data-dashboard-view="map"]').click();await page.locator('[data-map-subject="business"]').click();assert.match(await page.locator('#dbSyllabusAudit').textContent(),/0264.*2027-2029/s);
  await page.locator('#dbSyllabusAudit summary').click();assert.equal(await page.locator('#dbSyllabusAudit article').count(),29);
- await page.locator('#dbCurriculum').click();await page.locator('#curriculumCode').selectOption('0450');await page.locator('#curriculumExamYear').fill('2026');await page.getByRole('button',{name:'保存学习安排',exact:true}).click();
+ await page.locator('#dbCurriculum').click();if(!await page.locator('#curriculumCode').isVisible())await page.locator('#examProfileDetails > summary').click();await page.locator('#curriculumCode').selectOption('0450');await page.locator('#curriculumExamYear').fill('2026');await page.getByRole('button',{name:'保存学习安排',exact:true}).click();
  await page.locator('#dashboard-nav').click();assert.equal(await page.evaluate(()=>IGCSE_CURRICULUM.ordered('business').length),6);assert.match(await page.locator('#dbSyllabusAudit').textContent(),/0450.*2026/s);
  assert.ok(await page.evaluate(()=>IGCSE_MOCK_ENGINE.selectQuestions('business',30).every(q=>q.syllabus!=='0264')));
- await page.locator('#dbCurriculum').click();await page.locator('#curriculumCode').selectOption('0264');await page.locator('#curriculumExamYear').fill('2028');await page.getByRole('button',{name:'保存学习安排',exact:true}).click();
+ await page.locator('#dbCurriculum').click();if(!await page.locator('#curriculumCode').isVisible())await page.locator('#examProfileDetails > summary').click();await page.locator('#curriculumCode').selectOption('0264');await page.locator('#curriculumExamYear').fill('2028');await page.getByRole('button',{name:'保存学习安排',exact:true}).click();
  await page.locator('#dashboard-nav').click();assert.equal(await page.evaluate(()=>IGCSE_CURRICULUM.ordered('business').length),29);assert.ok(await page.evaluate(()=>IGCSE_MOCK_ENGINE.selectQuestions('business',30).every(q=>q.syllabus==='0264')));
  assert.equal(await page.evaluate(()=>userState.questionStats.course_business_technology_check.answered),1);
  await page.locator('#dbSyllabusAudit summary').click();assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,'expanded content overflow '+width);

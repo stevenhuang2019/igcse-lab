@@ -64,7 +64,7 @@ window.IGCSE_MOCK_ENGINE={ensure,getQuestions,start,score,finish,report,recordPr
   const cp=window.IGCSE_CURRICULUM,p=cp?.profile(subject);
   if(cp?.advanced(subject)&&!p?.foundation)return [];
   if(p&&!cp.edition(subject).matches&&!p.foundation)return [];
-  return [...(window.IGCSE_SKILL_DEPTH_QUESTIONS||[]),...(window.IGCSE_STRUCTURED_TASKS||[])].filter(q=>q.subject===subject&&(!cp||cp.questionAllowed(q))&&(scope==='all'||!cp||(p&&cp.eligible(subject,q.topicId))));
+  return [...(window.IGCSE_SKILL_DEPTH_QUESTIONS||[]),...(window.IGCSE_STRUCTURED_TASKS||[]),...(window.IGCSE_OBJECTIVE_QUESTIONS||[])].filter(q=>q.subject===subject&&(!cp||cp.questionAllowed(q))&&(scope==='all'||!cp||(p&&cp.eligible(subject,q.topicId))));
  };
  engine.saveActive=function(session){
   const s=engine.ensure();s.activePractice=JSON.parse(JSON.stringify(session));

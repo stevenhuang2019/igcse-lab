@@ -1,3 +1,5 @@
+> 小范围免费部署请优先阅读 [FREE_PILOT_GUIDE.md](FREE_PILOT_GUIDE.md)：环境邀请名单、无需磁盘、保留 AI；内存额度重启会重置。以下持久磁盘方案仍为可选扩展。
+
 # IGCSE Personal Learning OS
 
 A static learning application with seven subject catalogues, topic practice, a shared local learner state, a daily plan and timed mock practice. Serve this directory over HTTP and open `index.html`. No account or backend is required.
@@ -8,7 +10,7 @@ Start a local preview with `python3 scripts/preview.py` or double-click `start-l
 
 ## Current coverage
 
-- 1208 questions/tasks across 152 local topics (including retained legacy editions) and seven subjects.
+- 1232 questions/tasks across 152 local topics (including retained legacy editions) and seven subjects.
 - 62 new original questions: 50 Physics questions spanning 25 course-map sections, plus two each for Math, Chemistry, D&T, Business, CS and English.
 - Every local topic has linked questions. This is **local catalogue coverage**, not proof of full official syllabus coverage, exam readiness or a predicted grade. CS and English still have comparatively shallow banks.
 - The legacy `phy0625_4_6` ID is retained for saved progress, while its display/reference uses official 4.5 subdivisions (induction 4.5.1, generator 4.5.2, transformer 4.5.6), not a nonexistent official 4.6.
@@ -79,3 +81,5 @@ Six-subject content expansion: 55 original worked lessons and 110 checks/open ta
 Add 48 staged checks and advisory prerequisites, with school-scoped, resumable sample diagnostics and first-response isolation. These are partial sample checks, not formal examinations; English checks remain preparation. See [LEARNING_PATH_GUIDE.md](LEARNING_PATH_GUIDE.md).
 
 Six-subject structured practice mixes numerical/choice checks and saved open responses. Mock reports exclude preparation and self-assessment from objective accuracy. Learning JSON restoration validates and previews records, protects active exams, retains a recovery snapshot and preserves separate material/draft stores. See [RELEASE_GUIDE.md](RELEASE_GUIDE.md) and [ROADMAP_STATUS.md](ROADMAP_STATUS.md).
+
+Private invited pilot deployment: see PRIVATE_PILOT_GUIDE.md. Uses server-side authentication and persistent daily AI request quotas; not deployed by enabling GitHub Pages.

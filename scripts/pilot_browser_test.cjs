@@ -1,0 +1,2 @@
+const {chromium}=require('playwright'),fs=require('node:fs'),path=require('node:path');
+(async()=>{const results=path.resolve('test-results');fs.mkdirSync(results,{recursive:true});const browser=await chromium.launch({headless:true,...(process.env.CHROME_PATH?{executablePath:process.env.CHROME_PATH}:{})});try{for(const width of [1280,768,390])await require('./pilot_browser.cjs')(browser,width,results);}finally{await browser.close();}})().catch(e=>{console.error(e);process.exitCode=1;});

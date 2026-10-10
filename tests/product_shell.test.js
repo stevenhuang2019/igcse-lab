@@ -1,0 +1,11 @@
+const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
+function setup(){const saved={},window={addEventListener(){},dispatchEvent(){}};const context=vm.createContext({window,localStorage:{getItem:k=>saved[k],setItem:(k,v)=>saved[k]=v},document:{readyState:'loading',addEventListener(){},documentElement:{dataset:{}}},CustomEvent:function(type,opts){this.type=type;this.detail=opts.detail;},Map,WeakMap,RegExp});for(const f of ['interface_strings.js','product_shell.js','language_engine.js'])vm.runInContext(fs.readFileSync('data/'+f,'utf8'),context);return {w:window,saved,context};}
+test('seven groups give English its own destinations without duplicate navigation',()=>{
+ const {w}=setup(),groups=w.IGCSE_SHELL.groups,ids=groups.flatMap(g=>g.pages);assert.equal(groups.length,7);assert.equal(new Set(ids).size,ids.length);assert.ok(ids.includes('page-english'));assert.deepEqual(Array.from(groups.find(g=>g.id==='english').pages),['page-english','page-writing','page-grammar','page-english-commands','page-english-records']);assert.ok(!groups.find(g=>g.id==='tools').pages.includes('page-writing'));
+});
+test('interface language persists independently and unknown learning prose remains intact',()=>{
+ const {w,saved}=setup();w.IGCSE_SHELL.setUI('en');assert.equal(saved.igcseInterfaceLanguage,'en');assert.equal(saved.igcseLangMode,undefined);assert.equal(w.IGCSE_SHELL.translate('恢复建议顺序'),'Restore recommended order');assert.equal(w.IGCSE_SHELL.translate('练习本单元 · 3 题'),'Practise this unit · 3 questions');assert.equal(w.IGCSE_SHELL.translate('这是未经翻译的学习原文'),'这是未经翻译的学习原文');w.IGCSE_SHELL.setUI('zh');assert.equal(w.IGCSE_SHELL.translate('恢复建议顺序'),'恢复建议顺序');
+});
+test('content language preserves source and exposes Chinese on demand without generating translations',()=>{
+ const {w,saved}=setup();w.setIGCSEGlobalLang('exam');assert.equal(saved.igcseLangMode,'exam');assert.equal(saved.igcseInterfaceLanguage,undefined);const q=w.getTopicLanguage({title:'Topic',knowledge:'中文知识',knowledgeEn:'English knowledge'});assert.equal(q.fallback,false);assert.match(q.body,/<details class="lang-zh">/);assert.match(q.body,/lang="en"/);assert.match(q.body,/中文知识/);assert.equal(w.getTopicLanguage({knowledge:'原文'}).fallback,true);w.setIGCSEGlobalLang('bad-input');assert.equal(w.igcseLang(),'bilingual');
+});
