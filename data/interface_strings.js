@@ -305,6 +305,14 @@ window.IGCSE_INTERFACE_STRINGS=[
   "Your draft is saved automatically in this browser."
  ],
  [
+  "年级与考试档案 · 点击编辑",
+  "Year and exam profile · Edit"
+ ],
+ [
+  "对比 AI 检查前与当前草稿",
+  "Compare earlier and current drafts"
+ ],
+ [
   "没有匹配词汇，请调整筛选。",
   "No matching words. Adjust your filters."
  ],
@@ -323,6 +331,10 @@ window.IGCSE_INTERFACE_STRINGS=[
  [
   "我已核对这些章节的学校进度",
   "I have checked the school progress for these chapters"
+ ],
+ [
+  "高级操作 · 批量文本导入",
+  "Advanced · Bulk text import"
  ],
  [
   "当前筛选没有待复习题目。",
@@ -407,6 +419,10 @@ window.IGCSE_INTERFACE_STRINGS=[
  [
   "正在检查 AI 服务…",
   "Checking AI availability…"
+ ],
+ [
+  "正在读取本机附件清单…",
+  "Loading local material list..."
  ],
  [
   "公式、术语与语法速查",
@@ -589,6 +605,10 @@ window.IGCSE_INTERFACE_STRINGS=[
   "Simultaneous equations & substitution checks"
  ],
  [
+  "正在读取关联资料…",
+  "Loading linked materials..."
+ ],
+ [
   "章节 / 要点组",
   "Chapter / reference group"
  ],
@@ -695,6 +715,18 @@ window.IGCSE_INTERFACE_STRINGS=[
  [
   "请选择知识主题。",
   "Select a topic to study."
+ ],
+ [
+  "① 下载学习记录",
+  "1. Download learning records"
+ ],
+ [
+  "② 下载写作草稿",
+  "2. Download writing drafts"
+ ],
+ [
+  "③ 下载附件清单",
+  "3. Download material list"
  ],
  [
   "上传教材与作业",
@@ -859,6 +891,34 @@ window.IGCSE_INTERFACE_STRINGS=[
  [
   "英语写作工作室",
   "English writing studio"
+ ],
+ [
+  "已保存选中章节",
+  "Selected chapters saved"
+ ],
+ [
+  "返回本主题讲解",
+  "Return to this topic"
+ ],
+ [
+  "独立重练本主题",
+  "Retry this topic independently"
+ ],
+ [
+  "学习本章节词汇",
+  "Study chapter vocabulary"
+ ],
+ [
+  "上传或关联资料",
+  "Upload or link materials"
+ ],
+ [
+  "缺讲解或独立题",
+  "Missing lessons or independent practice"
+ ],
+ [
+  "暂无修改前快照",
+  "No earlier snapshot"
  ],
  [
   "打开语言选择",
@@ -1069,6 +1129,26 @@ window.IGCSE_INTERFACE_STRINGS=[
   "Chapter plan text"
  ],
  [
+  "保存选中章节",
+  "Save selected chapters"
+ ],
+ [
+  "主题学习步骤",
+  "Topic study steps"
+ ],
+ [
+  "统一备份向导",
+  "Backup guide"
+ ],
+ [
+  "导出建设清单",
+  "Export content inventory"
+ ],
+ [
+  "快照读取失败",
+  "Could not load snapshot"
+ ],
+ [
   "练习与测评",
   "Practice & assessment"
  ],
@@ -1251,6 +1331,10 @@ window.IGCSE_INTERFACE_STRINGS=[
  [
   "查看考纲第",
   "View syllabus, page"
+ ],
+ [
+  "例题与推理",
+  "Worked example and reasoning"
  ],
  [
   "平台设置",
@@ -1997,6 +2081,30 @@ window.IGCSE_INTERFACE_STRINGS=[
   "Model study"
  ],
  [
+  "学校状态",
+  "School status"
+ ],
+ [
+  "全部状态",
+  "All statuses"
+ ],
+ [
+  "批量标记",
+  "Batch status"
+ ],
+ [
+  "选择章节",
+  "Select chapter"
+ ],
+ [
+  "标记已读",
+  "Mark as read"
+ ],
+ [
+  "建设状态",
+  "Content status"
+ ],
+ [
   "模拟考",
   "Mock exam"
  ],
@@ -2042,7 +2150,7 @@ window.IGCSE_INTERFACE_STRINGS=[
  ],
  [
   "待复习",
-  "Pending review"
+  "To review"
  ],
  [
   "条错题",
@@ -2131,6 +2239,14 @@ window.IGCSE_INTERFACE_STRINGS=[
  [
   "补基础",
   "Foundation support"
+ ],
+ [
+  "已打开",
+  "Opened"
+ ],
+ [
+  "已练习",
+  "Practised"
  ],
  [
   "数学",
@@ -2603,6 +2719,30 @@ window.IGCSE_INTERFACE_STRINGS=[
  [
   "估计",
   "Estimate"
+ ],
+ [
+  "讲解",
+  "Explanation"
+ ],
+ [
+  "例题",
+  "Worked example"
+ ],
+ [
+  "错题",
+  "Mistakes"
+ ],
+ [
+  "资料",
+  "Materials"
+ ],
+ [
+  "范本",
+  "Models"
+ ],
+ [
+  "反馈",
+  "Feedback"
  ],
  [
   "波",

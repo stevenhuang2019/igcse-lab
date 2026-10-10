@@ -10,6 +10,7 @@
   function check(x,depth=0){if(++nodes>150000||depth>30)fail();if(typeof x==='number'&&(!Number.isFinite(x)||Math.abs(x)>Number.MAX_SAFE_INTEGER))fail();if(x&&typeof x==='object')for(const [key,value] of Object.entries(x)){if(['__proto__','constructor','prototype'].includes(key))fail();check(value,depth+1);}}
   check(s);if(!object(s)||!Array.isArray(s.learnedTopics)||!object(s.questionStats)||!object(s.globalStats))fail();
   for(const name of ['learnedTopics','mistakes','badges','assessmentRecords','homeworkRecords','vocabMistakes'])if(s[name]!==undefined&&!Array.isArray(s[name]))fail();
+  if(s.openedTopics!==undefined&&(!Array.isArray(s.openedTopics)||!s.openedTopics.every(x=>typeof x==='string')))fail();
   if(!s.learnedTopics.every(x=>typeof x==='string'))fail();
   for(const name of ['topicStats','dailyPlan','subjectStats','progress','mastery','srs','assessments','mockExams','achievements','errorDiagnosis','englishMaster','activityByDay','curriculum','learningPath','advancedLearning','hintReviews'])if(s[name]!==undefined&&!object(s[name]))fail();
   function counts(r,answerKey='answered',correctKey='correct'){if(!object(r))fail();for(const key of [answerKey,correctKey])if(r[key]!==undefined&&(!Number.isInteger(r[key])||r[key]<0))fail();if((r[correctKey]||0)>(r[answerKey]||0))fail();}

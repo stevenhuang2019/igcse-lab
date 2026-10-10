@@ -499,7 +499,7 @@ function openTopic(topic){
     document.getElementById('topicTitle').tabIndex = -1;
     document.getElementById('topicTitle').focus({preventScroll:true});
     document.getElementById('page-textbook').scrollIntoView({block:'start'});
-    if(!userState.learnedTopics.includes(topic.topicId)){ userState.learnedTopics.push(topic.topicId); saveUserState(userState); addXp(3); }
+    window.IGCSE_TOPIC_WORKSPACE?.opened(topic);
 }
 
 document.getElementById('backTopicList').onclick = renderTopicList;
@@ -1958,6 +1958,8 @@ document.addEventListener('DOMContentLoaded',function(){
 <script src="data/learning_discovery.js"></script>
 <script src="data/interface_strings.js"></script>
 <script src="data/product_shell.js"></script>
+<script src="data/study_flow.js"></script>
+<script src="data/study_support.js"></script>
 <script>
 // Use existing navigation handlers so history restores page-specific views too.
 function restoreLearningRoute(){

@@ -23,10 +23,10 @@ module.exports=async(page,width,results)=>{
  }
  await page.locator('#dashboard-nav').click();await page.locator('[data-dashboard-view="map"]').click();await page.locator('[data-map-subject="business"]').click();assert.match(await page.locator('#dbSyllabusAudit').textContent(),/0264.*2027-2029/s);
  await page.locator('#dbSyllabusAudit summary').click();assert.equal(await page.locator('#dbSyllabusAudit article').count(),29);
- await page.locator('#dbCurriculum').click();await page.locator('#curriculumCode').selectOption('0450');await page.locator('#curriculumExamYear').fill('2026');await page.getByRole('button',{name:'保存学习安排',exact:true}).click();
+ await page.locator('#dbCurriculum').click();if(!await page.locator('#curriculumCode').isVisible())await page.locator('#examProfileDetails > summary').click();await page.locator('#curriculumCode').selectOption('0450');await page.locator('#curriculumExamYear').fill('2026');await page.getByRole('button',{name:'保存学习安排',exact:true}).click();
  await page.locator('#dashboard-nav').click();assert.equal(await page.evaluate(()=>IGCSE_CURRICULUM.ordered('business').length),6);assert.match(await page.locator('#dbSyllabusAudit').textContent(),/0450.*2026/s);
  assert.ok(await page.evaluate(()=>IGCSE_MOCK_ENGINE.selectQuestions('business',30).every(q=>q.syllabus!=='0264')));
- await page.locator('#dbCurriculum').click();await page.locator('#curriculumCode').selectOption('0264');await page.locator('#curriculumExamYear').fill('2028');await page.getByRole('button',{name:'保存学习安排',exact:true}).click();
+ await page.locator('#dbCurriculum').click();if(!await page.locator('#curriculumCode').isVisible())await page.locator('#examProfileDetails > summary').click();await page.locator('#curriculumCode').selectOption('0264');await page.locator('#curriculumExamYear').fill('2028');await page.getByRole('button',{name:'保存学习安排',exact:true}).click();
  await page.locator('#dashboard-nav').click();assert.equal(await page.evaluate(()=>IGCSE_CURRICULUM.ordered('business').length),29);assert.ok(await page.evaluate(()=>IGCSE_MOCK_ENGINE.selectQuestions('business',30).every(q=>q.syllabus==='0264')));
  assert.equal(await page.evaluate(()=>userState.questionStats.course_business_technology_check.answered),1);
  await page.locator('#dbSyllabusAudit summary').click();assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,'expanded content overflow '+width);

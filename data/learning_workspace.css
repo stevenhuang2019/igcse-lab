@@ -34,3 +34,9 @@
 .ws-chapter-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.ws-chapter-grid .ws-unit{margin:0;min-width:0}.ws-chapter-grid .ws-unit[open]{grid-column:1/-1}.ws-chapter-grid summary{overflow-wrap:anywhere}
 @media(min-width:1100px){.ws-chapter-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:767px){header .header-tools{width:auto;flex:1;justify-content:flex-end;flex-wrap:nowrap}header #userStatus{display:none}.shell-language-controls{position:fixed;top:64px;left:12px;right:12px;width:auto}}
+
+.topic-workspace{margin:12px 0;padding:12px;border:1px solid #dce2f1;border-radius:14px}.topic-workspace .ws-tabs{flex-wrap:wrap}#topicWorkspacePanel{padding:12px 0}#topicWorkspacePanel button,#markTopicRead,#returnStudyTopic{border:1px solid #c7d2fe;border-radius:10px;padding:10px;margin:4px;background:#fff;color:#4338ca}.school-selection{display:flex;gap:8px;align-items:center}[data-curriculum-topic][data-dirty=true]{border-color:#d97706!important}#schoolPageCount{padding:12px}#topicBody[hidden]{display:none!important}
+#coverageRows{max-height:440px;overflow:auto}#backupWizard button{min-height:44px}#writingViews{margin:12px 0}.ws-layout pre{white-space:pre-wrap;overflow-wrap:anywhere;padding:12px;border:1px solid #dce2f1;border-radius:10px}
+@media(min-width:768px){#writingViews{display:none}}
+@media(max-width:767px){#page-writing[data-writing-view=draft] [data-writing-pane=model],#page-writing[data-writing-view=feedback] [data-writing-pane=model],#page-writing[data-writing-view=model] [data-writing-pane=editor]{display:none}}
+@media(max-width:767px){#page-writing[data-writing-view=feedback] [data-writing-pane=editor]>label,#page-writing[data-writing-view=feedback] #writingWordCount,#page-writing[data-writing-view=feedback] #writingLocalHints{display:none}}

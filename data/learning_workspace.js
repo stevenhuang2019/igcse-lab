@@ -28,7 +28,7 @@
   const controls=document.createElement('div');controls.className='ws-filters';controls.innerHTML='<label>章节 / 单元<select id="learningChapter">'+options(chapters,filter.chapter,'全部章节')+'</select></label><label>查找知识点<input id="learningSearch" type="search" placeholder="标题或知识点" value="'+esc(filter.search)+'"></label>'+actions([['page-materials','教材与作业资料'],['page-curriculum','学校进度'],['page-advanced','AS / A Level'],['page-writing','英语写作'],['page-english','英语技能中心']]);area.append(controls);bindRoutes(area);
   document.getElementById('topicContent').classList.add('hidden');list.hidden=false;today.hidden=false;
   const renderList=()=>{const query=filter.search.trim().toLowerCase(),rows=ts.filter(t=>(!filter.chapter||(t.chapter||'其他')===filter.chapter)&&(!query||(t.title+' '+t.chapter).toLowerCase().includes(query)));
-   list.innerHTML='<p class="ws-count" role="status">'+rows.length+' 个知识点 · 已读与掌握分别记录</p>'+rows.map(t=>'<button class="ws-topic topic-card" data-topic-id="'+esc(t.topicId)+'"><span><b>'+esc(t.title)+'</b><small>'+esc(t.chapter)+' · '+(window.IGCSE_CURRICULUM?.labels[window.IGCSE_CURRICULUM.status(subject(),t.topicId)]||'未设置学校进度')+'</small></span><span>'+(userState.learnedTopics.includes(t.topicId)?'已读':'未读')+' · '+window.IGCSE_CATALOG.questionsFor(subject(),t.topicId).length+' 题 →</span></button>').join('')+(!rows.length?'<p>没有匹配的知识点，试试其他章节或关键词。</p>':'');
+   list.innerHTML='<p class="ws-count" role="status">'+rows.length+' 个知识点 · 已读与掌握分别记录</p>'+rows.map(t=>'<button class="ws-topic topic-card" data-topic-id="'+esc(t.topicId)+'"><span><b>'+esc(t.title)+'</b><small>'+esc(t.chapter)+' · '+(window.IGCSE_CURRICULUM?.labels[window.IGCSE_CURRICULUM.status(subject(),t.topicId)]||'未设置学校进度')+'</small></span><span>'+(window.IGCSE_TOPIC_WORKSPACE?.stateLabel(t)||(userState.learnedTopics.includes(t.topicId)?'已读':'未读'))+' · '+window.IGCSE_CATALOG.questionsFor(subject(),t.topicId).length+' 题 →</span></button>').join('')+(!rows.length?'<p>没有匹配的知识点，试试其他章节或关键词。</p>':'');
    list.querySelectorAll('[data-topic-id]').forEach(b=>b.onclick=()=>openTopic(ts.find(t=>t.topicId===b.dataset.topicId)));};
   controls.querySelector('select').onchange=e=>{filter.chapter=e.target.value;save();renderList();};controls.querySelector('input').oninput=e=>{filter.search=e.target.value;save();renderList();};renderList();
   const d=window.IGCSE_DASHBOARD.day(),tasks=d.tasks.filter(t=>t.subject===subject());
@@ -133,6 +133,6 @@
   window.initMotionWorkspace?.();
   renderLearning();
  }
- window.IGCSE_WORKSPACE={subjectChips:chips,setVocabRange:(chapter)=>{prefs.vocab={subject:'english',chapter,search:''};save();renderVocab();},renderLearning,rememberTopic,renderPractice,practiceTab,enhanceDashboard,renderQuickref,renderVocab,gamePool,renderGrowth};
+ window.IGCSE_WORKSPACE={subjectChips:chips,setVocabRange:(chapter,selectedSubject='english')=>{prefs.vocab={subject:selectedSubject,chapter,search:''};save();renderVocab();},renderLearning,rememberTopic,renderPractice,practiceTab,enhanceDashboard,renderQuickref,renderVocab,gamePool,renderGrowth};
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',build);else build();
 })();
