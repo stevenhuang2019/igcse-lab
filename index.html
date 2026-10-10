@@ -319,6 +319,7 @@
 <script src="data/objective_coverage.js"></script>
 <script src="data/igcse_release_depth.js"></script>
 <script src="data/igcse_gap_depth.js"></script>
+<script src="data/igcse_stage_practice.js"></script>
 <script src="data/learning_catalog.js"></script>
 <script>
 /* ===================== 用户状态管理 ===================== */
@@ -477,6 +478,7 @@ function openTopic(topic){
     }
     bodyHtml += L.body || '';
     if(topic.reinforcement){const r=topic.reinforcement;bodyHtml+='<section class="db-panel"><h3>本轮深化 · Selected objectives</h3><div data-no-translate lang="en">'+esc(r.en)+'</div><details class="lang-zh"><summary>查看中文解释</summary><p data-no-translate>'+esc(r.zh)+'</p></details><h4>Worked example</h4><p data-no-translate>'+esc(r.example)+'</p><p>'+esc(r.refs.join(' / '))+' · <a href="'+esc(topic.sourceUrl)+'#page='+r.page+'" target="_blank" rel="noopener">官方考纲依据</a> · 样例深化，非完整覆盖</p></section>'; }
+    if(topic.stagedStudy){const r=topic.stagedStudy;bodyHtml+='<section class="db-panel"><h3>分层学习要点</h3><p data-no-translate lang="en">'+esc(r.en)+'</p><details class="lang-zh"><summary>查看中文解释</summary><p data-no-translate>'+esc(r.zh)+'</p></details><p>'+esc(r.refs.join(' / '))+' · <a href="'+esc(topic.sourceUrl)+'#page='+r.page+'" target="_blank" rel="noopener">官方考纲依据</a> · 样例深化，非完整覆盖</p></section>'; }
     if(topic.depthNotes?.length){bodyHtml+='<section class="db-panel"><h3>应用与综合训练</h3>'+topic.depthNotes.map(x=>'<p>'+esc(x)+'</p>').join('')+'</section>';}
     if(topic.workedExample){bodyHtml+='<section class="db-panel"><h3>例题与推理</h3><p>'+esc(topic.workedExample)+'</p><p>学习目标：'+(topic.objectives||[]).map(esc).join('；')+'</p><p>关联细目：'+(topic.objectiveRefs||[]).map(esc).join('、')+' · '+esc(topic.tier||'未分层')+'</p><ul>'+(topic.checklist||[]).map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul><p>原创教学样例，尚不代表全部考纲细目。<a href="'+esc(topic.sourceUrl)+'" target="_blank" rel="noopener">官方考纲</a></p></section>';}
     if(topic.formulas && topic.formulas.length){
@@ -599,6 +601,7 @@ function renderQuestion(){
     document.getElementById('practiceResult').classList.add('hidden');
     let html = '<div class="border rounded-lg p-4 mb-3">';
     html += '<div class="flex items-center justify-between mb-2"><span class="text-xs font-semibold text-indigo-600">第 ' + (s.idx + 1) + ' / ' + s.total + ' 题</span><span class="text-xs text-gray-500">主题：' + esc((contentData.find(t=>t.topicId===q.topicId)||{}).title || '') + '</span></div>';
+    if(q.practiceLevel&&!['mock','paper'].includes(s.mode)){const level={basic:'基础巩固',application:'应用迁移',integrated:'综合推理'}[q.practiceLevel];if(level)html+='<p class="practice-level-label">'+esc(level)+(q.tier&&q.tier!=='unclassified'?' · '+esc(q.tier):'')+(q.type==='essay'?' · 自查任务':'')+'</p>'; }
     html += '<div class="font-medium mb-3 q-body">' + questionStemHtml(q) + '</div>';
     if(q.type === 'choice'){
         html += '<div class="grid gap-2 q-opts">';

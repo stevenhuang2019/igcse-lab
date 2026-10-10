@@ -1,5 +1,12 @@
 /* Authored interface translations. Learning material and learner text remain separate. */
 window.IGCSE_INTERFACE_STRINGS=[
+ ["分层学习要点","Staged study notes"],
+ ["自查任务","Self-check task"],
+ ["基础巩固","Foundations"],
+ ["应用迁移","Application"],
+ ["综合推理","Integrated reasoning"],
+ ["分层练习","Staged practice"],
+ ["难度层级不等于 Core / Extended 分卷；开放任务只供自查。","Practice difficulty is separate from the exam tier; open tasks are for self-checking."],
  ["继续上次主题：","Resume last topic: "],
  ["返回本主题讲解：","Return to lesson: "],
  [

@@ -7,7 +7,7 @@ function load(){
  const document={readyState:'loading',addEventListener(){}};
  const ctx=vm.createContext({window,document,console,Date,CustomEvent:function(type,{detail}){this.type=type;this.detail=detail;}});
  const run=f=>{vm.runInContext(fs.readFileSync(path.join(root,'data',f),'utf8'),ctx,{filename:f});if(f==='syllabus_registry.js')run('curriculum_expansion_map.js');};
- for(const f of ['igcse_content.js','igcse_questions.js','igcse_questions_math.js','igcse_questions_physics.js','igcse_questions_chemistry.js','igcse_questions_dt.js','igcse_questions_business.js','igcse_cs_0478.js','igcse_questions_cs.js','igcse_english_esl.js','igcse_questions_english.js','igcse_english_deep.js','igcse_cs_deep.js','physics_0625_course_map.js','igcse_questions_extension.js','igcse_questions_depth.js','igcse_foundation.js','igcse_curriculum_expansion.js','igcse_skill_depth.js','structured_tasks.js','objective_coverage.js','igcse_release_depth.js','igcse_gap_depth.js','learning_catalog.js'])run(f);
+ for(const f of ['igcse_content.js','igcse_questions.js','igcse_questions_math.js','igcse_questions_physics.js','igcse_questions_chemistry.js','igcse_questions_dt.js','igcse_questions_business.js','igcse_cs_0478.js','igcse_questions_cs.js','igcse_english_esl.js','igcse_questions_english.js','igcse_english_deep.js','igcse_cs_deep.js','physics_0625_course_map.js','igcse_questions_extension.js','igcse_questions_depth.js','igcse_foundation.js','igcse_curriculum_expansion.js','igcse_skill_depth.js','structured_tasks.js','objective_coverage.js','igcse_release_depth.js','igcse_gap_depth.js','igcse_stage_practice.js','learning_catalog.js'])run(f);
  window.userState={topicStats:{},questionStats:{},learnedTopics:[],dailyPlan:{},mistakes:[]};window.saveUserState=()=>{};
  return {window,run,listeners};
 }
@@ -106,7 +106,7 @@ test('section progress counts unique answered samples separately from preparatio
 test('foundation chapters have edition-linked samples and new lessons retain all legacy topics',()=>{
  const {window:w,run}=load();run('syllabus_registry.js');run('syllabus_audit.js');
  assert.equal(w.IGCSE_FOUNDATION_CONTENT.length,9);assert.equal(w.IGCSE_FOUNDATION_QUESTIONS.length,42);
- assert.equal(w.IGCSE_CATALOG.topics.length,152);assert.equal(w.IGCSE_CATALOG.questions.length,1280);
+ assert.equal(w.IGCSE_CATALOG.topics.length,152);assert.equal(w.IGCSE_CATALOG.questions.length,1304);
  assert.equal(new Set(w.IGCSE_FOUNDATION_QUESTIONS.map(q=>q.question)).size,42);
  for(const [subject,n] of [['math',9],['chemistry',12]]){
   const a=w.getIGCSESyllabusAudit(subject);assert.equal(a.sampled,n);

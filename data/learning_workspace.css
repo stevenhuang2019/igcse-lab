@@ -48,3 +48,6 @@
 /* Once a lesson is open, its own steps replace the catalogue controls. */
 #page-textbook:has(#topicContent:not(.hidden)) #learningCenterTools{display:none}
 #topicContent>.mt-4{position:static;z-index:auto}
+
+.staged-example>details{margin:12px}.staged-example p{overflow-wrap:anywhere}.staged-example summary span{font-weight:400}
+.practice-level-label{color:#475569;font-size:.85rem;margin:8px 0;padding:8px;background:#f1f5f9;border-radius:8px}
