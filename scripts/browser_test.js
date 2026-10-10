@@ -23,6 +23,7 @@ const server=http.createServer((req,res)=>{
    const performance=await page.evaluate(()=>({domReadyMs:Math.round(window.performance.getEntriesByType('navigation')[0].domContentLoadedEventEnd),localAssetBytes:window.performance.getEntriesByType('resource').filter(r=>r.name.startsWith(location.origin)).reduce((n,r)=>n+r.decodedBodySize,0)}));
    assert.ok(performance.domReadyMs<5000,'startup budget '+width);assert.ok(performance.localAssetBytes<3*1024*1024,'local asset budget '+width);metrics.push({width,...performance});
    await require('./vocabulary_arcade_browser.cjs')(page,width,results);
+   await require('./english_center_browser.cjs')(page,width,results);
    await require('./full_backup_browser.cjs')(page,width,results);
    await require('./study_flow_browser.cjs')(page,width,results);
    await require('./stage_practice_browser.cjs')(page,width,results);

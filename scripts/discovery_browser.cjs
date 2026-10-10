@@ -2,8 +2,8 @@ const assert=require('node:assert/strict'),path=require('node:path');
 module.exports=async(page,width,results)=>{
  console.log('discovery',width);const before=await page.evaluate(()=>JSON.stringify(userState));
  const menu=await page.locator('#mainNav .nav-btn:not([hidden])').evaluateAll(bs=>bs.map(b=>b.dataset.page));
- assert.equal(await page.locator('#mainNav [data-shell-group]').count(),6);assert.equal(menu.indexOf('page-writing')+1,menu.indexOf('page-vocab'));
- await page.locator('#platformSettings').click();await page.locator('#navOrderSettings > summary').click();await page.locator('[data-order-id="page-vocab"] [data-move=up]').click();await page.reload();await page.locator('#navOrderSettings > summary').click();const moved=await page.locator('#mainNav .nav-btn:not([hidden])').evaluateAll(bs=>bs.map(b=>b.dataset.page));assert.equal(moved.indexOf('page-vocab')+1,moved.indexOf('page-writing'));await page.locator('#resetNavOrder').click();await page.locator('#navOrderSettings > summary').click();
+ assert.equal(await page.locator('#mainNav [data-shell-group]').count(),7);assert.equal(menu.indexOf('page-english')+1,menu.indexOf('page-writing'));
+ await page.locator('#platformSettings').click();await page.locator('#navOrderSettings > summary').click();await page.locator('[data-order-id="page-writing"] [data-move=up]').click();await page.reload();await page.locator('#navOrderSettings > summary').click();const moved=await page.locator('#mainNav .nav-btn:not([hidden])').evaluateAll(bs=>bs.map(b=>b.dataset.page));assert.equal(moved.indexOf('page-writing')+1,moved.indexOf('page-english'));await page.locator('#resetNavOrder').click();await page.locator('#navOrderSettings > summary').click();
  // Hint use is preserved, separated from mistakes and completed only by independent success.
  const qid=await page.evaluate(()=>IGCSE_CATALOG.questions.find(q=>q.subject==='math'&&q.type==='choice').id);
  await page.evaluate(id=>startSessionFromIds([id],'normal',{subject:'math'}),qid);await page.locator('#questionArea [data-hint-button]').click();assert.equal(await page.locator('#questionArea [data-hint-text]').isVisible(),true);

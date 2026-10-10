@@ -41,7 +41,7 @@
         .toast { animation: toastIn .25s ease; }
         @keyframes toastIn { from { transform:translateY(12px); opacity:0; } to { transform:none; opacity:1; } }
         .ms-block { white-space:pre-wrap; }
-    
+
 #mainNav{display:flex;flex-wrap:nowrap;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;white-space:nowrap;touch-action:pan-x}#mainNav::-webkit-scrollbar{display:none}.nav-btn{min-height:44px;flex:0 0 auto;touch-action:manipulation}.btn,button{min-height:44px;touch-action:manipulation;-webkit-tap-highlight-color:transparent}.btn:active,button:active{transform:translateY(1px)}input,select,textarea{font-size:16px;min-height:44px;max-width:100%;box-sizing:border-box}@media (max-width:768px){body{font-size:15px}.page{padding-left:10px;padding-right:10px}.grid,.cards,.stats-grid{grid-template-columns:1fr!important}.table-wrap,.overflow-x-auto{overflow-x:auto;-webkit-overflow-scrolling:touch}.opt-btn{text-align:left;min-height:52px;padding:12px}.modal,.dialog{width:calc(100vw - 20px)!important;max-width:none!important}.toast{max-width:calc(100vw - 24px)}}@media (max-width:430px){h1{font-size:1.55rem}h2{font-size:1.25rem}.nav-btn{font-size:14px;padding:8px 10px}.btn{width:100%;max-width:100%}.page section,.card{border-radius:12px}}button:focus-visible,a:focus-visible,select:focus-visible{outline:3px solid var(--ig-primary);outline-offset:3px}
 </style>
 <link rel="stylesheet" href="data/product.css">
@@ -167,7 +167,7 @@
         <div id="page-english" class="page">
             <div class="bg-white rounded-xl shadow p-4 mb-4">
                 <div class="flex items-center justify-between gap-3 flex-wrap">
-                    <div><h2 class="text-2xl font-bold">🇬🇧 English Learning Center</h2><p class="text-sm text-gray-500 mt-1">IGCSE ESL + CET/Academic English + 学科英语统一学习数据层</p></div>
+                    <div><h2 class="text-2xl font-bold">🇬🇧 英语技能中心</h2><p class="text-sm text-gray-500 mt-1">课程学习 · 专项训练 · 分级写作 · 词汇游戏</p></div>
                     <button id="englishBackBtn" class="bg-indigo-600 text-white px-4 py-2 rounded text-sm">← 返回 IGCSE</button>
                 </div>
                 <div id="englishDashboard" class="grid grid-cols-2 md:grid-cols-3 gap-3 mt-4"></div>
@@ -175,11 +175,11 @@
             <div class="bg-white rounded-xl shadow p-3">
                 <div class="flex flex-wrap gap-2 mb-4">
                     <button class="eng-tab px-3 py-2 rounded border text-sm" data-eng-tab="learn">📚 ESL课程</button>
-                    <button class="eng-tab px-3 py-2 rounded border text-sm" data-eng-tab="vocab">🔤 英语词汇</button>
+                    <button id="englishWordGames" class="px-3 py-2 rounded border text-sm">🎧 词汇与听音游戏</button>
                     <button class="eng-tab px-3 py-2 rounded border text-sm" data-eng-tab="commands">🎯 Command Words</button>
                     <button class="eng-tab px-3 py-2 rounded border text-sm" data-eng-tab="writing">✍️ 写作工作室</button>
                     <button class="eng-tab px-3 py-2 rounded border text-sm" data-eng-tab="practice">📝 练习</button>
-                    <button class="eng-tab px-3 py-2 rounded border text-sm" data-eng-tab="master">🧠 Master Database</button>
+                    <button class="eng-tab px-3 py-2 rounded border text-sm" data-eng-tab="master">📊 学习记录</button>
                 </div>
                 <div id="englishCenterContent"></div>
             </div>
@@ -1049,8 +1049,8 @@ let englishPracticeIndex = 0;
 function renderEnglishPage(tab){
     const dash=document.getElementById('englishDashboard'), c=document.getElementById('englishCenterContent');
     if(!dash||!c) return;
-    const topics=window.IGCSE_ENGLISH_CONTENT||[];
-    const qs=questionData.filter(q=>q.subject==='english');
+    const topics=(window.IGCSE_ENGLISH_CONTENT||[]).filter(t=>!window.englishSkillFilter||String(t.chapter).toLowerCase().includes(window.englishSkillFilter));
+    const qs=questionData.filter(q=>q.subject==='english'&&(!window.englishSkillFilter||String(q.chapter).toLowerCase().includes(window.englishSkillFilter)));
     const st=userState.subjectStats.english||{answered:0,correct:0};
     const rate=st.answered?Math.round(st.correct/st.answered*100):0;
     const em=userState.englishMaster||{vocab:{},grammar:{},sentences:{},commandWords:{}};
@@ -1059,14 +1059,14 @@ function renderEnglishPage(tab){
     dash.innerHTML=[
       ['📚','课程主题',topics.length+' 个学习模块'],
       ['🎯','英语正确率',st.answered?rate+'%':'尚未开始'],
-      ['🔤','Vocabulary Mastery',vMaster+'%'],
+
       ['📐','Grammar Mastery',gMaster+'%'],
-      ['💬','Sentence Mastery',sMaster+'%'],
-      ['🎯','Command Word Mastery',cMaster+'%'],
-      ['🧠','学习路径','Learn → Practice → SRS → Mastery'],
-      ['🚀','下一步',rate<70?'优先完成基础诊断':'进入考试技能训练']
+
+
+
+
     ].map(x=>'<div class="border rounded-xl p-4 bg-slate-50"><div class="text-2xl">'+x[0]+'</div><div class="font-semibold mt-1">'+x[1]+'</div><div class="text-sm text-gray-600 mt-1">'+x[2]+'</div></div>').join('');
-    const active=tab||'learn';
+    const active=tab||'learn';window.englishCenterTab=active;
     if(active==='writing'&&window.IGCSE_WRITING?.open){window.IGCSE_WRITING.open();return;}
     document.querySelectorAll('.eng-tab').forEach(b=>{b.classList.toggle('bg-indigo-600',b.dataset.engTab===active);b.classList.toggle('text-white',b.dataset.engTab===active);});
     if(active==='master'){
@@ -1962,6 +1962,7 @@ document.addEventListener('DOMContentLoaded',function(){
 <script src="data/study_resources.js"></script>
 <script src="data/study_resource_browser.js"></script>
 <script src="data/writing_examples.js"></script>
+<script src="data/writing_path.js"></script>
 <script src="data/writing_studio.js"></script>
 
 <script src="data/learning_workspace.js"></script>
@@ -1972,6 +1973,7 @@ document.addEventListener('DOMContentLoaded',function(){
 <script src="data/subject_sentences.js"></script>
 <script src="data/vocabulary_arcade.js"></script>
 <script src="data/product_shell.js"></script>
+<script src="data/english_center.js"></script>
 <script src="data/study_flow.js"></script>
 <script src="data/study_support.js"></script>
 <script src="data/full_backup.js"></script>
