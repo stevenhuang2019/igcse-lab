@@ -9,7 +9,7 @@ module.exports=async(browser,width,results)=>{
  const freeMode=width===390;
  pilot=createPilot({origin,userFile,usageFile,aiEnabled:false,freeMode,usersJSON:JSON.stringify(users)});
  // The only ignored certificate is this ephemeral local test fixture; production still requires trusted HTTPS.
- const context=await browser.newContext({viewport:{width,height:900},ignoreHTTPSErrors:true}),page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
+ const context=await browser.newContext({viewport:{width,height:900},ignoreHTTPSErrors:true}),page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));require('./legacy_navigation.cjs')(page);
  await context.route('**/*',route=>route.request().url().startsWith(origin+'/')?route.continue():route.abort());
  const login=async id=>{await page.goto(origin+'/login');await page.locator('[name=username]').fill(id);await page.locator('[name=password]').fill(password);await page.getByRole('button',{name:'登录学习平台'}).click();await page.locator('#dbMock').waitFor();};
  try{

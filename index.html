@@ -426,6 +426,7 @@ function switchPage(id){
     if(window.IGCSE_WORKSPACE){if(id==='page-home')id='page-textbook';if(id==='page-assessment')id='page-practice';}
     const target = document.getElementById(id);
     if(!target || !target.classList.contains('page')) return;
+    window.dispatchEvent(new CustomEvent('igcse-before-page-change',{detail:{from:document.querySelector('.page.active')?.id,to:id}}));
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     target.classList.add('active');
     document.querySelectorAll('#mainNav .nav-btn').forEach(b => {
@@ -470,8 +471,8 @@ function openTopic(topic){
     const L = window.getTopicLanguage ? window.getTopicLanguage(topic) : {title:topic.title,body:topic.knowledge||''};
     document.getElementById('topicTitle').innerText = L.title;
     let bodyHtml = '<p class="curriculum-edition">'+esc(window.IGCSE_CURRICULUM?.edition(topic.subject).message||'')+'</p>';
-    if(L.fallback && (window.IGCSE_GLOBAL_LANG||'learn') === 'exam'){
-        bodyHtml += '<div class="mb-3 p-3 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-sm">English content is being expanded for this topic. Bilingual content is shown as a temporary learning fallback.</div>';
+    if(L.fallback){
+        bodyHtml += '<div class="content-fallback-note mb-3 p-3 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-sm">原文暂无英文译文；当前保留中文内容。</div>';
     }
     bodyHtml += L.body || '';
     if(topic.depthNotes?.length){bodyHtml+='<section class="db-panel"><h3>应用与综合训练</h3>'+topic.depthNotes.map(x=>'<p>'+esc(x)+'</p>').join('')+'</section>';}
@@ -612,6 +613,7 @@ function renderQuestion(){
     html += '</div>';
     if(s.mode==='mock') html += '<div class="mock-controls"><button id="mockSubmitEarly">提前交卷</button></div>';
     area.innerHTML = html;
+    area.dataset.examPrompt=String(s.mode==='mock'||s.mode==='paper');
     if(!s.noHints)window.IGCSE_DISCOVERY?.attachHint(area,q,s.mode,(id,level)=>{s.hints=s.hints||{};s.hints[id]=level;});
     const early=document.getElementById('mockSubmitEarly');if(early)early.onclick=()=>{finishPractice();};
     if(window.renderMathInElement){
@@ -1576,20 +1578,17 @@ try { langMode = localStorage.getItem('igcseLangMode') || 'learn'; } catch(e){}
 if(langMode !== 'learn' && langMode !== 'exam') langMode = 'learn';
 
 function questionStemHtml(q){
-    if(q && q.en){
-        if(langMode === 'learn'){
-            return esc(q.en) + (q.zh ? '<div class="text-xs text-gray-400 mt-1 font-normal">' + esc(q.zh) + '</div>' : '');
-        }
-        return esc(q.en);
-    }
-    return (q && q.question) ? q.question : '';
+    if(q && q.en)return '<span data-stem-en data-no-translate>'+esc(q.en)+'</span>'+(q.zh?'<span data-stem-zh data-no-translate class="text-xs text-gray-400 mt-1 font-normal block">'+esc(q.zh)+'</span>':'');
+    return '<span data-no-translate>'+((q&&q.question)||'')+'</span>';
 }
+
 function applyLangToggleLabel(){
     const b = document.getElementById('langToggle');
     if(b) b.textContent = langMode === 'learn' ? '🌐 学习模式·中英' : '🌐 考试模式·英文';
 }
 function setLangMode(mode){
-    langMode = (mode === 'exam') ? 'exam' : 'learn';
+    if(window.setIGCSEGlobalLang){window.setIGCSEGlobalLang(mode);return;}
+    langMode = (mode === 'exam') ? 'exam' : 'bilingual';
     try { localStorage.setItem('igcseLangMode', langMode); } catch(e){}
     applyLangToggleLabel();
     showToast(langMode === 'learn' ? '已切换：中英对照学习模式' : '已切换：纯英文题干考试模式（答案解析仍为中文）');
@@ -1668,10 +1667,10 @@ function renderVocabPage(){
 }
 
 let vocabGame = null;
-function startVocabGame(mode){
-    const rows = window.IGCSE_WORKSPACE?window.IGCSE_WORKSPACE.gamePool():getVocab().filter(v => v.subject === currentSubject);
-    if(rows.length < 4){ showToast('词汇量不足 4 个，无法出题'); return; }
-    vocabGame = { mode: mode, pool: rows.slice(), idx: 0, combo: 0, right: 0, limit: Math.min(10,rows.length), missed: [], _answered: false, _opts: null, _answer: null };
+function startVocabGame(mode, reviewWord){
+    const rows = reviewWord?[reviewWord]:(window.IGCSE_WORKSPACE?window.IGCSE_WORKSPACE.gamePool():getVocab().filter(v => v.subject === currentSubject));
+    if(!reviewWord&&rows.length < 4){ showToast('词汇量不足 4 个，无法出题'); return; }
+    vocabGame = { review:!!reviewWord, distractors:reviewWord?getVocab().filter(v=>v.subject===reviewWord.subject):rows, mode: mode, pool: rows.slice(), idx: 0, combo: 0, right: 0, limit: Math.min(10,rows.length), missed: [], _answered: false, _opts: null, _answer: null };
     nextVocabQuestion();
 }
 function nextVocabQuestion(){
@@ -1687,7 +1686,7 @@ function nextVocabQuestion(){
         return;
     }
     const answer = g.pool[g.idx];
-    const others = shuffle(g.pool.filter(v => v !== answer && v.en !== answer.en && v.zh !== answer.zh).slice()).slice(0, 3);
+    const others = shuffle((g.distractors||g.pool).filter(v => v !== answer && v.en !== answer.en && v.zh !== answer.zh).slice()).slice(0, 3);
     const opts = shuffle(others.concat([answer]));
     g._opts = opts; g._answer = answer;
     const isListen = g.mode === 'listen2zh' || g.mode === 'listen2en';
@@ -1718,6 +1717,7 @@ function answerVocab(i, btn){
     ga.querySelectorAll('[data-vopt]').forEach(b => b.classList.add('disabled'));
     if(correct){
         g.right++; g.combo++;
+        if(g.review){const record=userState.vocabMistakes.find(m=>m.key===g._answer.subject+'::'+g._answer.en);if(record){record.srsStage=Math.min(3,(record.srsStage||0)+1);record.reviewedCount=(record.reviewedCount||0)+1;record.mastered=record.srsStage>=3;record.nextReviewAt=new Date(Date.now()+[1,3,7,14][record.srsStage]*864e5).toISOString();saveUserState(userState);window.IGCSE_SHELL?.refreshVocabReview();}}
         addXp(5);
         if(g.combo === 3) showToast('🎉 连对 3 词！');
         else if(g.combo === 5) showToast('🔥 连对 5 词！');
@@ -1739,7 +1739,7 @@ function recordVocabMistake(v){
     userState.vocabMistakes = userState.vocabMistakes || [];
     const key = (v.subject || '') + '::' + v.en;
     const ex = userState.vocabMistakes.find(m => m.key === key);
-    if(ex){ ex.wrongCount = (ex.wrongCount || 0) + 1; ex.nextReviewAt = new Date(Date.now() + 864e5).toISOString(); }
+    if(ex){ex.mastered=false;ex.srsStage=0; ex.wrongCount = (ex.wrongCount || 0) + 1; ex.nextReviewAt = new Date(Date.now() + 864e5).toISOString(); }
     else {
         userState.vocabMistakes.push({ key: key, subject: v.subject, en: v.en, zh: v.zh, chapter: v.chapter || '', wrongCount: 1, srsStage: 0, nextReviewAt: new Date(Date.now() + 864e5).toISOString() });
     }
@@ -1927,22 +1927,7 @@ document.addEventListener('DOMContentLoaded',function(){
   draw();learn();
 });
 </script><script src="data/igcse_language_pack.js"></script><script src="data/language_engine.js"></script>
-<script>
-(function(){
-  function languageBar(){
-    if(document.getElementById('igcse-language-bar')) return;
-    var bar=document.createElement('div');bar.id='igcse-language-bar';bar.className='fixed bottom-3 left-1/2 -translate-x-1/2 z-50 bg-white border shadow-lg rounded-full px-2 py-1 flex gap-1 text-xs';
-    bar.innerHTML='<span class="px-2 py-1 text-slate-500">学习语言</span><button data-lang-mode="learn" class="px-2 py-1 rounded-full">中英学习</button><button data-lang-mode="bilingual" class="px-2 py-1 rounded-full">中英对照</button><button data-lang-mode="exam" class="px-2 py-1 rounded-full">English Only</button>';
-    document.body.appendChild(bar);
-    bar.querySelectorAll('[data-lang-mode]').forEach(function(b){b.onclick=function(){window.setIGCSEGlobalLang(b.dataset.langMode);highlight();rerender();};});
-    function highlight(){var m=window.IGCSE_GLOBAL_LANG||'learn';bar.querySelectorAll('[data-lang-mode]').forEach(function(b){b.classList.toggle('bg-indigo-600',b.dataset.langMode===m);b.classList.toggle('text-white',b.dataset.langMode===m);});}
-    function rerender(){if(typeof renderTopicList==='function'&&document.getElementById('page-learn')&&document.getElementById('page-learn').classList.contains('active')){if(currentTopicId){var t=contentData.find(function(x){return x.topicId===currentTopicId});if(t&&typeof openTopic==='function')openTopic(t);}else renderTopicList();}if(typeof renderQuestion==='function'&&practiceSession&&document.getElementById('page-practice')&&document.getElementById('page-practice').classList.contains('active'))renderQuestion();if(typeof renderVocabPage==='function'&&document.getElementById('page-vocab')&&document.getElementById('page-vocab').classList.contains('active'))renderVocabPage();}
-    highlight();
-  }
-  window.addEventListener('DOMContentLoaded',languageBar);
-  window.addEventListener('igcse-language-change',function(){});
-})();
-</script><script src="data/chapter_learning_engine.js"></script>
+<script src="data/chapter_learning_engine.js"></script>
 
 <script src="data/mastery_engine.js"></script>
 <script src="data/user_state_schema.js"></script>
@@ -1971,6 +1956,8 @@ document.addEventListener('DOMContentLoaded',function(){
 
 <script src="data/learning_workspace.js"></script>
 <script src="data/learning_discovery.js"></script>
+<script src="data/interface_strings.js"></script>
+<script src="data/product_shell.js"></script>
 <script>
 // Use existing navigation handlers so history restores page-specific views too.
 function restoreLearningRoute(){

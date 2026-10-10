@@ -89,6 +89,7 @@
         '<div class="border rounded-2xl p-5"><div class="text-xs text-indigo-600 font-bold">'+esc(command(q))+' · '+esc(skill(q))+'</div><div class="text-lg font-semibold mt-2">'+questionStemHtml(q)+'</div>'+
         (q.type==='choice'?'<div class="grid gap-2 mt-4">'+(q.options||[]).map((o,i)=>'<button data-ans="'+i+'" class="border rounded-lg p-3 text-left hover:bg-indigo-50">'+String.fromCharCode(65+i)+'. '+o+'</button>').join('')+'</div>':'<textarea id="ceEssay" class="w-full border rounded-lg p-3 mt-4 h-28" placeholder="写出你的答案，再对照 Mark Scheme 自查"></textarea><button id="ceEssayBtn" class="mt-2 bg-indigo-600 text-white px-4 py-2 rounded-lg">查看解析</button>')+
         questionMeta(q)+'<div id="ceFeedback" class="mt-4"></div></div>';
+      ceBody.dataset.examPrompt=String(mode!=='practice');
       window.IGCSE_DISCOVERY?.attachHint(ceBody,q,mode==='practice'?'chapter':'test',(id,level)=>{session.hints=session.hints||{};session.hints[id]=level;});
       if(q.type==='choice')ceBody.querySelectorAll('[data-ans]').forEach(x=>x.onclick=()=>answer(q,Number(x.dataset.ans)));
       if(q.type!=='choice')ceEssayBtn.onclick=()=>selfCheck(q);

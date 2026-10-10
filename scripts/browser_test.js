@@ -22,6 +22,9 @@ const server=http.createServer((req,res)=>{
    const started=Date.now();await page.goto(base+'/#page-dashboard');await page.locator('#dbMock').waitFor();
    const performance=await page.evaluate(()=>({domReadyMs:Math.round(window.performance.getEntriesByType('navigation')[0].domContentLoadedEventEnd),localAssetBytes:window.performance.getEntriesByType('resource').filter(r=>r.name.startsWith(location.origin)).reduce((n,r)=>n+r.decodedBodySize,0)}));
    assert.ok(performance.domReadyMs<5000,'startup budget '+width);assert.ok(performance.localAssetBytes<3*1024*1024,'local asset budget '+width);metrics.push({width,...performance});
+   await require('./shell_browser.cjs')(page,width,results);
+   require('./legacy_navigation.cjs')(page);
+   if(process.env.SHELL_ONLY){assert.deepEqual(errors,[]);await context.close();continue;}
    if(!process.env.DISCOVERY_ONLY)await require('./workspace_browser.cjs')(page,width,results);
    await require('./discovery_browser.cjs')(page,width,results);
    if(process.env.WORKSPACE_ONLY||process.env.DISCOVERY_ONLY){assert.deepEqual(errors,[]);await context.close();continue;}
@@ -168,7 +171,7 @@ const server=http.createServer((req,res)=>{
     assert.equal(await page.evaluate(()=>userState.questionStats.cs1d_q3.lastCorrect),true);
     await page.locator('#dashboard-nav').click();await page.locator('#subjectSelect').selectOption('english');
     assert.equal(await page.locator('#page-dashboard.active').count(),1);
-    assert.match(await page.locator('.db-hero').textContent(),/英语/);
+    assert.match(await page.locator('.page.active .db-hero').textContent(),/英语/);
    }
    await page.goto(base);await page.locator('#dbProgress').waitFor();assert.equal(await page.locator('#page-dashboard.active').count(),1,'default landing');
    await require('./content_expansion_browser.cjs')(page,width,results);
