@@ -101,6 +101,10 @@ window.IGCSE_INTERFACE_STRINGS=[
   "No units match the current profile. The material below is preview-only; answers and teaching status cannot be saved."
  ],
  [
+  "我已查看内容，确认替换当前账号的学习记录、草稿、收藏和附件",
+  "I reviewed the contents and confirm replacing this account’s learning records, drafts, saved resources and files."
+ ],
+ [
   "暂无匹配要点。此学科资料可能仍待补充，可前往教材学习。",
   "No matching reference. Some subject materials still need expansion; visit textbook learning."
  ],
@@ -129,6 +133,10 @@ window.IGCSE_INTERFACE_STRINGS=[
   "Platform levels and assessment bands provide learning feedback, not official exam grades."
  ],
  [
+  "本轮深化 · Selected objectives",
+  "Selected objective reinforcement"
+ ],
+ [
   "写出你的答案，再对照 Mark Scheme 自查",
   "Write an answer, then compare it with the marking points"
  ],
@@ -139,6 +147,10 @@ window.IGCSE_INTERFACE_STRINGS=[
  [
   "尚无达到本站证据门槛的主题，继续独立练习积累记录。",
   "No topics meet the local evidence threshold yet. Keep practising independently to build evidence."
+ ],
+ [
+  "完整备份格式无效或内容损坏，请使用本站导出的文件。",
+  "Invalid or damaged backup. Use a file exported by this platform."
  ],
  [
   "没有待提示的本站先修单元；不代表完整基础已掌握。",
@@ -183,6 +195,10 @@ window.IGCSE_INTERFACE_STRINGS=[
  [
   "当前科目没有这类资料。请先上传教材或作业。",
   "No materials of this type for the selected subject. Upload a textbook or homework file first."
+ ],
+ [
+  "高级选项 · 分开导出学习记录、草稿或附件",
+  "Advanced · Export records, drafts or files separately"
  ],
  [
   "无译文时显示原文；切换保留未提交的回答。",
@@ -281,6 +297,10 @@ window.IGCSE_INTERFACE_STRINGS=[
   "Statistics & probability"
  ],
  [
+  "完整备份已生成，请保留下载文件。",
+  "Complete backup created. Keep the downloaded file."
+ ],
+ [
   "本站 IGCSE 平均掌握估计",
   "Average local IGCSE mastery estimate"
  ],
@@ -311,6 +331,10 @@ window.IGCSE_INTERFACE_STRINGS=[
  [
   "对比 AI 检查前与当前草稿",
   "Compare earlier and current drafts"
+ ],
+ [
+  "先下载当前快照，再恢复并刷新",
+  "Download current snapshot, then restore and reload"
  ],
  [
   "没有匹配词汇，请调整筛选。",
@@ -473,6 +497,10 @@ window.IGCSE_INTERFACE_STRINGS=[
   "AI grammar & expression check"
  ],
  [
+  "样例深化，非完整覆盖",
+  "Reinforcement samples, not complete coverage"
+ ],
+ [
   "课程地图与练习覆盖",
   "Course map & practice coverage"
  ],
@@ -607,6 +635,14 @@ window.IGCSE_INTERFACE_STRINGS=[
  [
   "正在读取关联资料…",
   "Loading linked materials..."
+ ],
+ [
+  "正在生成完整备份…",
+  "Creating complete backup..."
+ ],
+ [
+  "正在校验备份内容…",
+  "Checking backup contents..."
  ],
  [
   "章节 / 要点组",
@@ -921,6 +957,18 @@ window.IGCSE_INTERFACE_STRINGS=[
   "No earlier snapshot"
  ],
  [
+  "完整学习备份包",
+  "Complete learning backup"
+ ],
+ [
+  "下载完整备份包",
+  "Download complete backup"
+ ],
+ [
+  "选择完整备份包",
+  "Choose complete backup"
+ ],
+ [
   "打开语言选择",
   "Open language choices"
  ],
@@ -1147,6 +1195,10 @@ window.IGCSE_INTERFACE_STRINGS=[
  [
   "快照读取失败",
   "Could not load snapshot"
+ ],
+ [
+  "官方考纲依据",
+  "Official syllabus reference"
  ],
  [
   "练习与测评",

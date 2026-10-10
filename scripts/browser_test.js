@@ -22,6 +22,7 @@ const server=http.createServer((req,res)=>{
    const started=Date.now();await page.goto(base+'/#page-dashboard');await page.locator('#dbMock').waitFor();
    const performance=await page.evaluate(()=>({domReadyMs:Math.round(window.performance.getEntriesByType('navigation')[0].domContentLoadedEventEnd),localAssetBytes:window.performance.getEntriesByType('resource').filter(r=>r.name.startsWith(location.origin)).reduce((n,r)=>n+r.decodedBodySize,0)}));
    assert.ok(performance.domReadyMs<5000,'startup budget '+width);assert.ok(performance.localAssetBytes<3*1024*1024,'local asset budget '+width);metrics.push({width,...performance});
+   await require('./full_backup_browser.cjs')(page,width,results);
    await require('./study_flow_browser.cjs')(page,width,results);
    await require('./shell_browser.cjs')(page,width,results);
    require('./legacy_navigation.cjs')(page);
@@ -67,7 +68,7 @@ const server=http.createServer((req,res)=>{
    assert.ok(await page.evaluate(()=>userState.learnedTopics.includes('cs0478_8_files')));
    await page.locator('#dashboard-nav').click();await page.locator('#dbSyllabusAudit summary').click();
    await page.getByRole('button',{name:'练习 8.3',exact:true}).click();
-   assert.equal(await page.evaluate(()=>practiceSession.order.length),11);
+   assert.equal(await page.evaluate(()=>practiceSession.order.length),14);
    assert.ok(await page.evaluate(()=>practiceSession.order.every(id=>{const q=findQuestion(id);return q.syllabus==='0478'&&q.syllabusYear==='2026-2028'&&q.syllabusRef==='8.3';})));
    const fileQuestionType=await page.evaluate(()=>findQuestion(practiceSession.order[practiceSession.idx]).type);
    if(fileQuestionType==='choice')await page.locator('#questionArea .opt-btn').first().click();

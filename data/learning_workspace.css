@@ -40,3 +40,4 @@
 @media(min-width:768px){#writingViews{display:none}}
 @media(max-width:767px){#page-writing[data-writing-view=draft] [data-writing-pane=model],#page-writing[data-writing-view=feedback] [data-writing-pane=model],#page-writing[data-writing-view=model] [data-writing-pane=editor]{display:none}}
 @media(max-width:767px){#page-writing[data-writing-view=feedback] [data-writing-pane=editor]>label,#page-writing[data-writing-view=feedback] #writingWordCount,#page-writing[data-writing-view=feedback] #writingLocalHints{display:none}}
+#fullBackup button{display:inline-block;max-width:100%;min-height:44px;border:1px solid #c7d2fe;border-radius:10px;padding:10px 14px;margin:6px 0;background:#eef2ff;color:#4338ca}#fullBackup button:disabled{opacity:.5}#fullBackup label{display:block;margin:14px 0;line-height:1.6}#fullBackup input[type=file]{display:block;max-width:100%;margin-top:8px}#fullBackupStatus{margin:12px 0}#separateBackupDetails>summary{cursor:pointer;font-weight:600}

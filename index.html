@@ -318,6 +318,7 @@
 <script src="data/structured_tasks.js"></script>
 <script src="data/objective_coverage.js"></script>
 <script src="data/igcse_release_depth.js"></script>
+<script src="data/igcse_gap_depth.js"></script>
 <script src="data/learning_catalog.js"></script>
 <script>
 /* ===================== 用户状态管理 ===================== */
@@ -475,6 +476,7 @@ function openTopic(topic){
         bodyHtml += '<div class="content-fallback-note mb-3 p-3 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-sm">原文暂无英文译文；当前保留中文内容。</div>';
     }
     bodyHtml += L.body || '';
+    if(topic.reinforcement){const r=topic.reinforcement;bodyHtml+='<section class="db-panel"><h3>本轮深化 · Selected objectives</h3><div data-no-translate lang="en">'+esc(r.en)+'</div><details class="lang-zh"><summary>查看中文解释</summary><p data-no-translate>'+esc(r.zh)+'</p></details><h4>Worked example</h4><p data-no-translate>'+esc(r.example)+'</p><p>'+esc(r.refs.join(' / '))+' · <a href="'+esc(topic.sourceUrl)+'#page='+r.page+'" target="_blank" rel="noopener">官方考纲依据</a> · 样例深化，非完整覆盖</p></section>'; }
     if(topic.depthNotes?.length){bodyHtml+='<section class="db-panel"><h3>应用与综合训练</h3>'+topic.depthNotes.map(x=>'<p>'+esc(x)+'</p>').join('')+'</section>';}
     if(topic.workedExample){bodyHtml+='<section class="db-panel"><h3>例题与推理</h3><p>'+esc(topic.workedExample)+'</p><p>学习目标：'+(topic.objectives||[]).map(esc).join('；')+'</p><p>关联细目：'+(topic.objectiveRefs||[]).map(esc).join('、')+' · '+esc(topic.tier||'未分层')+'</p><ul>'+(topic.checklist||[]).map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul><p>原创教学样例，尚不代表全部考纲细目。<a href="'+esc(topic.sourceUrl)+'" target="_blank" rel="noopener">官方考纲</a></p></section>';}
     if(topic.formulas && topic.formulas.length){
@@ -1960,6 +1962,7 @@ document.addEventListener('DOMContentLoaded',function(){
 <script src="data/product_shell.js"></script>
 <script src="data/study_flow.js"></script>
 <script src="data/study_support.js"></script>
+<script src="data/full_backup.js"></script>
 <script>
 // Use existing navigation handlers so history restores page-specific views too.
 function restoreLearningRoute(){
