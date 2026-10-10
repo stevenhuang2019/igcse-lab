@@ -26,6 +26,4 @@
 
 ## 英语语法速查
 
-学习工具 → 速查卡 → 英语，按需加载与训练营相同的24主题，分为基础、IGCSE核心、雅思应用三组。保留写作/阅读术语组，支持分组与关键词搜索；加载失败保留原有速查并提供重试。
-
-Cambridge未发布封闭的英语ESL语法与词汇清单，因此本站按常见基础/应用训练补充，不声明官方完整覆盖：[官方说明](https://help.cambridgeinternational.org/hc/en-gb/articles/28783145916690-What-grammatical-structures-and-vocabulary-are-expected-Is-there-a-list)。
+本轮扩充暂缓，保留原有速查卡功能。新增语法内容可在英语技能中心的语法训练营中学习。
