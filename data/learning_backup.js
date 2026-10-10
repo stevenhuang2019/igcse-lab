@@ -23,6 +23,7 @@
   for(const day of Object.values(s.activityByDay||{})){if(!object(day))fail();for(const r of Object.values(day))counts(r);}
   for(const e of Object.values(s.errorDiagnosis||{})){if(!object(e)||!object(e.subjects)||!Array.isArray(e.questions)||!e.questions.every(x=>typeof x==='string')||!Number.isInteger(e.count)||e.count<0||!Object.values(e.subjects).every(x=>Number.isInteger(x)&&x>=0))fail();}
   for(const key of ['subjects','topics'])if(s.progress?.[key]!==undefined&&!object(s.progress[key]))fail();
+  if(s.vocabArcade!==undefined){if(!object(s.vocabArcade)||!object(s.vocabArcade.records)||Object.keys(s.vocabArcade.records).length>10000)fail();for(const [id,r] of Object.entries(s.vocabArcade.records)){if(id.length>300||!object(r))fail();for(const n of ['wrong','correct','stage','lastQualifiedAt','nextReviewAt','lastSeenAt'])if(!Number.isSafeInteger(r[n])||r[n]<0)fail();if(r.stage>3||typeof r.mastered!=='boolean'||typeof r.flagged!=='boolean')fail();}}
   for(const key of ['vocab','grammar','sentences','commandWords'])if(s.englishMaster?.[key]!==undefined&&!object(s.englishMaster[key]))fail();
   if(s.hintReviews)for(const [id,r] of Object.entries(s.hintReviews)){if(!window.IGCSE_CATALOG.question(id)||!object(r)||r.qid!==id||r.subject!==window.IGCSE_CATALOG.question(id).subject||typeof r.lastHintAt!=='number'||!Number.isFinite(r.lastHintAt)||!Number.isInteger(r.level)||r.level<1||r.level>2||!['pending','complete'].includes(r.status))fail();}
   for(const r of s.mistakes||[])if(!object(r)||typeof (r.questionId||r.qid||r.id)!=='string')fail();

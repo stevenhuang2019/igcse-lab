@@ -1,7 +1,7 @@
 const assert=require('node:assert/strict'),path=require('node:path');
 module.exports=async(page,width,results)=>{
  console.log('shell',width);await page.locator('#mainNav [data-shell-group]').first().waitFor({state:'attached'});
- assert.equal(await page.locator('#subjectSelect').isVisible(),false);assert.equal(await page.locator('#langToggle').isVisible(),false);assert.equal(await page.locator('#igcse-language-bar').count(),0);assert.equal(await page.locator('#mainNav [data-shell-group]').count(),5);
+ assert.equal(await page.locator('#subjectSelect').isVisible(),false);assert.equal(await page.locator('#langToggle').isVisible(),false);assert.equal(await page.locator('#igcse-language-bar').count(),0);assert.equal(await page.locator('#mainNav [data-shell-group]').count(),6);
  const source=await page.evaluate(()=>JSON.stringify(userState));
  const group=page.locator((width<768?'#mobileNavigation':'#mainNav')+' [data-shell-group="tools"]');await group.click();await page.locator('#mainNav [data-page="page-writing"]').click();assert.equal(await page.locator('#page-writing.active').count(),1);if(width<768)assert.equal(await page.locator('#learningSidebar').isVisible(),false);
  await page.locator('#writingDraft').fill('A draft that must survive interface and content language changes.');const draft=await page.locator('#writingDraft').inputValue();

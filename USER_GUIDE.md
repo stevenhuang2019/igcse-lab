@@ -72,3 +72,7 @@ macOS：解压交付包，双击 `start-local.command`。需要本机已有 Pyth
 我的成长 → 学习备份，可下载完整包，包含学习记录、草稿、收藏与原附件；选择包预览并确认后恢复，先下载当前快照。详见 FULL_BACKUP_GUIDE.md。附件合计最多 30 MiB，不提供自动云同步。
 
 六科新增 18 道原创练习/任务与中英推理示例，进入对应教材主题的“本轮深化”。细目与版本见 CONTENT_DEPTH_ROUND2.md，仍是样例深化，D&T 暂缓。
+
+## 词汇游戏中心
+
+主导航「词汇游戏」提供独立游戏模块，可按七科、章节、CET4/CET6起步集或综合练习。支持六种玩法、错词加强与间隔复习。当前CET各20词、听句63条、语法12题，非完整考频词表。详见 [VOCABULARY_ARCADE_GUIDE.md](VOCABULARY_ARCADE_GUIDE.md)。
