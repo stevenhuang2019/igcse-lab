@@ -88,7 +88,7 @@ window.IGCSE_INTERFACE_STRINGS=[
  ],
  [
   "IGCSE ESL + CET/Academic English + 学科英语统一学习数据层",
-  "Shared language learning layer for IGCSE ESL, academic English and subject English; CET starter training is available in Vocabulary arcade."
+  "Shared language learning layer for IGCSE ESL, academic English and subject English; Imported CET vocabulary training is available in Vocabulary arcade."
  ],
  [
   "同组功能可调整顺序；手机或键盘可使用上移 / 下移。恢复建议顺序后，写作工作室位于词汇前。",

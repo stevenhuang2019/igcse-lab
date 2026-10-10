@@ -75,4 +75,4 @@ macOS：解压交付包，双击 `start-local.command`。需要本机已有 Pyth
 
 ## 词汇游戏中心
 
-主导航「词汇游戏」提供独立游戏模块，可按七科、章节、CET4/CET6起步集或综合练习。支持六种玩法、错词加强与间隔复习。当前CET各20词、听句63条、语法12题，非完整考频词表。详见 [VOCABULARY_ARCADE_GUIDE.md](VOCABULARY_ARCADE_GUIDE.md)。
+主导航「词汇游戏」提供独立游戏模块，可按七科、章节、CET4/CET6词库或综合练习。支持六种玩法、错词加强与间隔复习。当前CET4 3301词、CET6 1821词，支持字母分组和高频重点筛选；七科新增70条原创例句，听句共2838条、语法12题。导入词表未按官方完整考纲或考频核验。详见 [VOCABULARY_ARCADE_GUIDE.md](VOCABULARY_ARCADE_GUIDE.md)。
