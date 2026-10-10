@@ -1111,7 +1111,7 @@ function openEnglishTopic(t){
     c.innerHTML='<div class="border rounded-xl p-5"><button id="engBackLearn" class="text-sm text-indigo-600 mb-3">← 返回英语课程</button><h3 class="text-xl font-bold">'+esc(t.title)+'</h3><p class="mt-3 text-gray-700">'+esc(t.knowledge)+'</p><h4 class="font-semibold mt-5 mb-2">Learning Objectives</h4><ul class="list-disc ml-5 text-sm">'+(t.objectives||[]).map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul><h4 class="font-semibold mt-5 mb-2">Common Mistake</h4><div class="bg-amber-50 border border-amber-200 rounded p-3 text-sm">'+esc(t.commonMistake)+'</div><button id="engTopicPractice" class="mt-4 bg-indigo-600 text-white px-4 py-2 rounded">练习本模块</button></div>';
     if(/Writing/i.test(t.chapter||t.examSkill||'')){const b=document.createElement('button');b.textContent='进入写作工作室：范文与 AI 辅助';b.className='material-entry';b.onclick=()=>window.IGCSE_WRITING.open();c.append(b);}
     document.getElementById('engBackLearn').onclick=()=>renderEnglishPage('learn');
-    document.getElementById('engTopicPractice').onclick=()=>{const qids=questionData.filter(q=>q.subject==='english'&&q.topicId===t.topicId).map(q=>q.id);if(qids.length)startSessionFromIds(qids,'normal',{topicId:t.topicId,label:'English · '+t.title});else showToast('该模块题库准备中');};
+    document.getElementById('engTopicPractice').onclick=()=>{const qids=questionData.filter(q=>q.subject==='english'&&q.topicId===t.topicId).map(q=>q.id);if(qids.length){setCurrentSubjectSafe('english');startSessionFromIds(qids,'normal',{subject:'english',topicId:t.topicId,label:'English · '+t.title});}else showToast('该模块题库准备中');};
 }
 function answerEnglish(q,idx){
     const picked=(q.options||[])[idx], correct=picked===q.answer;
