@@ -19,13 +19,15 @@
  function actions(items){return '<div class="ws-actions">'+items.map(([id,text])=>'<button type="button" data-ws-route="'+id+'">'+text+'</button>').join('')+'</div>';}
  function bindRoutes(root){root.querySelectorAll('[data-ws-route]').forEach(b=>b.onclick=()=>go(b.dataset.wsRoute));}
  function go(id){if(id==='page-english'){renderEnglishPage();switchPage(id);return;}const b=document.querySelector('#mainNav [data-page="'+id+'"]');if(b)b.click();else switchPage(id);}
- function rememberTopic(topic){prefs.lastTopic={subject:topic.subject,id:topic.topicId};save();}
+ function rememberTopic(topic){prefs.lastTopic={subject:topic.subject,id:topic.topicId};prefs.lastTopics=prefs.lastTopics||{};prefs.lastTopics[topic.subject]=topic.topicId;save();}
  function renderLearning(){
   const area=document.getElementById('learningCenterTools'),list=document.getElementById('topicList'),today=document.getElementById('learningToday');if(!area)return;
   const key='learn:'+subject(),filter=prefs[key]||{chapter:'',search:''},ts=topics(),chapters=[...new Set(ts.map(t=>t.chapter||'其他'))];
   if(!chapters.includes(filter.chapter))filter.chapter='';prefs[key]=filter;
   area.replaceChildren(chips(subject(),s=>{selectSubject(s);renderLearning();}));
   const controls=document.createElement('div');controls.className='ws-filters';controls.innerHTML='<label>章节 / 单元<select id="learningChapter">'+options(chapters,filter.chapter,'全部章节')+'</select></label><label>查找知识点<input id="learningSearch" type="search" placeholder="标题或知识点" value="'+esc(filter.search)+'"></label>'+actions([['page-materials','教材与作业资料'],['page-curriculum','学校进度'],['page-advanced','AS / A Level'],['page-writing','英语写作'],['page-english','英语技能中心']]);area.append(controls);bindRoutes(area);
+  const lastId=prefs.lastTopics?.[subject()]||(prefs.lastTopic?.subject===subject()?prefs.lastTopic.id:null),last=lastId&&window.IGCSE_CATALOG.topic(subject(),lastId);
+  if(last&&ts.some(t=>t.topicId===last.topicId)){const resume=document.createElement('button');resume.id='resumeStudyTopic';resume.className='ws-resume';resume.textContent='继续上次主题：'+last.title;resume.onclick=()=>openTopic(last);controls.append(resume);}
   document.getElementById('topicContent').classList.add('hidden');list.hidden=false;today.hidden=false;
   const renderList=()=>{const query=filter.search.trim().toLowerCase(),rows=ts.filter(t=>(!filter.chapter||(t.chapter||'其他')===filter.chapter)&&(!query||(t.title+' '+t.chapter).toLowerCase().includes(query)));
    list.innerHTML='<p class="ws-count" role="status">'+rows.length+' 个知识点 · 已读与掌握分别记录</p>'+rows.map(t=>'<button class="ws-topic topic-card" data-topic-id="'+esc(t.topicId)+'"><span><b>'+esc(t.title)+'</b><small>'+esc(t.chapter)+' · '+(window.IGCSE_CURRICULUM?.labels[window.IGCSE_CURRICULUM.status(subject(),t.topicId)]||'未设置学校进度')+'</small></span><span>'+(window.IGCSE_TOPIC_WORKSPACE?.stateLabel(t)||(userState.learnedTopics.includes(t.topicId)?'已读':'未读'))+' · '+window.IGCSE_CATALOG.questionsFor(subject(),t.topicId).length+' 题 →</span></button>').join('')+(!rows.length?'<p>没有匹配的知识点，试试其他章节或关键词。</p>':'');
@@ -47,7 +49,7 @@
   if(tab==='mistakes')go('page-mistake');
   if(tab==='mock')renderMockEntry();
  }
- function clearPractice(){practiceSession=null;stopMockTimer();document.getElementById('questionArea').replaceChildren();document.getElementById('practiceResult').classList.add('hidden');}
+ function clearPractice(){practiceSession=null;window.IGCSE_TOPIC_WORKSPACE?.syncPractice(null);stopMockTimer();document.getElementById('questionArea').replaceChildren();document.getElementById('practiceResult').classList.add('hidden');}
  function renderPractice(){
   const hub=document.getElementById('practiceHub'),el=document.getElementById('practiceTopicSelect');
   hub.replaceChildren(chips(subject(),s=>{if(userState.mockExams?.activePractice){showToast('请先继续或交卷当前模拟考');return;}clearPractice();selectSubject(s);renderPractice();}));
@@ -63,9 +65,9 @@
  }
  function enhanceDashboard(){
   const page=document.getElementById('page-dashboard');if(!page||page.querySelector('#continueLearning'))return;
-  const hero=page.querySelector('.db-hero'),d=window.IGCSE_DASHBOARD.day(),last=prefs.lastTopic;
+  const hero=page.querySelector('.db-hero'),d=window.IGCSE_DASHBOARD.day();
   const cta=document.createElement('div');cta.className='ws-actions';cta.innerHTML='<button id="continueLearning" class="ws-primary">继续学习 →</button><button id="dashboardPractice">练习与测评</button>';hero.prepend(cta);
-  cta.querySelector('#continueLearning').onclick=()=>{if(last&&window.IGCSE_CATALOG.topic(last.subject,last.id)){selectSubject(last.subject);go('page-textbook');openTopic(window.IGCSE_CATALOG.topic(last.subject,last.id));}else go('page-textbook');};cta.querySelector('#dashboardPractice').onclick=()=>go('page-practice');
+  cta.querySelector('#continueLearning').onclick=()=>{const last=prefs.lastTopic;if(last&&window.IGCSE_CATALOG.topic(last.subject,last.id)){selectSubject(last.subject);go('page-textbook');openTopic(window.IGCSE_CATALOG.topic(last.subject,last.id));}else go('page-textbook');};cta.querySelector('#dashboardPractice').onclick=()=>go('page-practice');
   const tasks=page.querySelector('.db-tasks');if(tasks&&tasks.children.length>3){const more=document.createElement('details');more.className='ws-more';more.innerHTML='<summary>其余今日任务（'+(tasks.children.length-3)+'）</summary>';while(tasks.children.length>3)more.append(tasks.children[3]);tasks.after(more);}
   const school=Array.from(page.querySelectorAll(':scope > .db-panel')).find(p=>p.querySelector('h3')?.textContent==='学校学习安排');if(school){const actions=page.querySelector('#dbMaterials').parentElement;actions.prepend(school.querySelector('#dbCurriculum'),school.querySelector('#dbPath'));const detail=document.createElement('details');detail.className='ws-more';detail.innerHTML='<summary>学校安排与学习路径</summary>';school.replaceWith(detail);detail.append(school);}
   const overview=page.querySelector('.db-subjects');overview.querySelectorAll('button').forEach(b=>{const original=b.onclick;b.innerHTML+='<small>学习章节 →</small>';b.onclick=()=>{original();go('page-textbook');};});

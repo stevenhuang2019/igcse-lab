@@ -1,5 +1,7 @@
 /* Authored interface translations. Learning material and learner text remain separate. */
 window.IGCSE_INTERFACE_STRINGS=[
+ ["继续上次主题：","Resume last topic: "],
+ ["返回本主题讲解：","Return to lesson: "],
  [
   "复制模板，按学校实际进度编辑后预览。只更新列出的 IGCSE 章节／补基础章节，不改变作答、掌握度或其他科目。状态：unstarted 未教、current 正在学、taught 已教、review 复习。AS/A Level 单元在高级课程入口单独安排。",
   "Copy the template, edit it to match school progress, then preview. Only the listed IGCSE or foundation chapters are updated; answers, mastery and other subjects are preserved. Status: unstarted, current, taught or review. AS/A Level units are planned separately in Advanced courses."

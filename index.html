@@ -591,6 +591,7 @@ function findQuestion(id){
 function renderQuestion(){
     if(!practiceSession){ return; }
     const s = practiceSession;
+    window.IGCSE_TOPIC_WORKSPACE?.syncPractice(s);
     if(s.mode==='mock'&&Date.now()-s.startedAt>=s.timeLimitSec*1000){s.timedOut=true;finishPractice();return;}
     const q = findQuestion(s.order[s.idx]);
     if(!q){ finishPractice(); return; }

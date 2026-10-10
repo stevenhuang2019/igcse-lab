@@ -41,3 +41,10 @@
 @media(max-width:767px){#page-writing[data-writing-view=draft] [data-writing-pane=model],#page-writing[data-writing-view=feedback] [data-writing-pane=model],#page-writing[data-writing-view=model] [data-writing-pane=editor]{display:none}}
 @media(max-width:767px){#page-writing[data-writing-view=feedback] [data-writing-pane=editor]>label,#page-writing[data-writing-view=feedback] #writingWordCount,#page-writing[data-writing-view=feedback] #writingLocalHints{display:none}}
 #fullBackup button{display:inline-block;max-width:100%;min-height:44px;border:1px solid #c7d2fe;border-radius:10px;padding:10px 14px;margin:6px 0;background:#eef2ff;color:#4338ca}#fullBackup button:disabled{opacity:.5}#fullBackup label{display:block;margin:14px 0;line-height:1.6}#fullBackup input[type=file]{display:block;max-width:100%;margin-top:8px}#fullBackupStatus{margin:12px 0}#separateBackupDetails>summary{cursor:pointer;font-weight:600}
+
+.ws-resume{flex-basis:100%;text-align:left}#topicWorkspacePanel p{white-space:pre-wrap;line-height:1.75}#topicWorkspace .ws-tabs{display:grid;grid-template-columns:repeat(6,minmax(0,1fr))}#topicWorkspace .ws-tabs button{padding:8px 4px}#returnStudyTopic{max-width:100%;text-align:left;overflow-wrap:anywhere}
+@media(max-width:600px){#topicWorkspace .ws-tabs{grid-template-columns:repeat(3,minmax(0,1fr))}#topicWorkspace{padding:10px}#topicStudyState{font-size:.85rem;line-height:1.6}}
+
+/* Once a lesson is open, its own steps replace the catalogue controls. */
+#page-textbook:has(#topicContent:not(.hidden)) #learningCenterTools{display:none}
+#topicContent>.mt-4{position:static;z-index:auto}
