@@ -4,3 +4,9 @@ test-results/
 # Generated, pinned document readers are bundled in release artifacts.
 vendor/*.mjs
 vendor/mammoth.browser.min.js
+
+# Private invitation credentials and deployment configuration.
+.pilot/
+.private/
+.env*
+*.invite
