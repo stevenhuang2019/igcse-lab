@@ -2,9 +2,9 @@
 (function(){
  'use strict';
  const en=()=>window.IGCSE_SHELL?.getLanguage()==='en',label=(zh,english)=>en()?english:zh;
- let cleanup=()=>{};
+ let cleanup=()=>{},onHide=()=>{};
  function source(q){return q?.audioTranscript||String(q?.question||'').match(/[“"]([^”"]+)[”"]/)?.[1]||'';}
- function stop(){cleanup();cleanup=()=>{};window.IGCSE_SPEECH?.cancel();}
+ function stop(){window.IGCSE_LISTENING_WORKSHOP?.stop();cleanup();cleanup=()=>{};onHide=()=>{};window.IGCSE_SPEECH?.cancel();}
  function panel(parent,kind,text,onReveal){
   stop();const box=document.createElement('section');box.className='english-media-panel';box.dataset.noTranslate='';
   const heading=document.createElement('h3');heading.textContent=label(kind==='listening'?'🎧 听前预测 → 播放 → 作答':'🎤 思考 → 录音 → 回放 → 自查',kind==='listening'?'🎧 Predict → Listen → Answer':'🎤 Plan → Record → Replay → Reflect');box.append(heading);
@@ -14,7 +14,7 @@
   box.append(play,status);parent.append(box);
   if(kind==='listening'){
    const note=document.createElement('p');note.textContent=label('本站原创合成语音训练，非官方录音。首次点播放启用声音；进入新题后可再次点播放。','Original synthesized practice, not official exam audio. Tap play to enable sound and replay each new item.');
-   const details=document.createElement('details');const summary=document.createElement('summary');summary.textContent=label('学习辅助：查看听力原文','Study support: reveal transcript');const transcript=document.createElement('p');transcript.lang='en';transcript.textContent=text;details.append(summary,transcript);if(onReveal)details.addEventListener('toggle',()=>{if(details.open)onReveal();});box.append(note,details);play.click();return box;
+   const details=document.createElement('details');const summary=document.createElement('summary');summary.textContent=label('学习辅助：查看听力原文','Study support: reveal transcript');const transcript=document.createElement('p');transcript.lang='en';transcript.textContent=text;details.append(summary,transcript);if(onReveal)details.addEventListener('toggle',()=>{if(details.open)onReveal();});box.append(note,details);if(window.IGCSE_LISTENING_WORKSHOP){const launch=document.createElement('button');launch.id='openListeningWorkshop';launch.textContent=label('🎯 完整对话题组（3组）','🎯 Full dialogue sets (3)');launch.onclick=()=>window.IGCSE_LISTENING_WORKSHOP.open(parent);box.append(launch);}play.click();return box;
   }
   const note=document.createElement('p');note.textContent=label('录音仅保存在当前页面，刷新后清除；可下载到本机。回放自查不是自动评分，也不推算考试等级。','Recordings remain in this tab until reload; download to keep them. Replay and reflection are not automatic grading or an exam level.');box.append(note);
   const start=document.createElement('button'),end=document.createElement('button');start.id='englishRecordStart';end.id='englishRecordStop';start.textContent=label('● 开始录音（最长90秒）','● Record (up to 90 seconds)');end.textContent=label('■ 停止录音','■ Stop recording');end.disabled=true;box.append(start,end);
@@ -22,13 +22,14 @@
   const checks=document.createElement('fieldset');const legend=document.createElement('legend');legend.textContent=label('回放后自查','Reflect after replay');checks.append(legend);for(const [zh,eng] of [['回答紧扣问题','I answered the question'],['给出了理由和例子','I included a reason and an example'],['表达清楚、停顿合理','My speech was clear with useful pauses']]){const row=document.createElement('label'),input=document.createElement('input');input.type='checkbox';row.append(input,document.createTextNode(label(zh,eng)));checks.append(row);}box.append(checks);
   let recorder,stream,url,timer,disposed=false,pending=false;
   const release=()=>{clearTimeout(timer);stream?.getTracks().forEach(t=>t.stop());stream=null;};
+  onHide=()=>{if(recorder?.state==='recording')recorder.stop();release();};
   cleanup=()=>{disposed=true;if(recorder?.state==='recording')recorder.stop();release();if(url)URL.revokeObjectURL(url);player.pause();player.removeAttribute('src');player.load();};
   start.onclick=async()=>{
    if(pending||recorder?.state==='recording')return;
    if(!navigator.mediaDevices?.getUserMedia||!window.MediaRecorder){status.textContent=label('此浏览器不支持录音，请使用 HTTPS 下的 Chrome 或 Safari。','Recording is unavailable. Use Chrome or Safari over HTTPS.');return;}
    pending=true;start.disabled=true;status.textContent=label('请允许麦克风权限…','Please allow microphone permission…');
    try{
-    stream=await navigator.mediaDevices.getUserMedia({audio:true});if(disposed||!box.isConnected){release();return;}
+    stream=await navigator.mediaDevices.getUserMedia({audio:true});if(disposed||!box.isConnected||document.hidden){release();if(!disposed){start.disabled=false;status.textContent=label('已暂停，返回后可重新录音。','Paused. You can record again when you return.');}return;}
     const mime=['audio/webm;codecs=opus','audio/mp4','audio/webm'].find(t=>MediaRecorder.isTypeSupported?.(t));recorder=new MediaRecorder(stream,mime?{mimeType:mime}:undefined);const chunks=[];
     recorder.ondataavailable=e=>{if(e.data.size)chunks.push(e.data);};
     recorder.onstop=()=>{release();if(disposed||!box.isConnected)return;start.disabled=false;end.disabled=true;if(!chunks.length){status.textContent=label('没有录到声音，请重试。','No recording was captured. Try again.');return;}if(url)URL.revokeObjectURL(url);const blob=new Blob(chunks,{type:recorder.mimeType||mime||'audio/webm'});url=URL.createObjectURL(blob);player.src=url;player.hidden=false;download.href=url;download.download='igcse-speaking.'+(blob.type.includes('mp4')?'m4a':'webm');download.hidden=false;status.textContent=label('录音完成，请回放并自查。','Recording ready. Replay and reflect.');};
@@ -59,6 +60,6 @@
  const original=window.openEnglishTopic;
  window.openEnglishTopic=function(t){original(t);currentTopic=t;const old=document.querySelector('#englishCenterContent .mt-3.text-gray-700');if(old){const notesRoot=document.createElement('div');notesRoot.id='englishTopicNotes';notesRoot.className=old.className;notesRoot.dataset.noTranslate='';old.replaceWith(notesRoot);document.querySelector('#englishCenterContent .content-fallback-note')?.remove();refreshNotes(t);}const kind=/listening/i.test(t.chapter)?'listening':/speaking/i.test(t.chapter)?'speaking':'';if(!kind){stop();return;}const qs=IGCSE_CATALOG.questionsFor('english',t.topicId);const q=qs.find(q=>source(q))||qs[0];const text=source(q)||(kind==='speaking'?'Describe an activity you enjoy. Explain why you enjoy it and give a personal example.':'Listen for the main idea. Then listen again for details and any changes to the first plan.');const media=panel(document.getElementById('englishCenterContent'),kind,text);document.getElementById('englishTopicNotes')?.before(media);};
  function attachQuestion(q,area,s){stop();if(q.subject!=='english'||['mock','paper'].includes(s.mode))return;const topic=IGCSE_CATALOG.topic('english',q.topicId);const category=['listening','speaking'].includes(q.skill)?q.skill:topic?.chapter||q.chapter||'';const kind=/listening/i.test(category)?'listening':/speaking/i.test(category)?'speaking':'';if(!kind)return;const text=source(q);if(kind==='listening'&&text){area.querySelector('.q-body').textContent=String(q.question).replace(text,label('[请听音源]','[listen to the audio]'));}const media=panel(area,kind,text||q.question,()=>{s.hints=s.hints||{};s.hints[q.id]=true;});area.querySelector('.q-body')?.after(media);}
- window.addEventListener('igcse-before-page-change',stop);document.addEventListener('visibilitychange',()=>{if(document.hidden)stop();});
+ window.addEventListener('igcse-before-page-change',stop);document.addEventListener('visibilitychange',()=>{if(document.hidden){onHide();window.IGCSE_SPEECH?.cancel();}});
  window.IGCSE_ENGLISH_MEDIA={attachQuestion,stop,source};
 })();
