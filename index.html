@@ -719,8 +719,8 @@ function markAnswered(q, isCorrect, area){
     }
     if(fb){
         fb.innerHTML = (isCorrect
-            ? '<div class="border border-green-200 bg-green-50 text-green-800 rounded-lg p-3 text-sm">回答正确！+'+ (q.xpReward||10) +' XP' + (q.explain ? '<div class="mt-1 text-green-700">' + q.explain + '</div>' : '') + '</div>'
-            : '<div class="border border-red-200 bg-red-50 text-red-800 rounded-lg p-3 text-sm">回答错误，已记入错题本。<div class="mt-1"><span class="font-semibold">正确答案：</span>' + (q.answer || '') + '</div>' + (q.explain ? '<div class="mt-1 text-red-700">' + q.explain + '</div>' : '') + '</div>');
+            ? '<div class="border border-green-200 bg-green-50 text-green-800 rounded-lg p-3 text-sm">回答正确！+'+ (q.xpReward||10) +' XP' + (q.explain ? '<div class="mt-1 text-green-700">' + questionExplanation(q) + '</div>' : '') + '</div>'
+            : '<div class="border border-red-200 bg-red-50 text-red-800 rounded-lg p-3 text-sm">回答错误，已记入错题本。<div class="mt-1"><span class="font-semibold">正确答案：</span>' + (q.answer || '') + '</div>' + (q.explain ? '<div class="mt-1 text-red-700">' + questionExplanation(q) + '</div>' : '') + '</div>');
         if(window.renderMathInElement) renderMathInElement(fb, { delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}] });
     }
     const next = document.createElement('div');
@@ -762,7 +762,7 @@ function showEssaySelfCheck(q, area){
     fb.innerHTML = '<div class="border border-slate-200 bg-slate-50 rounded-lg p-3 text-sm">'
         + '<div class="font-semibold mb-1">'+(q.rubric?'原创参考要点 · 自评，非官方评分':'参考答案 / Mark Scheme')+'</div>'
         + '<div class="ms-block text-gray-700">' + esc(q.answer || '') + '</div>'
-        + (q.explain ? '<div class="mt-1 text-gray-600">' + q.explain + '</div>' : '')
+        + (q.explain ? '<div class="mt-1 text-gray-600">' + questionExplanation(q) + '</div>' : '')
         + (q.rubric?'<ul>'+q.rubric.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>':'')
         + '<div class="mt-3 flex gap-2"><button data-self="ok" class="bg-green-600 text-white px-3 py-1.5 rounded text-sm">我答对了</button><button data-self="no" class="bg-red-600 text-white px-3 py-1.5 rounded text-sm">我答错了</button></div></div>';
     fb.querySelector('[data-self=ok]').onclick = () => { markAnswered(q, true, area); };
@@ -877,7 +877,7 @@ function renderMistakePage(){
             + '<div class="mb-2">' + (q.question || '') + '</div>'
             + (q.type === 'choice' ? '<div class="text-sm text-gray-600">你的选项 / 正确答案：<b class="text-green-700">' + (q.answer || '') + '</b></div>' : '')
             + '<div class="text-sm mt-1 text-gray-600">参考答案：<span class="ms-block">' + esc(q.answer || '') + '</span></div>'
-            + (q.explain ? '<div class="text-sm mt-1 text-gray-600">解析：' + q.explain + '</div>' : '')
+            + (q.explain ? '<div class="text-sm mt-1 text-gray-600">解析：' + questionExplanation(q) + '</div>' : '')
             + '<button class="remove-mistake bg-green-600 text-white px-3 py-1 rounded mt-2 text-sm" data-qid="' + q.id + '">标记已掌握</button>';
         container.appendChild(div);
         if(window.renderMathInElement) renderMathInElement(div, { delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}] });
@@ -1129,7 +1129,7 @@ function answerEnglish(q,idx){
     window.dispatchEvent(new CustomEvent('igcse-answer-recorded',{detail:{topicId:q.topicId,qid:q.id,subject:'english',correct:correct,srs:false,pastPaper:!!q.pastPaper,pastPaperType:q.pastPaperType||'official'}}));
     addXp(correct?10:3);
     const fb=document.getElementById('engFeedback');
-    fb.innerHTML=correct?'<div class="bg-green-50 border border-green-200 rounded p-3 text-green-700">✓ Correct · '+esc(q.explain||'')+'</div>':'<div class="bg-red-50 border border-red-200 rounded p-3 text-red-700">✗ 正确答案：'+esc(q.answer)+'<div class="mt-1">'+esc(q.explain||'')+'</div></div>';
+    fb.innerHTML=correct?'<div class="bg-green-50 border border-green-200 rounded p-3 text-green-700">✓ Correct · '+questionExplanation(q)+'</div>':'<div class="bg-red-50 border border-red-200 rounded p-3 text-red-700">✗ 正确答案：'+esc(q.answer)+'<div class="mt-1">'+questionExplanation(q)+'</div></div>';
     englishPracticeIndex++; setTimeout(()=>renderEnglishPage('practice'),250);
 }
 document.querySelectorAll('.eng-tab').forEach(b=>b.onclick=()=>renderEnglishPage(b.dataset.engTab));
@@ -1236,8 +1236,8 @@ function answerAssessment(optIdx){
     });
     const fb = area.querySelector('.q-feedback');
     fb.innerHTML = (isCorrect
-        ? '<div class="border border-green-200 bg-green-50 text-green-800 rounded-lg p-3 text-sm">回答正确！' + (q.explain ? '<div class="mt-1 text-green-700">' + q.explain + '</div>' : '') + '</div>'
-        : '<div class="border border-red-200 bg-red-50 text-red-800 rounded-lg p-3 text-sm">回答错误。<div class="mt-1"><span class="font-semibold">正确答案：</span>' + (q.answer || '') + '</div>' + (q.explain ? '<div class="mt-1 text-red-700">' + q.explain + '</div>' : '') + '</div>');
+        ? '<div class="border border-green-200 bg-green-50 text-green-800 rounded-lg p-3 text-sm">回答正确！' + (q.explain ? '<div class="mt-1 text-green-700">' + questionExplanation(q) + '</div>' : '') + '</div>'
+        : '<div class="border border-red-200 bg-red-50 text-red-800 rounded-lg p-3 text-sm">回答错误。<div class="mt-1"><span class="font-semibold">正确答案：</span>' + (q.answer || '') + '</div>' + (q.explain ? '<div class="mt-1 text-red-700">' + questionExplanation(q) + '</div>' : '') + '</div>');
     if(window.renderMathInElement) renderMathInElement(fb, { delimiters: ASSESS_DELIMS });
     const isLast = s.idx >= s.order.length - 1;
     const nxt = area.querySelector('.q-next');
@@ -1527,7 +1527,7 @@ function renderMockReport(id,area){
     const report=window.IGCSE_MOCK_ENGINE.report(record);
     const box=document.createElement('section');box.className='mock-report';box.id='mockDetailedReport';
     box.innerHTML='<h3>客观题样例检查 · '+(report.accuracy===null?'没有客观总分':report.accuracy+'%')+'</h3>'+(report.legacy?'<p>旧报告保留生成时的统计口径，未重新分类为客观能力。</p>':'')+'<p>'+(report.legacy?'原统计 ':'客观检查 ')+report.correct+'/'+report.objectiveTotal+' 题正确 · '+report.unanswered+' 题未答</p><p>开放回答已保存 '+report.openAnswered+'/'+report.openTotal+'，需要自查或独立评价；准备任务已答 '+report.preparationAnswered+'/'+report.preparationTotal+'。不计入客观正确率。</p><p>'+esc(report.recommendation)+'</p><h4>优先复习主题</h4><ul>'+report.weakTopics.filter(t=>t.accuracy<85).map(t=>{const topic=contentData.find(x=>x.topicId===t.topic);return '<li>'+esc(topic?.title||t.topic)+' · '+t.correct+'/'+t.total+(topic?' <button class="mock-action" data-report-topic="'+esc(t.topic)+'">针对练习</button>':'')+'</li>';}).join('')+'</ul>';
-    box.innerHTML+='<details><summary>查看逐题答案与解析</summary>'+record.questionIds.map(id=>{const q=findQuestion(id);if(!q)return '';const raw=record.answers?.[id],picked=raw===undefined?'未作答':q.options?.[raw]??raw;return '<article class="mt-4"><b>'+esc(q.question)+'</b><p>你的答案：'+esc(picked)+'</p><p>参考答案：'+esc(q.answer)+'</p><p>'+esc(q.explain||'')+'</p></article>';}).join('')+'</details>';
+    box.innerHTML+='<details><summary>查看逐题答案与解析</summary>'+record.questionIds.map(id=>{const q=findQuestion(id);if(!q)return '';const raw=record.answers?.[id],picked=raw===undefined?'未作答':q.options?.[raw]??raw;return '<article class="mt-4"><b>'+esc(q.question)+'</b><p>你的答案：'+esc(picked)+'</p><p>参考答案：'+esc(q.answer)+'</p><p>'+questionExplanation(q)+'</p></article>';}).join('')+'</details>';
     area.append(box);box.querySelectorAll('[data-report-topic]').forEach(b=>b.onclick=()=>gotoTopicPractice(b.dataset.reportTopic));
 }
 window.addEventListener('beforeunload',()=>{if(practiceSession?.mode==='mock')window.IGCSE_MOCK_ENGINE.saveActive(practiceSession);});
@@ -1587,6 +1587,11 @@ function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '
 let langMode = 'learn';
 try { langMode = localStorage.getItem('igcseLangMode') || 'learn'; } catch(e){}
 if(langMode !== 'learn' && langMode !== 'exam') langMode = 'learn';
+
+function questionExplanation(q){
+    if(!q.explainZh)return q.explain||'';
+    return '<div data-no-translate lang="en">'+esc(q.explain||'')+'</div><details class="lang-zh"><summary>中文解析 / Chinese explanation</summary><p data-no-translate lang="zh-CN">'+esc(q.explainZh)+'</p></details>';
+}
 
 function questionStemHtml(q){
     const context=(q?.stimulus?'<details class="question-stimulus" open><summary>Reading / Task text</summary><p data-no-translate lang="en">'+esc(q.stimulus)+'</p></details>':'')+(q?.code?'<pre class="question-code" data-no-translate>'+esc(q.code)+'</pre>':'');
@@ -1973,6 +1978,7 @@ document.addEventListener('DOMContentLoaded',function(){
 <script src="data/arcade_rewards.js"></script>
 <script src="data/cet_vocabulary.js"></script>
 <script src="data/subject_sentences.js"></script>
+<script src="data/arcade_options.js"></script>
 <script src="data/vocabulary_arcade.js"></script>
 <script src="data/grammar_training.js"></script>
 <script src="data/listening_workshop.js"></script>

@@ -25,6 +25,7 @@ const server=http.createServer((req,res)=>{
    await require('./vocabulary_arcade_browser.cjs')(page,width,results);
    await require('./english_center_browser.cjs')(page,width,results);
    await require('./arcade_flow_browser.cjs')(page,width,results);
+   await require('./options_language_browser.cjs')(page,width,results);
    await require('./english_media_browser.cjs')(page,width,results);
    await require('./grammar_chapters_browser.cjs')(page,width,results,expectedHTTP);
    await require('./full_backup_browser.cjs')(page,width,results);
