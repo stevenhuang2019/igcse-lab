@@ -6,7 +6,7 @@
     if(!s||!d.qid)return;
     s.questionStats=s.questionStats||{};
     const q=s.questionStats[d.qid]=s.questionStats[d.qid]||{answered:0,correct:0,subject:d.subject,topicId:d.topicId};
-    q.answered++;if(d.correct)q.correct++;
+    q.answered++;if(d.correct)q.correct++;if(d.assisted){q.assistedAnswered=(q.assistedAnswered||0)+1;if(d.correct)q.assistedCorrect=(q.assistedCorrect||0)+1;}
     const now=new Date(),day=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
     s.activityByDay=s.activityByDay||{};s.activityByDay[day]=s.activityByDay[day]||{};
     const activity=s.activityByDay[day][d.subject]=s.activityByDay[day][d.subject]||{answered:0,correct:0};

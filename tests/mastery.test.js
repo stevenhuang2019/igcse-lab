@@ -38,3 +38,12 @@ test('ordinary practice scheduling cannot overwrite measured SRS retention',()=>
  assert.equal(s.srsRetention,60);assert.equal(s.srsReviews,2);
  assert.ok(w.IGCSE_SRS.getCard('t','math','q0').lastReviewedAt);
 });
+
+test('hint-assisted success never establishes independent mastery or inflates SRS retention',()=>{
+ const {window:w,stats:s,run,emit}=setup();run('srs_engine.js');s.answered=5;s.correct=5;s.recentResults=[true];
+ for(let i=0;i<5;i++)w.userState.questionStats['q'+i]={answered:1,correct:1,assistedAnswered:1,assistedCorrect:1};
+ const evidence=w.getTopicMasteryEvidence('t','math');assert.equal(evidence.objectiveAttempts,0);assert.equal(evidence.assisted,5);assert.equal(evidence.established,false);
+ s.srsReviews=2;s.srsRetention=60;const card=w.IGCSE_SRS.getCard('t','math','q0');card.reviews=3;card.correct=2;card.interval=20;
+ emit({qid:'q0',topicId:'t',subject:'math',correct:true,assisted:true,srs:true});
+ assert.equal(s.srsRetention,60);assert.equal(s.srsReviews,2);assert.equal(card.correct,2);assert.equal(card.reviews,3);assert.equal(card.assistedReviews,1);assert.ok(new Date(card.dueAt)-Date.now()<86401000);
+});
