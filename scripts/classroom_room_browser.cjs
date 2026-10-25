@@ -2,7 +2,7 @@ const assert=require('node:assert/strict'),path=require('node:path');
 module.exports=async(browser,page,origin,password,width,results)=>{
  const context=await browser.newContext({viewport:{width,height:900},ignoreHTTPSErrors:true}),student=await context.newPage(),errors=[];student.on('pageerror',e=>errors.push(e.message));await context.route('**/*',route=>route.request().url().startsWith(origin+'/')?route.continue():route.abort());
  try{await student.goto(origin+'/login');await student.locator('[name=username]').fill('student2');await student.locator('[name=password]').fill(password);await student.getByRole('button',{name:'登录学习平台'}).click();await student.locator('#dbMock').waitFor();
- for(const p of [page,student]){await p.locator('#pilotClassroomOpen').click();await p.locator('#classroomCreate').waitFor();}
+ for(const p of [page,student]){await p.evaluate(()=>IGCSE_ARCADE.open());await p.locator('#arcadeOnline').click();await p.locator('#classroomCreate').waitFor();}
  assert.equal(await student.locator('#classroomRefresh').isVisible(),false);assert.equal(await student.evaluate(async()=> (await fetch('/api/classroom/admin')).status),403);await page.getByText('学生成长汇总',{exact:false}).first().waitFor();
  await page.locator('#classroomBank').selectOption('cet4');await page.locator('#classroomSize').fill('5');await page.locator('#classroomCreate').click();await page.locator('#classroomRoom h3').first().waitFor();const code=(await page.locator('#classroomRoom h3').first().textContent()).match(/[A-F0-9]{6}/)[0];
  await page.locator('#pilotClassroomOpen').click();await page.locator('#classroomLeave').waitFor({timeout:3000});

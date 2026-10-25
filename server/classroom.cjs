@@ -34,5 +34,18 @@ function createRooms({words=[],now=Date.now,random=Math.random}={}){
 }
 module.exports={createRooms,validateSummary,createCloudStore};
 let cachedWords;
-function classroomWords(){if(cachedWords)return cachedWords;const fs=require('node:fs'),vm=require('node:vm'),path=require('node:path'),w={};for(const file of ['vocab.js','cet_vocabulary.js'])vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../data',file),'utf8'),{window:w},{timeout:2000});return cachedWords=[...(w.SUBJECT_VOCAB||[]),...(w.IGCSE_CET_VOCAB||[])];}
+function classroomWords(){
+ if(cachedWords)return cachedWords;
+ const fs=require('node:fs'),vm=require('node:vm'),path=require('node:path'),root=path.resolve(__dirname,'..');
+ const w={addEventListener(){},openEnglishTopic(){}},ctx=vm.createContext({window:w,document:{addEventListener(){}},Date});
+ const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
+ for(const match of html.matchAll(/<script src="(data\/[^"\n]+\.js)"><\/script>/g)){
+  vm.runInContext(fs.readFileSync(path.join(root,match[1]),'utf8'),ctx,{timeout:2000});
+  if(match[1]==='data/learning_catalog.js')break;
+ }
+ vm.runInContext(fs.readFileSync(path.join(root,'data/cet_vocabulary.js'),'utf8'),ctx,{timeout:2000});
+ const rows=[...(w.SUBJECT_VOCAB||[]),...(w.IGCSE_CET_VOCAB||[])];
+ for(const t of w.IGCSE_CATALOG.topics.filter(t=>t.subject==='computer_science'))for(const word of t.vocabulary||[]){const en=Array.isArray(word)?word[0]:word.en,zh=Array.isArray(word)?word[1]:word.zh;if(en&&zh)rows.push({subject:t.subject,chapter:t.chapter,en,zh});}
+ return cachedWords=rows;
+}
 module.exports.classroomWords=classroomWords;
