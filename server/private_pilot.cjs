@@ -1,5 +1,6 @@
 'use strict';
 const http=require('node:http'),fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
+const {createRooms,validateSummary,createCloudStore,classroomWords:loadClassroomWords}=require('./classroom.cjs');
 const {createServer,config}=require('./material_ai.cjs');
 const root=path.resolve(__dirname,'..'),cookieName='__Host-igcsePilot';
 const hashPassword=(password,salt)=>crypto.scryptSync(password,salt,64).toString('hex');
@@ -10,7 +11,7 @@ function loadUsers(file){
 function validateUsers(users){
  if(!Array.isArray(users)||!users.length||users.length>20)throw new Error('Expected 1–20 invited users');
  const ids=new Set();for(const u of users){
-  if(!u||!/^[a-zA-Z0-9][a-zA-Z0-9_-]{0,39}$/.test(u.id)||ids.has(u.id)||! /^[a-f0-9]{32}$/.test(u.salt)||! /^[a-f0-9]{128}$/.test(u.hash)||typeof u.enabled!=='boolean')throw new Error('Invalid invitation record');ids.add(u.id);
+  if(!u||!/^[a-zA-Z0-9][a-zA-Z0-9_-]{0,39}$/.test(u.id)||ids.has(u.id)||! /^[a-f0-9]{32}$/.test(u.salt)||! /^[a-f0-9]{128}$/.test(u.hash)||typeof u.enabled!=='boolean')throw new Error('Invalid invitation record');if(u.role!==undefined&&!['admin','student'].includes(u.role))throw new Error('Invalid user role');ids.add(u.id);
  }return users;
 }
 function quotaStore(file,userLimit,globalLimit,now){
@@ -29,7 +30,7 @@ function quotaStore(file,userLimit,globalLimit,now){
  }return {remaining,reserve};
 }
 function boundedInt(value,fallback,max){const n=value===undefined?fallback:Number(value);if(!Number.isInteger(n)||n<1||n>max)throw new Error('Invalid pilot limit');return n;}
-function createPilot({origin,userFile,usageFile,provider='deepseek',key,model,fetcher=fetch,topicsFor,now=Date.now,userLimit=20,globalLimit=100,aiEnabled=true,freeMode=false,usersJSON}={}){
+function createPilot({origin,userFile,usageFile,provider='deepseek',key,model,fetcher=fetch,topicsFor,now=Date.now,userLimit=20,globalLimit=100,aiEnabled=true,freeMode=false,usersJSON,classroomStore,cloudURL,cloudKey,classroomWords}={}){
  const publicURL=new URL(origin);if(publicURL.protocol!=='https:'||publicURL.origin!==origin||publicURL.username||publicURL.password)throw new Error('Pilot requires an exact HTTPS origin');
  let readUsers;
  if(freeMode){
@@ -42,6 +43,8 @@ function createPilot({origin,userFile,usageFile,provider='deepseek',key,model,fe
  }
  userLimit=boundedInt(userLimit,20,100);globalLimit=boundedInt(globalLimit,100,1000);
  const quota=quotaStore(freeMode?null:usageFile,userLimit,globalLimit,now),sessions=new Map(),attempts=new Map();
+ const cloud=classroomStore||createCloudStore({url:cloudURL,key:cloudKey});let roomHub;const hub=()=>roomHub||(roomHub=createRooms({words:classroomWords||loadClassroomWords(),now}));
+ const summaryWrites=new Map(),roomWrites=new Map();
  const app=createServer({provider,key:aiEnabled?key:undefined,model,fetcher,topicsFor,publicOrigin:origin});
  function headers(res){res.setHeader('Cache-Control','no-store');res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','no-referrer');res.setHeader('Content-Security-Policy',"frame-ancestors 'none'; base-uri 'self'; object-src 'none'");res.setHeader('Strict-Transport-Security','max-age=31536000');}
  const json=(res,status,value)=>{res.writeHead(status,{'Content-Type':'application/json'});res.end(JSON.stringify(value));};
@@ -78,6 +81,34 @@ function createPilot({origin,userFile,usageFile,provider='deepseek',key,model,fe
    if(!id)return url.pathname.startsWith('/api/')?json(res,401,{error:'请先使用受邀账号登录'}):redirect(res,'/login');
    if(url.pathname.startsWith('/api/')){
     if(req.headers['x-igcse-user']!==id)return json(res,403,{error:'账号已切换，请刷新页面'});
+    if(url.pathname.startsWith('/api/classroom/')){
+     const user=readUsers().find(u=>u.id===id),admin=user.role==='admin';
+     if(url.pathname==='/api/classroom/me'&&req.method==='GET')return json(res,200,{user:id,role:admin?'admin':'student',cloudConfigured:!!cloud});
+     if(url.pathname==='/api/classroom/admin'&&req.method==='GET'){
+      if(!admin)return json(res,403,{error:'仅管理员可查看学生汇总'});if(!cloud)return json(res,503,{error:'云端统计尚未配置'});
+      const allowed=new Set(readUsers().filter(u=>u.enabled).map(u=>u.id)),rows=await cloud.list();return json(res,200,{students:readUsers().filter(u=>u.enabled&&u.role!=='admin').map(u=>u.id),rows:rows.filter(r=>allowed.has(r.user_id)).map(r=>({user:r.user_id,date:r.day,summary:validateSummary(r.summary),updatedAt:r.updated_at}))});
+     }
+     if(url.pathname==='/api/classroom/room'&&req.method==='GET'){try{return json(res,200,hub().view(id,url.searchParams.get('code')));}catch{return json(res,404,{error:'房间已结束、已过期或你未加入'});}}
+     if(req.method!=='POST')return json(res,405,{error:'请使用 POST'});
+     if(!sameOrigin())return json(res,403,{error:'只允许本站请求'});if(!req.headers['content-type']?.startsWith('application/json'))return json(res,415,{error:'请使用 JSON'});
+     const body=JSON.parse(await readBody(req));
+     if(url.pathname==='/api/classroom/summary'){
+      if(!cloud)return json(res,503,{error:'云端统计尚未配置；本机学习记录仍保留'});
+      let summary;try{summary=validateSummary(body);}catch{return json(res,400,{error:'统计格式不正确'});}
+      const today=new Date(now()).toLocaleDateString('en-CA',{timeZone:'Asia/Shanghai'});if(summary.date!==today)return json(res,400,{error:'仅同步今天的学习统计（北京时间）'});
+      if(now()-(summaryWrites.get(id)||0)<10000)return json(res,429,{error:'请稍后再同步'});summaryWrites.set(id,now());await cloud.put(id,summary);return json(res,200,{ok:true,syncedAt:new Date(now()).toISOString()});
+     }
+     const recent=roomWrites.get(id)||[];const times=recent.filter(t=>now()-t<10000);if(times.length>=30)return json(res,429,{error:'请求过快'});times.push(now());roomWrites.set(id,times);
+     try{
+      const code=body.code;
+      if(url.pathname==='/api/classroom/rooms')return json(res,200,hub().create(id,body));
+      if(url.pathname==='/api/classroom/join')return json(res,200,hub().join(id,code));
+      if(url.pathname==='/api/classroom/start')return json(res,200,hub().start(id,code));
+      if(url.pathname==='/api/classroom/answer')return json(res,200,hub().answer(id,code,body));
+      if(url.pathname==='/api/classroom/leave')return json(res,200,hub().leave(id,code));
+     }catch(e){return json(res,400,{error:({ 'Already answered':'本题已提交','Answer window closed':'本题作答时间已结束','Need two players':'至少两人加入后可开始','Host already has a room':'请先退出或关闭你之前的房间' })[e.message]||'房间操作失败，请检查房间码、人数或词库数量'});}
+     return json(res,404,{error:'接口不存在'});
+    }
     if(url.pathname==='/api/ai/status'&&req.method==='GET')return json(res,200,{configured:aiEnabled&&Boolean(key),provider,model,liveValidated:false});
     if(url.pathname==='/api/pilot/status'&&req.method==='GET')return json(res,200,{user:id,aiEnabled:aiEnabled&&Boolean(key),quota:{...quota.remaining(id),persistent:!freeMode}});
     if(['/api/materials/analyse','/api/writing/coach'].includes(url.pathname)&&req.method==='POST'){
@@ -87,17 +118,18 @@ function createPilot({origin,userFile,usageFile,provider='deepseek',key,model,fe
    }
    if(url.pathname==='/'||url.pathname==='/index.html'){
     if(!['GET','HEAD'].includes(req.method))return json(res,405,{error:'请使用 GET'});
-    const markup=fs.readFileSync(path.join(root,'index.html'),'utf8').replace('<head>','<head><script src="/pilot/storage.js" data-user="'+id+'"></script>').replace(/<body([^>]*)>/,'<body$1><aside style="background:#eef2ff;color:#312e81;padding:8px;font-size:14px">私人测试版 · '+id+' · 资料仍保存在本机浏览器 <span id="pilotQuota"></span> <button id="pilotLogout" style="margin-left:8px">退出登录</button></aside>');
+    const markup=fs.readFileSync(path.join(root,'index.html'),'utf8').replace('<head>','<head><script src="/pilot/storage.js" data-user="'+id+'"></script><script defer src="/pilot/classroom.js"></script>').replace(/<body([^>]*)>/,'<body$1><aside style="background:#eef2ff;color:#312e81;padding:8px;font-size:14px">私人测试版 · '+id+' · 学习正文保存在本机浏览器 · 学习统计可同步管理员 <span id="pilotQuota"></span> <button id="pilotLogout" style="margin-left:8px">退出登录</button></aside>');
     res.setHeader('Content-Type','text/html; charset=utf-8');return res.end(req.method==='HEAD'?'':markup);
    }
    if(url.pathname==='/pilot/storage.js'&&req.method==='GET'){res.setHeader('Content-Type','text/javascript');return res.end(fs.readFileSync(path.join(__dirname,'pilot_storage.js')));}
+   if(url.pathname==='/pilot/classroom.js'&&req.method==='GET'){res.setHeader('Content-Type','text/javascript');return res.end(fs.readFileSync(path.join(__dirname,'classroom_client.js')));}
    app.emit('request',req,res);
   }catch{if(!res.headersSent)json(res,503,{error:'私人测试服务暂时不可用，请联系管理员'});else res.end();}
  });server.requestTimeout=30000;server.headersTimeout=15000;server.keepAliveTimeout=5000;return server;
 }
 function deploymentOrigin(env){return env.IGCSE_PUBLIC_ORIGIN||(env.RENDER==='true'?env.RENDER_EXTERNAL_URL:undefined);}
 if(require.main===module){try{
- const c=config(),server=createPilot({origin:deploymentOrigin(process.env),freeMode:process.env.IGCSE_PILOT_STORAGE==='environment',usersJSON:process.env.IGCSE_PILOT_USERS_JSON,userFile:process.env.IGCSE_PILOT_USERS_FILE,usageFile:process.env.IGCSE_PILOT_USAGE_FILE,...c,userLimit:process.env.IGCSE_PILOT_USER_DAILY_LIMIT,globalLimit:process.env.IGCSE_PILOT_GLOBAL_DAILY_LIMIT,aiEnabled:process.env.IGCSE_PILOT_AI_ENABLED==='true'});
+ const c=config(),server=createPilot({cloudURL:process.env.IGCSE_CLOUD_URL,cloudKey:process.env.IGCSE_CLOUD_SERVICE_KEY,origin:deploymentOrigin(process.env),freeMode:process.env.IGCSE_PILOT_STORAGE==='environment',usersJSON:process.env.IGCSE_PILOT_USERS_JSON,userFile:process.env.IGCSE_PILOT_USERS_FILE,usageFile:process.env.IGCSE_PILOT_USAGE_FILE,...c,userLimit:process.env.IGCSE_PILOT_USER_DAILY_LIMIT,globalLimit:process.env.IGCSE_PILOT_GLOBAL_DAILY_LIMIT,aiEnabled:process.env.IGCSE_PILOT_AI_ENABLED==='true'});
  const port=boundedInt(process.env.PORT,4174,65535);server.listen(port,'0.0.0.0',()=>console.log('IGCSE 私人测试服务已启动；需 HTTPS 网关与受邀账号'));server.on('error',()=>{console.error('私人测试服务启动失败');process.exitCode=1;});
 }catch{console.error('私人测试配置无效，请核对 HTTPS 地址、授权名单和配额文件；未开放服务');process.exitCode=1;}}
 module.exports={createPilot,hashPassword,loadUsers,quotaStore,deploymentOrigin};
