@@ -12,7 +12,7 @@ module.exports=async(page,width,results)=>{
  const before=await page.evaluate(()=>JSON.stringify(userState.questionStats));
  await page.evaluate(()=>{for(const subject of IGCSE_CATALOG.subjects.filter(s=>s!=='math')){const r=IGCSE_SYLLABUS_REGISTRY[subject];IGCSE_CURRICULUM.setProfile(subject,{qualification:'IGCSE',code:r.code,examYear:Math.max(2026,Number(r.year.split('-')[0]))});}});
  await page.locator('#dashboard-nav').click();
- assert.ok(await page.evaluate(()=>IGCSE_DASHBOARD.day().tasks.every(t=>t.subject==='math'&&['math_transform_01','math_algebra_01'].includes(t.topic))));
+ assert.ok(await page.evaluate(()=>IGCSE_DASHBOARD.day().tasks.filter(t=>['practice','material'].includes(t.type)).every(t=>t.subject==='math'&&['math_transform_01','math_algebra_01'].includes(t.topic))));
  assert.equal(await page.evaluate(()=>IGCSE_DASHBOARD.day().tasks.find(t=>t.type==='practice').topic),'math_transform_01');
  await page.locator('[data-page="page-practice"]').click();await page.locator('#practiceSchoolScope').selectOption('taught');assert.equal(await page.locator('[data-start-topic]').count(),2);
  await page.locator('#practiceSchoolScope').selectOption('all');assert.equal(await page.locator('[data-start-topic]').count(),15);
@@ -25,13 +25,13 @@ module.exports=async(page,width,results)=>{
  await page.locator('#page-curriculum [data-browse-search]').fill('');assert.equal(await page.locator('[data-curriculum-topic]').first().getAttribute('data-curriculum-topic'),'math_transform_01');
  await page.locator('#examProfileDetails > summary').click();await page.locator('#curriculumYear').selectOption('12');await page.locator('#curriculumQualification').selectOption('AS');assert.equal(await page.locator('#curriculumCode').inputValue(),'9709');await page.locator('#curriculumExamYear').fill('2028');await page.getByRole('button',{name:'保存学习安排',exact:true}).click();
  assert.match(await page.locator('#curriculumEdition').textContent(),/高级课程入口/);
- await page.locator('#dashboard-nav').click();assert.equal(await page.evaluate(()=>IGCSE_DASHBOARD.day().tasks.length),0);
+ await page.locator('#dashboard-nav').click();assert.equal(await page.evaluate(()=>IGCSE_DASHBOARD.day().tasks.filter(t=>['practice','material'].includes(t.type)).length),0);
  await page.locator('[data-page="page-practice"]').click();await page.locator('#practiceSchoolScope').selectOption('all');assert.equal(await page.locator('[data-start-topic]').count(),15);
  await page.locator('#curriculum-nav').click();await page.locator('#examProfileDetails > summary').click();await page.locator('#curriculumFoundation').check();await page.getByRole('button',{name:'保存学习安排',exact:true}).click();
- await page.locator('#dashboard-nav').click();assert.ok(await page.evaluate(()=>IGCSE_DASHBOARD.day().tasks.length)>0);
+ await page.locator('#dashboard-nav').click();assert.ok(await page.evaluate(()=>IGCSE_DASHBOARD.day().tasks.filter(t=>['practice','material'].includes(t.type)).length)>0);
  await page.locator('#curriculum-nav').click();await page.locator('#examProfileDetails > summary').click();await page.locator('#curriculumFoundation').uncheck();await page.locator('#curriculumQualification').selectOption('IGCSE');await page.getByRole('button',{name:'保存学习安排',exact:true}).click();
  assert.match(await page.locator('#curriculumEdition').textContent(),/尚未完成映射/);
- await page.locator('#dashboard-nav').click();assert.equal(await page.evaluate(()=>IGCSE_DASHBOARD.day().tasks.length),0);
+ await page.locator('#dashboard-nav').click();assert.equal(await page.evaluate(()=>IGCSE_DASHBOARD.day().tasks.filter(t=>['practice','material'].includes(t.type)).length),0);
  assert.equal(await page.evaluate(()=>JSON.stringify(userState.questionStats)),before,'school settings preserve answer evidence');
  await page.locator('#curriculum-nav').click();assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,'curriculum overflow '+width);
  const downloading=page.waitForEvent('download');await page.locator('#curriculumExport').click();const download=await downloading;const matrix=JSON.parse(require('node:fs').readFileSync(await download.path(),'utf8'));assert.equal(matrix.sections.length,9);assert.equal(matrix.edition.matches,false);assert.equal(matrix.sections[0].lessons[0].reviewStatus,'not-fully-audited');

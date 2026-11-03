@@ -22,6 +22,7 @@ const server=http.createServer((req,res)=>{
    const started=Date.now();await page.goto(base+'/#page-dashboard');await page.locator('#dbMock').waitFor();
    const performance=await page.evaluate(()=>({domReadyMs:Math.round(window.performance.getEntriesByType('navigation')[0].domContentLoadedEventEnd),localAssetBytes:window.performance.getEntriesByType('resource').filter(r=>r.name.startsWith(location.origin)).reduce((n,r)=>n+r.decodedBodySize,0)}));
    assert.ok(performance.domReadyMs<5000,'startup budget '+width);assert.ok(performance.localAssetBytes<3.1*1024*1024,'local asset budget '+width);metrics.push({width,...performance});
+   await require('./daily_review_browser.cjs')(page,width,results);
    await require('./classroom_arcade_browser.cjs')(page,width,results);
    await require('./vocabulary_arcade_browser.cjs')(page,width,results);
    await require('./english_center_browser.cjs')(page,width,results);
@@ -121,8 +122,8 @@ const server=http.createServer((req,res)=>{
    await page.locator('#dashboard-nav').click();
    await page.locator('[data-dashboard-view="map"]').click();await page.locator('[data-map-subject="math"]').click();
    await page.locator('[data-dashboard-view="today"]').click();
-   const taskId=await page.locator('[data-task]').first().getAttribute('data-task');
-   await page.locator('[data-task]').first().click();
+   const taskId=await page.evaluate(()=>IGCSE_DASHBOARD.day().tasks.find(t=>t.type==='practice').id);
+   await page.locator('[data-task="'+taskId+'"]').click();
    const qid=await page.evaluate(()=>practiceSession.order[0]);
    const priorAnswers=await page.evaluate(id=>userState.questionStats?.[id]?.answered||0,qid);
    const type=await page.evaluate(()=>findQuestion(practiceSession.order[0]).type);
@@ -157,10 +158,10 @@ const server=http.createServer((req,res)=>{
    await page.locator('#mockSubmitEarly').click();
    assert.match(await page.locator('#mockDetailedReport').textContent(),/29 题未答/);
    assert.equal(await page.evaluate(()=>userState.mockExams.records.length),1);
-   await page.locator('#mockDetailedReport summary').click();
+   await page.locator('#mockDetailedReport > details > summary').click();
    assert.match(await page.locator('#mockDetailedReport').textContent(),/参考答案/);
    // Long unbroken formula text must wrap even when random mocks do not sample it.
-   await page.locator('#mockDetailedReport details').evaluate(node=>{const p=document.createElement('p');p.textContent='formula_without_spaces_'.repeat(40);node.append(p);});
+   await page.locator('#mockDetailedReport > details').evaluate(node=>{const p=document.createElement('p');p.textContent='formula_without_spaces_'.repeat(40);node.append(p);});
    await page.screenshot({path:path.join(results,'mock-report-'+width+'.png'),fullPage:true});
    const reportOverflow=await page.evaluate(()=>Array.from(document.querySelectorAll('#mockDetailedReport, #mockDetailedReport *')).filter(e=>e.getBoundingClientRect().right>innerWidth+1).map(e=>({tag:e.tagName,text:e.textContent.slice(0,100)})));
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,'mock overflow '+width+' '+JSON.stringify(reportOverflow));
