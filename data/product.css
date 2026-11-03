@@ -11,3 +11,19 @@
 
 .progress-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;margin-top:14px}.progress-days li{display:flex;flex-direction:column;gap:6px;background:#f8fafc;border-radius:9px;padding:12px;text-align:center}.progress-days span{font-size:12px;color:#64748b}#page-progress details{margin-top:8px}#page-progress summary{min-height:44px;padding:10px 0;cursor:pointer}#page-progress details li{font-size:14px;padding:3px 0}@media(max-width:768px){.progress-days{grid-template-columns:repeat(4,minmax(0,1fr))}}@media(max-width:430px){.progress-days{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .curriculum-form,.curriculum-row{display:flex;flex-wrap:wrap;align-items:end;gap:12px}.curriculum-form label,.curriculum-row label{display:flex;flex-direction:column;gap:6px;min-width:120px}.curriculum-form select,.curriculum-form input,.curriculum-row select,.curriculum-row input{border:1px solid #cbd5e1;border-radius:8px;padding:9px;max-width:100%;font-size:16px}.curriculum-row input{width:90px}.curriculum-form input[type=checkbox]{align-self:start}.curriculum-form button,.curriculum-row button{border:1px solid #cbd5e1;border-radius:8px;padding:10px;background:#eef2ff}.curriculum-form p{flex-basis:100%}
+/* Advanced lessons and school-plan imports use readable full-width answer fields. */
+#page-advanced h4{font-weight:700;margin:18px 0 8px}
+#page-advanced p{margin:10px 0;line-height:1.65;overflow-wrap:anywhere}
+#page-advanced ul{list-style:disc;padding-left:24px;line-height:1.65}
+#page-advanced a{color:#4338ca;text-decoration:underline}
+#page-advanced button,#schoolImportPanel button,#learnerWelcome button{min-height:44px;padding:8px 14px;border:1px solid #c7d2fe;border-radius:8px;background:#eef2ff;color:#3730a3;margin:6px 6px 6px 0}
+#page-advanced button:disabled,#schoolImportPanel button:disabled{opacity:.5;cursor:not-allowed}
+#page-advanced details{margin-top:16px}
+#page-advanced summary{cursor:pointer;min-height:44px;padding:10px 0;font-weight:600}
+#page-advanced [data-advanced-question]{padding:16px;margin:14px 0;border:1px solid #cbd5e1;border-radius:12px;background:#f8fafc}
+#page-advanced [data-advanced-question] label,#schoolImportPanel label{display:block;line-height:1.65}
+#page-advanced [name=answer],#schoolPlanText{display:block;width:100%;min-width:0;min-height:44px;margin:10px 0;padding:10px;border:1px solid #94a3b8;border-radius:8px;background:white;color:#0f172a;font-size:16px}
+#page-advanced textarea,#schoolPlanText{resize:vertical}
+#page-advanced [role=status]{overflow-wrap:anywhere}
+#schoolImportPanel input[type=checkbox]{width:18px;height:18px;margin-right:8px;vertical-align:middle}
+@media(max-width:430px){#page-advanced .db-panel{padding:16px}#page-advanced [data-advanced-question]{padding:12px}#page-advanced [data-advanced-question] button{width:100%}}

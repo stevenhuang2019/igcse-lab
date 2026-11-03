@@ -34,7 +34,8 @@ async function extract(file,ext){
  const magic=new Uint8Array(await file.slice(0,12).arrayBuffer());const valid=ext==='png'?magic[0]===137&&magic[1]===80:ext==='webp'?new TextDecoder().decode(magic.slice(0,4))==='RIFF'&&new TextDecoder().decode(magic.slice(8,12))==='WEBP':magic[0]===255&&magic[1]===216;
  if(!valid)throw new Error('图片文件格式不正确');return [];
 }
-window.IGCSE_MATERIALS={list,get,put,remove,extract,type,validateDocx,open,reconcile};
+async function replaceAll(documents){const d=await db();await new Promise((resolve,reject)=>{const tx=d.transaction('documents','readwrite'),store=tx.objectStore('documents');store.clear();for(const document of documents)store.put(document);tx.oncomplete=resolve;tx.onerror=tx.onabort=()=>reject(new Error('附件恢复失败，原附件事务已回滚'));});}
+window.IGCSE_MATERIALS={list,get,put,remove,extract,type,validateDocx,open,reconcile,all:()=>transact('readonly',s=>s.getAll()),replaceAll};
 function build(){
  const main=document.querySelector('main'),nav=document.getElementById('mainNav');if(!main||!nav)return;
  const button=document.createElement('button');button.id='materials-nav';button.dataset.page='page-materials';button.className='nav-btn px-3 py-1 rounded';button.textContent='我的教材与作业';button.onclick=()=>switchPage('page-materials');nav.append(button);

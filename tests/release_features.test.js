@@ -28,3 +28,9 @@ test('six subjects have 12 original structured tasks with source editions and ex
  const window={};for(const f of ['igcse_curriculum_expansion.js','structured_tasks.js'])vm.runInNewContext(fs.readFileSync('data/'+f,'utf8'),{window});
  const qs=window.IGCSE_STRUCTURED_TASKS;assert.equal(qs.length,12);assert.equal(new Set(qs.map(q=>q.question)).size,12);assert.equal(new Set(qs.map(q=>q.subject)).size,6);assert.ok(qs.every(q=>q.type==='essay'&&q.marks===0&&q.rubric.length===3&&q.syllabusYear&&q.subject!=='dt'));
 });
+
+test('exports containing real millisecond material timestamps restore without importing separate material links',()=>{
+ const {api}=backup(),s=fixture();s.materialStudyLinks=[{id:'local-document',createdAt:Date.UTC(2026,9,10)}];
+ const restored=api.parse(JSON.stringify(s));assert.equal(restored.summary.answered,2);assert.equal(restored.state.materialStudyLinks,undefined);
+ s.materialStudyLinks[0].createdAt=Number.MAX_SAFE_INTEGER+1;assert.throws(()=>api.parse(JSON.stringify(s)));
+});

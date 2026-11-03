@@ -1,6 +1,6 @@
 const assert=require('node:assert/strict'),path=require('node:path');
 module.exports=async(page,width,results)=>{
- await page.locator('#dashboard-nav').click();await page.locator('[data-db-subject="business"]').click();await page.locator('#dbMock').click();await page.locator('[data-structured="business"]').click();
+ await page.locator('#dashboard-nav').click();await page.locator('[data-dashboard-view="map"]').click();await page.locator('[data-map-subject="business"]').click();await page.locator('#dbMock').click();await page.locator('[data-structured="business"]').click();
  assert.match(await page.locator('.mock-preflight').textContent(),/开放回答/);await page.locator('#confirmMock').click();assert.ok(await page.evaluate(()=>practiceSession.order.some(id=>findQuestion(id).type==='essay')));await page.locator('#mockSubmitEarly').click();
  // Fixed task order isolates numeric scoring and writing storage from random selection.
  const ids=['course_business_ratios_depth_1','course_business_ratios_structured'];
@@ -9,7 +9,7 @@ module.exports=async(page,width,results)=>{
  const before=await page.evaluate(()=>JSON.stringify(userState.questionStats));await page.locator('#essayInput').fill('My financial analysis uses cash timing and comparable ratios.');await page.locator('[data-act=essay-check]').click();assert.match(await page.locator('.q-feedback').textContent(),/不自动判分/);assert.equal(await page.evaluate(()=>JSON.stringify(userState.questionStats)),before);
  const deadline=await page.evaluate(()=>practiceSession.startedAt);await page.reload();await page.locator('#resumeMock').click();assert.equal(await page.evaluate(()=>Date.parse(userState.mockExams.records[0].startedAt)),deadline);
  const r=await page.evaluate(()=>userState.mockExams.records[0]);assert.equal(r.result.objectiveTotal,1);assert.equal(r.result.correct,1);assert.equal(r.result.openAnswered,1);assert.equal(r.result.accuracy,100);assert.equal(r.answers[ids[1]],'My financial analysis uses cash timing and comparable ratios.');
- await page.locator('#mockDetailedReport summary').click();assert.match(await page.locator('#mockDetailedReport').textContent(),/My financial analysis/);await page.screenshot({path:path.join(results,'structured-report-'+width+'.png'),fullPage:true});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);
+ await page.locator('#mockDetailedReport > details > summary').click();assert.match(await page.locator('#mockDetailedReport').textContent(),/My financial analysis/);await page.screenshot({path:path.join(results,'structured-report-'+width+'.png'),fullPage:true});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);
  // A normal exported backup can be previewed, restored and then undone without touching attachments or drafts.
  const separate=await page.evaluate(async()=>({drafts:localStorage.getItem('igcseWritingDrafts'),materials:(await IGCSE_MATERIALS.list('math')).map(d=>d.id).sort()}));
  const original=await page.evaluate(()=>JSON.stringify(userState)),imported=JSON.parse(original);imported.globalStats.totalAnswered+=7;imported.mockExams.activePractice={id:'forged'};imported.mockExams.activeQuestions=[{options:['<img>']}];

@@ -1,0 +1,1588 @@
+{
+  "version": 1,
+  "scope": "reviewed-legacy-and-original-training-not-official-exhaustive-syllabus",
+  "units": [
+    {
+      "id": "noun-article",
+      "title": "名词与冠词",
+      "level": "foundation",
+      "origin": "restored-reviewed",
+      "rule": "第一次提到用 a/an；再次提到同一对象用 the。可数名词复数或不可数名词表泛指时不加冠词。",
+      "points": [
+        "可数名词单数前必须有冠词或限定词：a book / the book / my book",
+        "不可数名词（information, advice, luggage, water）不加 a/an，也不加 -s",
+        "球类运动、三餐、语言名称前通常用零冠词：play basketball, have lunch, learn English"
+      ],
+      "examples": [
+        {
+          "en": "I saw a dog. The dog was barking at me.",
+          "note": "第一次提到用 a；再次提到同一只狗用 the 表特指。"
+        },
+        {
+          "en": "She plays basketball after school.",
+          "note": "球类运动前用零冠词，不加 the。"
+        },
+        {
+          "en": "Water is important for life.",
+          "note": "不可数名词表泛指时不加冠词；若说 the water in the glass 才用 the。"
+        }
+      ],
+      "questions": [
+        {
+          "id": "gr-noun-article-0",
+          "kind": "choice",
+          "prompt": "Can you give me ___ advice on how to study English?",
+          "options": [
+            "a",
+            "an",
+            "/（不加冠词）",
+            "the a"
+          ],
+          "answer": "/（不加冠词）",
+          "explain": "advice 是不可数名词，前面不能加 a/an；表示“一条建议”用 a piece of advice。"
+        },
+        {
+          "id": "gr-noun-article-1",
+          "kind": "choice",
+          "prompt": "I saw ___ elephant in the zoo yesterday.",
+          "options": [
+            "a",
+            "an",
+            "the an",
+            "/"
+          ],
+          "answer": "an",
+          "explain": "elephant 以元音音素开头，泛指时用 an；first time mention 用不定冠词。"
+        },
+        {
+          "id": "gr-noun-article-2",
+          "kind": "choice",
+          "prompt": "选择正确的句子：",
+          "options": [
+            "She plays the basketball well.",
+            "She plays basketball well.",
+            "She plays a basketball well.",
+            "She plays an basketball well."
+          ],
+          "answer": "She plays basketball well.",
+          "explain": "球类运动名词前用零冠词：play basketball / play football，不加 the。"
+        },
+        {
+          "id": "gr-noun-article-correct",
+          "kind": "correct",
+          "prompt": "Correct the error: I bought a umbrella.",
+          "answer": "I bought an umbrella.",
+          "explain": "第一次提到用 a/an；再次提到同一对象用 the。可数名词复数或不可数名词表泛指时不加冠词。 参考答案仅是一种表达；核对意义、结构与标点，允许其他合理答案。"
+        },
+        {
+          "id": "gr-noun-article-rewrite",
+          "kind": "rewrite",
+          "prompt": "Rewrite: I bought a book. The book is useful.",
+          "answer": "The book I bought is useful.",
+          "explain": "第一次提到用 a/an；再次提到同一对象用 the。可数名词复数或不可数名词表泛指时不加冠词。 参考答案仅是一种表达；核对意义、结构与标点，允许其他合理答案。"
+        }
+      ]
+    },
+    {
+      "id": "pronoun",
+      "title": "代词体系",
+      "level": "foundation",
+      "origin": "restored-reviewed",
+      "rule": "形容词性物主代词（my, your）+ 名词；名词性物主代词（mine, yours）单独使用，不能跟名词。",
+      "points": [
+        "主格做主语：She likes music. 宾格做宾语：Tom helped me.",
+        "形容词性物主代词后必须接名词：my book；名词性物主代词独立使用：The book is mine.",
+        "反身代词：主语与宾语指向同一人时用 myself / himself / themselves 等",
+        "常用不定代词：someone 有人，nothing 没什么，everything 一切，none 一个也没有"
+      ],
+      "examples": [
+        {
+          "en": "This is not my pen. Mine is on the desk.",
+          "note": "my 后接名词 pen；mine 单独使用指代“我的（钢笔）”。"
+        },
+        {
+          "en": "He taught himself to cook.",
+          "note": "主语 he 与宾语同为人，用反身代词 himself。"
+        },
+        {
+          "en": "There is nothing in the box.",
+          "note": "nothing 是否定意义的不定代词，谓语用单数 is。"
+        }
+      ],
+      "questions": [
+        {
+          "id": "gr-pronoun-0",
+          "kind": "choice",
+          "prompt": "The pen is not mine. It is ___ .",
+          "options": [
+            "her",
+            "hers",
+            "she",
+            "herself"
+          ],
+          "answer": "hers",
+          "explain": "横线后没有名词，需用名词性物主代词 hers（她的），her 是形容词性物主代词，后面要接名词。"
+        },
+        {
+          "id": "gr-pronoun-1",
+          "kind": "choice",
+          "prompt": "The children enjoyed ___ at the party.",
+          "options": [
+            "them",
+            "themselves",
+            "their",
+            "they"
+          ],
+          "answer": "themselves",
+          "explain": "enjoy oneself 是固定搭配“玩得开心”，主语 the children 对应反身代词 themselves。"
+        },
+        {
+          "id": "gr-pronoun-2",
+          "kind": "choice",
+          "prompt": "选择正确的句子：",
+          "options": [
+            "My friend and I goes to the park.",
+            "My friend and I went to the park.",
+            "Me and my friend went to the park.",
+            "My friend and me went to the park."
+          ],
+          "answer": "My friend and I went to the park.",
+          "explain": "作主语用 I；My friend and I 是复数主语，不接 goes。并列顺序涉及礼貌风格，不是本题的错误判据。"
+        },
+        {
+          "id": "gr-pronoun-correct",
+          "kind": "correct",
+          "prompt": "Correct the error: Me like science.",
+          "answer": "I like science.",
+          "explain": "形容词性物主代词（my, your）+ 名词；名词性物主代词（mine, yours）单独使用，不能跟名词。 参考答案仅是一种表达；核对意义、结构与标点，允许其他合理答案。"
+        },
+        {
+          "id": "gr-pronoun-rewrite",
+          "kind": "rewrite",
+          "prompt": "Rewrite using a possessive pronoun: This notebook belongs to me.",
+          "answer": "This notebook is mine.",
+          "explain": "形容词性物主代词（my, your）+ 名词；名词性物主代词（mine, yours）单独使用，不能跟名词。 参考答案仅是一种表达；核对意义、结构与标点，允许其他合理答案。"
+        }
+      ]
+    },
+    {
+      "id": "adj-adv",
+      "title": "形容词与副词",
+      "level": "foundation",
+      "origin": "restored-reviewed",
+      "rule": "单音节与部分双音节词加 -er/-est（tall→taller→tallest）；多音节词用 more/most（beautiful→more beautiful）。",
+      "points": [
+        "形容词修饰名词（a beautiful girl）；副词修饰动词（run quickly）",
+        "不规则变化：good/well→better→best；bad/badly→worse→worst；many/much→more→most",
+        "比较级标志词 than；最高级前通常加 the，且常有范围 in/of"
+      ],
+      "examples": [
+        {
+          "en": "This book is more interesting than that one.",
+          "note": "interesting 是多音节词，比较级用 more + 原级，不用 interestinger。"
+        },
+        {
+          "en": "She is the tallest student in our class.",
+          "note": "最高级前用 the，范围用 in + 集体。"
+        },
+        {
+          "en": "He runs faster than before.",
+          "note": "fast 是单音节副词，比较级直接加 -er：faster。"
+        }
+      ],
+      "questions": [
+        {
+          "id": "gr-adj-adv-0",
+          "kind": "choice",
+          "prompt": "This question is ___ than that one.",
+          "options": [
+            "difficulter",
+            "more difficult",
+            "most difficult",
+            "the most difficult"
+          ],
+          "answer": "more difficult",
+          "explain": "difficult 是多音节形容词，比较级用 more difficult；有 than 表明是比较级。"
+        },
+        {
+          "id": "gr-adj-adv-1",
+          "kind": "choice",
+          "prompt": "She is ___ student in our class.",
+          "options": [
+            "tallest",
+            "the tallest",
+            "taller",
+            "more tall"
+          ],
+          "answer": "the tallest",
+          "explain": "“全班最高”用最高级，前加 the：the tallest student。"
+        },
+        {
+          "id": "gr-adj-adv-2",
+          "kind": "choice",
+          "prompt": "选择正确的句子：",
+          "options": [
+            "He is gooder at math than me.",
+            "He is better at math than me.",
+            "He is more good at math than me.",
+            "He is best at math than me."
+          ],
+          "answer": "He is better at math than me.",
+          "explain": "good 的比较级是不规则的 better，不能用 gooder 或 more good。"
+        },
+        {
+          "id": "gr-adj-adv-correct",
+          "kind": "correct",
+          "prompt": "Correct the error: She speaks careful.",
+          "answer": "She speaks carefully.",
+          "explain": "单音节与部分双音节词加 -er/-est（tall→taller→tallest）；多音节词用 more/most（beautiful→more beautiful）。 参考答案仅是一种表达；核对意义、结构与标点，允许其他合理答案。"
+        },
+        {
+          "id": "gr-adj-adv-rewrite",
+          "kind": "rewrite",
+          "prompt": "Rewrite with a comparative: This task is easy. The other task is less easy.",
+          "answer": "This task is easier than the other task.",
+          "explain": "单音节与部分双音节词加 -er/-est（tall→taller→tallest）；多音节词用 more/most（beautiful→more beautiful）。 参考答案仅是一种表达；核对意义、结构与标点，允许其他合理答案。"
+        }
+      ]
+    },
+    {
+      "id": "tense-basic",
+      "title": "时态基础：一般现在时与一般过去时",
+      "level": "foundation",
+      "origin": "restored-reviewed",
+      "rule": "一般现在时三单加 -s/-es（go→goes, study→studies）；一般过去时规则动词加 -ed，不规则动词需记忆（go→went, take→took）。",
+      "points": [
+        "一般现在时表习惯/事实/真理，常与 every day, usually, often 连用",
+        "第三人称单数（he/she/it）作主语时，动词必须加 -s/-es",
+        "一般过去时常与 last night, yesterday, ago 连用，动词用过去式",
+        "否定与疑问：一般现在时用 do/does，一般过去时用 did（动词还原）"
+      ],
+      "examples": [
+        {
+          "en": "My father goes to work by bus every day.",
+          "note": "主语 my father 是第三人称单数，一般现在时动词加 -s：go→goes。"
+        },
+        {
+          "en": "I watched a movie last night.",
+          "note": "last night 是过去时间标志，动词用过去式 watched。"
+        },
+        {
+          "en": "She didn't come to school yesterday.",
+          "note": "否定句用 didn't + 动词原形 come，过去式不再保留。"
+        }
+      ],
+      "questions": [
+        {
+          "id": "gr-tense-basic-0",
+          "kind": "choice",
+          "prompt": "My sister ___ to school by bike every day.",
+          "options": [
+            "go",
+            "goes",
+            "going",
+            "went"
+          ],
+          "answer": "goes",
+          "explain": "every day 是一般现在时标志，主语 my sister 为三单，动词用 goes。"
+        },
+        {
+          "id": "gr-tense-basic-1",
+          "kind": "choice",
+          "prompt": "I ___ my homework last night.",
+          "options": [
+            "finish",
+            "finishes",
+            "finished",
+            "finishing"
+          ],
+          "answer": "finished",
+          "explain": "last night 表示过去时间，动词用过去式 finished。"
+        },
+        {
+          "id": "gr-tense-basic-2",
+          "kind": "choice",
+          "prompt": "选择正确的句子：",
+          "options": [
+            "She don't like coffee.",
+            "She doesn't likes coffee.",
+            "She doesn't like coffee.",
+            "She not like coffee."
+          ],
+          "answer": "She doesn't like coffee.",
+          "explain": "否定句用 doesn't + 动词原形：doesn't like；likes 要还原为 like。"
+        },
+        {
+          "id": "gr-tense-basic-correct",
+          "kind": "correct",
+          "prompt": "Correct the error: Yesterday he walk to school.",
+          "answer": "Yesterday he walked to school.",
+          "explain": "一般现在时三单加 -s/-es（go→goes, study→studies）；一般过去时规则动词加 -ed，不规则动词需记忆（go→went, take→took）。 参考答案仅是一种表达；核对意义、结构与标点，允许其他合理答案。"
+        },
+        {
+          "id": "gr-tense-basic-rewrite",
+          "kind": "rewrite",
+          "prompt": "Rewrite in the past: They play tennis every Friday.",
+          "answer": "They played tennis every Friday.",
+          "explain": "一般现在时三单加 -s/-es（go→goes, study→studies）；一般过去时规则动词加 -ed，不规则动词需记忆（go→went, take→took）。 参考答案仅是一种表达；核对意义、结构与标点，允许其他合理答案。"
+        }
+      ]
+    },
+    {
+      "id": "tense-perfect",
+      "title": "进行时与完成时",
+      "level": "core",
+      "origin": "restored-reviewed",
+      "rule": "进行时标志词：now, look, listen, at the moment；完成时标志词：already, yet, ever, never, since, for, just。",
+      "points": [
+        "现在进行时表此刻正在进行的动作：Look! They are playing football.",
+        "现在完成时表过去发生但对现在有影响：I have finished my homework.（现在可以交）",
+        "since + 时间点，for + 时间段：since 2020 / for two years",
+        "短暂性动词（come, leave, buy）不与 for/since 直接连用，常转为 have been/owned 等"
+      ],
+      "examples": [
+        {
+          "en": "Look! The children are playing in the yard.",
+          "note": "look 表示“看”，提示动作正在进行，用are + playing。"
+        },
+        {
+          "en": "I have lived here for two years.",
+          "note": "for two years 表示持续到现在的时段，用现在完成时 have lived。"
+        },
+        {
+          "en": "She has already finished her report.",
+          "note": "already 常与完成时连用，放在 have/has 与过去分词之间。"
+        }
+      ],
+      "questions": [
+        {
+          "id": "gr-tense-perfect-0",
+          "kind": "choice",
+          "prompt": "Listen! Someone ___ the piano upstairs.",
+          "options": [
+            "plays",
+            "is playing",
+            "played",
+            "has played"
+          ],
+          "answer": "is playing",
+          "explain": "listen 提示声音正在进行，用现在进行时 is playing。"
+        },
+        {
+          "id": "gr-tense-perfect-1",
+          "kind": "choice",
+          "prompt": "I ___ in this city since 2020.",
+          "options": [
+            "live",
+            "lived",
+            "have lived",
+            "am living"
+          ],
+          "answer": "have lived",
+          "explain": "since 2020 表示从过去持续到现在，用现在完成时 have lived。"
+        },
+        {
+          "id": "gr-tense-perfect-2",
+          "kind": "choice",
+          "prompt": "选择正确的句子：",
+          "options": [
+            "She has went to Beijing.",
+            "She has gone to Beijing.",
+            "She has goed to Beijing.",
+            "She have gone to Beijing."
+          ],
+          "answer": "She has gone to Beijing.",
+          "explain": "go 的过去分词是 gone，不是 went/goed；主语 she 用 has。has gone to 表示“去了还没回来”。"
+        },
+        {
+          "id": "gr-tense-perfect-correct",
+          "kind": "correct",
+          "prompt": "Correct the error: She has went home.",
+          "answer": "She has gone home.",
+          "explain": "进行时标志词：now, look, listen, at the moment；完成时标志词：already, yet, ever, never, since, for, just。 参考答案仅是一种表达；核对意义、结构与标点，允许其他合理答案。"
+        },
+        {
+          "id": "gr-tense-perfect-rewrite",
+          "kind": "rewrite",
+          "prompt": "Rewrite using since: I moved here in 2020 and still live here.",
+          "answer": "I have lived here since 2020.",
+          "explain": "进行时标志词：now, look, listen, at the moment；完成时标志词：already, yet, ever, never, since, for, just。 参考答案仅是一种表达；核对意义、结构与标点，允许其他合理答案。"
+        }
+      ]
+    },
+    {
+      "id": "passive",
+      "title": "被动语态",
+      "level": "core",
+      "origin": "restored-reviewed",
+      "rule": "被动语态的时态体现在 be 上：is spoken（一般现在）、was built（一般过去）、will be held（将来）、has been done（完成）。",
+      "points": [
+        "主动→被动：宾语提前作主语，动词变 be + 过去分词",
+        "一般现在时被动：am/is/are + done；一般过去时被动：was/were + done",
+        "情态动词被动：can/must/should + be + done",
+        "感官动词/使役动词后不定式省略 to，被动时补回：make sb do → be made to do"
+      ],
+      "examples": [
+        {
+          "en": "English is spoken in many countries.",
+          "note": "一般现在时被动：is + spoken，动作执行者不明时省略 by。"
+        },
+        {
+          "en": "The bridge was built in 1990.",
+          "note": "一般过去时被动：was + built（build→built→built）。"
+        },
+        {
+          "en": "The room must be kept clean.",
+          "note": "情态动词被动：must + be + kept。"
+        }
+      ],
+      "questions": [
+        {
+          "id": "gr-passive-0",
+          "kind": "choice",
+          "prompt": "English ___ all over the world.",
+          "options": [
+            "speaks",
+            "is spoken",
+            "is speaking",
+            "spoke"
+          ],
+          "answer": "is spoken",
+          "explain": "English 是动作承受者，用被动语态；一般现在时被动为 is spoken。"
+        },
+        {
+          "id": "gr-passive-1",
+          "kind": "choice",
+          "prompt": "The Great Wall ___ by thousands of tourists every year.",
+          "options": [
+            "visits",
+            "is visited",
+            "is visiting",
+            "visited"
+          ],
+          "answer": "is visited",
+          "explain": "长城被参观，用一般现在时被动 is visited。"
+        },
+        {
+          "id": "gr-passive-2",
+          "kind": "choice",
+          "prompt": "主动句 “They clean the room every day.” 改为被动语态：",
+          "options": [
+            "The room is cleaned every day.",
+            "The room cleans every day.",
+            "The room was cleaned every day.",
+            "The room is cleaning every day."
+          ],
+          "answer": "The room is cleaned every day.",
+          "explain": "every day 为一般现在时，被动结构 is cleaned；时态要保留原句的一般现在。"
+        },
+        {
+          "id": "gr-passive-correct",
+          "kind": "correct",
+          "prompt": "Correct the error: The samples was collected yesterday.",
+          "answer": "The samples were collected yesterday.",
+          "explain": "被动语态的时态体现在 be 上：is spoken（一般现在）、was built（一般过去）、will be held（将来）、has been done（完成）。 参考答案仅是一种表达；核对意义、结构与标点，允许其他合理答案。"
+        },
+        {
+          "id": "gr-passive-rewrite",
+          "kind": "rewrite",
+          "prompt": "Rewrite in the passive: They clean the classroom every day.",
+          "answer": "The classroom is cleaned every day.",
+          "explain": "被动语态的时态体现在 be 上：is spoken（一般现在）、was built（一般过去）、will be held（将来）、has been done（完成）。 参考答案仅是一种表达；核对意义、结构与标点，允许其他合理答案。"
+        }
+      ]
+    },
+    {
+      "id": "modal",
+      "title": "情态动词",
+      "level": "core",
+      "origin": "restored-reviewed",
+      "rule": "常见核心情态动词 can/could/may/might/must/should 后接原形；ought to 和 have to 的结构另记。禁止 must not 与不必 need not 意义不同。",
+      "points": [
+        "can/could：能力与许可（Can I use your phone?）",
+        "may/might：许可与可能性（may 语气更正式）",
+        "must：必须（主观义务）与肯定推测（must be 一定是）；否定 mustn't 表禁止",
+        "should/ought to：应该（建议、义务）；needn't 表“不必”"
+      ],
+      "examples": [
+        {
+          "en": "He must be at home; the light is on.",
+          "note": "灯亮着，做出肯定推测用 must be（一定是）。"
+        },
+        {
+          "en": "You should see a doctor if you feel unwell.",
+          "note": "建议用 should + 动词原形 see。"
+        },
+        {
+          "en": "Must I finish it today? No, you needn't.",
+          "note": "must 提问，否定回答用 needn't（不必），而非 mustn't（禁止）。"
+        }
+      ],
+      "questions": [
+        {
+          "id": "gr-modal-0",
+          "kind": "choice",
+          "prompt": "___ I borrow your dictionary? — Sure, here you are.",
+          "options": [
+            "Must",
+            "Need",
+            "Can",
+            "Should"
+          ],
+          "answer": "Can",
+          "explain": "请求许可用 Can/May/Could I…?；must 表必须，不用于借东西的请求。"
+        },
+        {
+          "id": "gr-modal-1",
+          "kind": "choice",
+          "prompt": "School rules require this: You ___ finish your homework before going out.",
+          "options": [
+            "must",
+            "can't",
+            "may",
+            "could"
+          ],
+          "answer": "must",
+          "explain": "表示“必须”（义务）用 must；can't 表禁止/不可能，语气不当。"
+        },
+        {
+          "id": "gr-modal-2",
+          "kind": "choice",
+          "prompt": "选择正确的句子：",
+          "options": [
+            "He can sings well.",
+            "He can sing well.",
+            "He cans sing well.",
+            "He can to sing well."
+          ],
+          "answer": "He can sing well.",
+          "explain": "情态动词后接动词原形，且无人称变化：He can sing well.。"
+        },
+        {
+          "id": "gr-modal-correct",
+          "kind": "correct",
+          "prompt": "Correct the error: He can to swim.",
+          "answer": "He can swim.",
+          "explain": "常见核心情态动词 can/could/may/might/must/should 后接原形；ought to 和 have to 的结构另记。禁止 must not 与不必 need not 意义不同。 参考答案仅是一种表达；核对意义、结构与标点，允许其他合理答案。"
+        },
+        {
+          "id": "gr-modal-rewrite",
+          "kind": "rewrite",
+          "prompt": "Rewrite as advice: It is a good idea to check your answer.",
+          "answer": "You should check your answer.",
+          "explain": "常见核心情态动词 can/could/may/might/must/should 后接原形；ought to 和 have to 的结构另记。禁止 must not 与不必 need not 意义不同。 参考答案仅是一种表达；核对意义、结构与标点，允许其他合理答案。"
+        }
+      ]
+    },
+    {
+      "id": "attrib-clause",
+      "title": "定语从句",
+      "level": "core",
+      "origin": "restored-reviewed",
+      "rule": "限定性从句中 who/that 可指人，which/that 可指物；非限定性从句不用 that。作宾语的关系代词在限定性从句中常可省略，作主语不能省略。",
+      "points": [
+        "who 指人，作主语：The man who is talking to Mary is my uncle.",
+        "which 指物，作主语或宾语：This is the book which I bought yesterday.",
+        "that 可指人或物，常与 who/which 互换；介词后不用 that 而用 which/whom",
+        "关系代词在从句中作宾语时可省略：the book (that) I read"
+      ],
+      "examples": [
+        {
+          "en": "The girl who wears glasses is my sister.",
+          "note": "先行词 the girl 指人，用 who 引导并在从句中作主语。"
+        },
+        {
+          "en": "This is the movie which we watched last week.",
+          "note": "the movie 指物，用 which（也可用 that）引导，在从句中作宾语。"
+        },
+        {
+          "en": "The house whose roof is red belongs to my aunt.",
+          "note": "表示所属关系用 whose：房子的屋顶（the house's roof）。"
+        }
+      ],
+      "questions": [
+        {
+          "id": "gr-attrib-clause-0",
+          "kind": "choice",
+          "prompt": "The man ___ is standing at the door is my teacher.",
+          "options": [
+            "which",
+            "who",
+            "whom",
+            "whose"
+          ],
+          "answer": "who",
+          "explain": "先行词 the man 指人，且关系代词在从句中作主语，用 who。"
+        },
+        {
+          "id": "gr-attrib-clause-1",
+          "kind": "choice",
+          "prompt": "This is the book ___ I bought yesterday.",
+          "options": [
+            "who",
+            "whom",
+            "which",
+            "whose"
+          ],
+          "answer": "which",
+          "explain": "先行词 the book 指物，用 which（或 that）；I bought 缺宾语，which 作宾语。"
+        },
+        {
+          "id": "gr-attrib-clause-2",
+          "kind": "choice",
+          "prompt": "选择正确的句子：",
+          "options": [
+            "The boy which is singing is my brother.",
+            "The boy who is singing is my brother.",
+            "The boy who he is singing is my brother.",
+            "The boy whom is singing is my brother."
+          ],
+          "answer": "The boy who is singing is my brother.",
+          "explain": "指人的先行词用 who；who 已在从句中作主语，不能再加 he；whom 只能作宾语。"
+        },
+        {
+          "id": "gr-attrib-clause-correct",
+          "kind": "correct",
+          "prompt": "Correct the error: The student who she won is smiling.",
+          "answer": "The student who won is smiling.",
+          "explain": "限定性从句中 who/that 可指人，which/that 可指物；非限定性从句不用 that。作宾语的关系代词在限定性从句中常可省略，作主语不能省略。 参考答案仅是一种表达；核对意义、结构与标点，允许其他合理答案。"
+        },
+        {
+          "id": "gr-attrib-clause-rewrite",
+          "kind": "rewrite",
+          "prompt": "Combine: I met a teacher. The teacher speaks Spanish.",
+          "answer": "I met a teacher who speaks Spanish.",
+          "explain": "限定性从句中 who/that 可指人，which/that 可指物；非限定性从句不用 that。作宾语的关系代词在限定性从句中常可省略，作主语不能省略。 参考答案仅是一种表达；核对意义、结构与标点，允许其他合理答案。"
+        }
+      ]
+    },
+    {
+      "id": "agreement",
+      "title": "主谓一致",
+      "level": "foundation",
+      "origin": "original",
+      "rule": "主语的数决定谓语；介词短语不能代替主语。",
+      "points": [
+        "主语的数决定谓语；介词短语不能代替主语。"
+      ],
+      "examples": [
+        {
+          "en": "The box of pencils is on the shelf.",
+          "note": "主语的数决定谓语；介词短语不能代替主语。"
+        }
+      ],
+      "questions": [
+        {
+          "id": "gr-agreement-0",
+          "kind": "choice",
+          "prompt": "The box of pencils ___ on the shelf.",
+          "answer": "is",
+          "options": [
+            "is",
+            "are",
+            "be",
+            "have"
+          ],
+          "explain": "主语的数决定谓语；介词短语不能代替主语。"
+        },
+        {
+          "id": "gr-agreement-1",
+          "kind": "choice",
+          "prompt": "Each student ___ a notebook.",
+          "answer": "has",
+          "options": [
+            "has",
+            "have",
+            "are",
+            "were"
+          ],
+          "explain": "主语的数决定谓语；介词短语不能代替主语。"
+        },
+        {
+          "id": "gr-agreement-correct",
+          "kind": "correct",
+          "prompt": "Correct the error: The box of books are heavy.",
+          "answer": "The box of books is heavy.",
+          "explain": "主语的数决定谓语；介词短语不能代替主语。 参考答案仅是一种表达；核对意义、结构与标点，允许其他合理答案。"
+        },
+        {
+          "id": "gr-agreement-rewrite",
+          "kind": "rewrite",
+          "prompt": "Rewrite with each: All students have a calculator.",
+          "answer": "Each student has a calculator.",
+          "explain": "主语的数决定谓语；介词短语不能代替主语。 参考答案仅是一种表达；核对意义、结构与标点，允许其他合理答案。"
+        }
+      ]
+    },
+    {
+      "id": "questions",
+      "title": "疑问与否定",
+      "level": "foundation",
+      "origin": "original",
+      "rule": "一般现在、过去时用 do/does/did，后接动词原形；be 和情态动词直接提前。",
+      "points": [
+        "一般现在、过去时用 do/does/did，后接动词原形；be 和情态动词直接提前。"
+      ],
+      "examples": [
+        {
+          "en": "Did you finish the experiment?",
+          "note": "一般现在、过去时用 do/does/did，后接动词原形；be 和情态动词直接提前。"
+        }
+      ],
+      "questions": [
+        {
+          "id": "gr-questions-0",
+          "kind": "choice",
+          "prompt": "___ she work here every day?",
+          "answer": "Does",
+          "options": [
+            "Does",
+            "Do",
+            "Is",
+            "Has"
+          ],
+          "explain": "一般现在、过去时用 do/does/did，后接动词原形；be 和情态动词直接提前。"
+        },
+        {
+          "id": "gr-questions-1",
+          "kind": "choice",
+          "prompt": "He did not ___ the bus yesterday.",
+          "answer": "catch",
+          "options": [
+            "catch",
+            "caught",
+            "catches",
+            "catching"
+          ],
+          "explain": "一般现在、过去时用 do/does/did，后接动词原形；be 和情态动词直接提前。"
+        },
+        {
+          "id": "gr-questions-correct",
+          "kind": "correct",
+          "prompt": "Correct the error: Did she finished the task?",
+          "answer": "Did she finish the task?",
+          "explain": "一般现在、过去时用 do/does/did，后接动词原形；be 和情态动词直接提前。 参考答案仅是一种表达；核对意义、结构与标点，允许其他合理答案。"
+        },
+        {
+          "id": "gr-questions-rewrite",
+          "kind": "rewrite",
+          "prompt": "Rewrite as a question: They visited the museum.",
+          "answer": "Did they visit the museum?",
+          "explain": "一般现在、过去时用 do/does/did，后接动词原形；be 和情态动词直接提前。 参考答案仅是一种表达；核对意义、结构与标点，允许其他合理答案。"
+        }
+      ]
+    },
+    {
+      "id": "determiners",
+      "title": "数量与限定词",
+      "level": "foundation",
+      "origin": "original",
+      "rule": "many/few 配可数复数，much/little 配不可数；a few/a little 表有一些。",
+      "points": [
+        "many/few 配可数复数，much/little 配不可数；a few/a little 表有一些。"
+      ],
+      "examples": [
+        {
+          "en": "There is very little water left.",
+          "note": "many/few 配可数复数，much/little 配不可数；a few/a little 表有一些。"
+        }
+      ],
+      "questions": [
+        {
+          "id": "gr-determiners-0",
+          "kind": "choice",
+          "prompt": "There is not ___ water in the bottle.",
+          "answer": "much",
+          "options": [
+            "much",
+            "many",
+            "a few",
+            "several"
+          ],
+          "explain": "many/few 配可数复数，much/little 配不可数；a few/a little 表有一些。"
+        },
+        {
+          "id": "gr-determiners-1",
+          "kind": "choice",
+          "prompt": "We have ___ chairs for all ten guests: twelve chairs.",
+          "answer": "enough",
+          "options": [
+            "enough",
+            "much",
+            "little",
+            "any"
+          ],
+          "explain": "many/few 配可数复数，much/little 配不可数；a few/a little 表有一些。"
+        },
+        {
+          "id": "gr-determiners-correct",
+          "kind": "correct",
+          "prompt": "Correct the error: There are much books here.",
+          "answer": "There are many books here.",
+          "explain": "many/few 配可数复数，much/little 配不可数；a few/a little 表有一些。 参考答案仅是一种表达；核对意义、结构与标点，允许其他合理答案。"
+        },
+        {
+          "id": "gr-determiners-rewrite",
+          "kind": "rewrite",
+          "prompt": "Rewrite using a little: There is some water left.",
+          "answer": "There is a little water left.",
+          "explain": "many/few 配可数复数，much/little 配不可数；a few/a little 表有一些。 参考答案仅是一种表达；核对意义、结构与标点，允许其他合理答案。"
+        }
+      ]
+    },
+    {
+      "id": "prepositions",
+      "title": "时间与地点介词",
+      "level": "foundation",
+      "origin": "original",
+      "rule": "at 用于时刻，on 用于具体日期，in 用于月份年份；固定搭配需结合语境。",
+      "points": [
+        "at 用于时刻，on 用于具体日期，in 用于月份年份；固定搭配需结合语境。"
+      ],
+      "examples": [
+        {
+          "en": "The meeting starts at nine on Monday.",
+          "note": "at 用于时刻，on 用于具体日期，in 用于月份年份；固定搭配需结合语境。"
+        }
+      ],
+      "questions": [
+        {
+          "id": "gr-prepositions-0",
+          "kind": "choice",
+          "prompt": "The meeting starts ___ nine o’clock.",
+          "answer": "at",
+          "options": [
+            "at",
+            "in",
+            "on",
+            "during"
+          ],
+          "explain": "at 用于时刻，on 用于具体日期，in 用于月份年份；固定搭配需结合语境。"
+        },
+        {
+          "id": "gr-prepositions-1",
+          "kind": "choice",
+          "prompt": "Her birthday is ___ July.",
+          "answer": "in",
+          "options": [
+            "in",
+            "at",
+            "on",
+            "to"
+          ],
+          "explain": "at 用于时刻，on 用于具体日期，in 用于月份年份；固定搭配需结合语境。"
+        },
+        {
+          "id": "gr-prepositions-correct",
+          "kind": "correct",
+          "prompt": "Correct the error: The lesson begins in nine o’clock.",
+          "answer": "The lesson begins at nine o’clock.",
+          "explain": "at 用于时刻，on 用于具体日期，in 用于月份年份；固定搭配需结合语境。 参考答案仅是一种表达；核对意义、结构与标点，允许其他合理答案。"
+        },
+        {
+          "id": "gr-prepositions-rewrite",
+          "kind": "rewrite",
+          "prompt": "Combine: The meeting is Monday. It starts at noon.",
+          "answer": "The meeting starts at noon on Monday.",
+          "explain": "at 用于时刻，on 用于具体日期，in 用于月份年份；固定搭配需结合语境。 参考答案仅是一种表达；核对意义、结构与标点，允许其他合理答案。"
+        }
+      ]
+    },
+    {
+      "id": "future",
+      "title": "将来表达",
+      "level": "core",
+      "origin": "original",
+      "rule": "will 可作即时决定，be going to 可表计划；现在进行时可表已安排的将来活动。",
+      "points": [
+        "will 可作即时决定，be going to 可表计划；现在进行时可表已安排的将来活动。"
+      ],
+      "examples": [
+        {
+          "en": "I have booked my ticket. I am flying tomorrow.",
+          "note": "will 可作即时决定，be going to 可表计划；现在进行时可表已安排的将来活动。"
+        }
+      ],
+      "questions": [
+        {
+          "id": "gr-future-0",
+          "kind": "choice",
+          "prompt": "Look at those dark clouds! It ___ rain.",
+          "answer": "is going to",
+          "options": [
+            "is going to",
+            "going to",
+            "will to",
+            "is go to"
+          ],
+          "explain": "will 可作即时决定，be going to 可表计划；现在进行时可表已安排的将来活动。"
+        },
+        {
+          "id": "gr-future-1",
+          "kind": "choice",
+          "prompt": "I promise I ___ help you.",
+          "answer": "will",
+          "options": [
+            "will",
+            "am",
+            "did",
+            "have"
+          ],
+          "explain": "will 可作即时决定，be going to 可表计划；现在进行时可表已安排的将来活动。"
+        },
+        {
+          "id": "gr-future-correct",
+          "kind": "correct",
+          "prompt": "Correct the error: She is going visit us.",
+          "answer": "She is going to visit us.",
+          "explain": "will 可作即时决定，be going to 可表计划；现在进行时可表已安排的将来活动。 参考答案仅是一种表达；核对意义、结构与标点，允许其他合理答案。"
+        },
+        {
+          "id": "gr-future-rewrite",
+          "kind": "rewrite",
+          "prompt": "Write one sentence about your arranged trip tomorrow.",
+          "answer": "I am visiting the museum tomorrow.",
+          "explain": "will 可作即时决定，be going to 可表计划；现在进行时可表已安排的将来活动。 参考答案仅是一种表达；核对意义、结构与标点，允许其他合理答案。"
+        }
+      ]
+    },
+    {
+      "id": "past-perfect",
+      "title": "过去完成时",
+      "level": "core",
+      "origin": "original",
+      "rule": "过去的参照时间之前已完成：had + 过去分词；时间顺序需明确。",
+      "points": [
+        "过去的参照时间之前已完成：had + 过去分词；时间顺序需明确。"
+      ],
+      "examples": [
+        {
+          "en": "The train had left before we reached the station.",
+          "note": "过去的参照时间之前已完成：had + 过去分词；时间顺序需明确。"
+        }
+      ],
+      "questions": [
+        {
+          "id": "gr-past-perfect-0",
+          "kind": "choice",
+          "prompt": "When we arrived, the train ___ already left.",
+          "answer": "had",
+          "options": [
+            "had",
+            "has",
+            "have",
+            "is"
+          ],
+          "explain": "过去的参照时间之前已完成：had + 过去分词；时间顺序需明确。"
+        },
+        {
+          "id": "gr-past-perfect-1",
+          "kind": "choice",
+          "prompt": "By noon yesterday, she had ___ the report.",
+          "answer": "written",
+          "options": [
+            "written",
+            "wrote",
+            "write",
+            "writing"
+          ],
+          "explain": "过去的参照时间之前已完成：had + 过去分词；时间顺序需明确。"
+        },
+        {
+          "id": "gr-past-perfect-correct",
+          "kind": "correct",
+          "prompt": "Correct the error: The train had went before we arrived.",
+          "answer": "The train had gone before we arrived.",
+          "explain": "过去的参照时间之前已完成：had + 过去分词；时间顺序需明确。 参考答案仅是一种表达；核对意义、结构与标点，允许其他合理答案。"
+        },
+        {
+          "id": "gr-past-perfect-rewrite",
+          "kind": "rewrite",
+          "prompt": "Combine with past perfect: We arrived. The film started earlier.",
+          "answer": "The film had started before we arrived.",
+          "explain": "过去的参照时间之前已完成：had + 过去分词；时间顺序需明确。 参考答案仅是一种表达；核对意义、结构与标点，允许其他合理答案。"
+        }
+      ]
+    },
+    {
+      "id": "conditionals",
+      "title": "条件句",
+      "level": "core",
+      "origin": "original",
+      "rule": "真实未来常用 if + 现在时/will；假设现在用过去式/would；过去假设用 had done/would have done。",
+      "points": [
+        "真实未来常用 if + 现在时/will；假设现在用过去式/would；过去假设用 had done/would have done。"
+      ],
+      "examples": [
+        {
+          "en": "If I had more time, I would learn another language.",
+          "note": "真实未来常用 if + 现在时/will；假设现在用过去式/would；过去假设用 had done/would have done。"
+        }
+      ],
+      "questions": [
+        {
+          "id": "gr-conditionals-0",
+          "kind": "choice",
+          "prompt": "If it rains tomorrow, we ___ indoors.",
+          "answer": "will stay",
+          "options": [
+            "will stay",
+            "would stayed",
+            "had stayed",
+            "staying"
+          ],
+          "explain": "真实未来常用 if + 现在时/will；假设现在用过去式/would；过去假设用 had done/would have done。"
+        },
+        {
+          "id": "gr-conditionals-1",
+          "kind": "choice",
+          "prompt": "If I had known, I ___ helped.",
+          "answer": "would have",
+          "options": [
+            "would have",
+            "will have",
+            "would had",
+            "had would"
+          ],
+          "explain": "真实未来常用 if + 现在时/will；假设现在用过去式/would；过去假设用 had done/would have done。"
+        },
+        {
+          "id": "gr-conditionals-correct",
+          "kind": "correct",
+          "prompt": "Correct the error: If I will see him tomorrow, I will call you.",
+          "answer": "If I see him tomorrow, I will call you.",
+          "explain": "真实未来常用 if + 现在时/will；假设现在用过去式/would；过去假设用 had done/would have done。 参考答案仅是一种表达；核对意义、结构与标点，允许其他合理答案。"
+        },
+        {
+          "id": "gr-conditionals-rewrite",
+          "kind": "rewrite",
+          "prompt": "Rewrite as a hypothetical: I do not have a car, so I cannot drive there.",
+          "answer": "If I had a car, I could drive there.",
+          "explain": "真实未来常用 if + 现在时/will；假设现在用过去式/would；过去假设用 had done/would have done。 参考答案仅是一种表达；核对意义、结构与标点，允许其他合理答案。"
+        }
+      ]
+    },
+    {
+      "id": "reported",
+      "title": "间接引语",
+      "level": "core",
+      "origin": "original",
+      "rule": "转述需结合报告时间调整时态、人称、时间词；间接疑问句使用陈述语序。",
+      "points": [
+        "转述需结合报告时间调整时态、人称、时间词；间接疑问句使用陈述语序。"
+      ],
+      "examples": [
+        {
+          "en": "She asked where I lived.",
+          "note": "转述需结合报告时间调整时态、人称、时间词；间接疑问句使用陈述语序。"
+        }
+      ],
+      "questions": [
+        {
+          "id": "gr-reported-0",
+          "kind": "choice",
+          "prompt": "Yesterday, he said he ___ tired at that moment.",
+          "answer": "was",
+          "options": [
+            "was",
+            "is",
+            "be",
+            "were"
+          ],
+          "explain": "转述需结合报告时间调整时态、人称、时间词；间接疑问句使用陈述语序。"
+        },
+        {
+          "id": "gr-reported-1",
+          "kind": "choice",
+          "prompt": "Choose the indirect question.",
+          "answer": "She asked where I lived.",
+          "options": [
+            "She asked where I lived.",
+            "She asked where did I live.",
+            "She asked where I live?",
+            "She asked where lived I."
+          ],
+          "explain": "转述需结合报告时间调整时态、人称、时间词；间接疑问句使用陈述语序。"
+        },
+        {
+          "id": "gr-reported-correct",
+          "kind": "correct",
+          "prompt": "Correct the error: She asked where did I live.",
+          "answer": "She asked where I lived.",
+          "explain": "转述需结合报告时间调整时态、人称、时间词；间接疑问句使用陈述语序。 参考答案仅是一种表达；核对意义、结构与标点，允许其他合理答案。"
+        },
+        {
+          "id": "gr-reported-rewrite",
+          "kind": "rewrite",
+          "prompt": "Report yesterday: Tom said, “I am tired now.”",
+          "answer": "Tom said that he was tired then.",
+          "explain": "转述需结合报告时间调整时态、人称、时间词；间接疑问句使用陈述语序。 参考答案仅是一种表达；核对意义、结构与标点，允许其他合理答案。"
+        }
+      ]
+    },
+    {
+      "id": "gerund",
+      "title": "动名词与不定式",
+      "level": "core",
+      "origin": "original",
+      "rule": "enjoy/avoid 后常接 -ing；decide/hope 后接 to do。stop doing 与 stop to do 意义不同。",
+      "points": [
+        "enjoy/avoid 后常接 -ing；decide/hope 后接 to do。stop doing 与 stop to do 意义不同。"
+      ],
+      "examples": [
+        {
+          "en": "We decided to leave early.",
+          "note": "enjoy/avoid 后常接 -ing；decide/hope 后接 to do。stop doing 与 stop to do 意义不同。"
+        }
+      ],
+      "questions": [
+        {
+          "id": "gr-gerund-0",
+          "kind": "choice",
+          "prompt": "She enjoys ___ novels.",
+          "answer": "reading",
+          "options": [
+            "reading",
+            "read",
+            "to reading",
+            "reads"
+          ],
+          "explain": "enjoy/avoid 后常接 -ing；decide/hope 后接 to do。stop doing 与 stop to do 意义不同。"
+        },
+        {
+          "id": "gr-gerund-1",
+          "kind": "choice",
+          "prompt": "They decided ___ early.",
+          "answer": "to leave",
+          "options": [
+            "to leave",
+            "leaving",
+            "leave",
+            "to leaving"
+          ],
+          "explain": "enjoy/avoid 后常接 -ing；decide/hope 后接 to do。stop doing 与 stop to do 意义不同。"
+        },
+        {
+          "id": "gr-gerund-correct",
+          "kind": "correct",
+          "prompt": "Correct the error: I enjoy to read novels.",
+          "answer": "I enjoy reading novels.",
+          "explain": "enjoy/avoid 后常接 -ing；decide/hope 后接 to do。stop doing 与 stop to do 意义不同。 参考答案仅是一种表达；核对意义、结构与标点，允许其他合理答案。"
+        },
+        {
+          "id": "gr-gerund-rewrite",
+          "kind": "rewrite",
+          "prompt": "Rewrite using decide: We made a decision to leave early.",
+          "answer": "We decided to leave early.",
+          "explain": "enjoy/avoid 后常接 -ing；decide/hope 后接 to do。stop doing 与 stop to do 意义不同。 参考答案仅是一种表达；核对意义、结构与标点，允许其他合理答案。"
+        }
+      ]
+    },
+    {
+      "id": "noun-clauses",
+      "title": "名词性从句",
+      "level": "core",
+      "origin": "original",
+      "rule": "that/what/whether 从句可作宾语；从句使用陈述语序，what 自身可作句子成分。",
+      "points": [
+        "that/what/whether 从句可作宾语；从句使用陈述语序，what 自身可作句子成分。"
+      ],
+      "examples": [
+        {
+          "en": "I do not know what he wants.",
+          "note": "that/what/whether 从句可作宾语；从句使用陈述语序，what 自身可作句子成分。"
+        }
+      ],
+      "questions": [
+        {
+          "id": "gr-noun-clauses-0",
+          "kind": "choice",
+          "prompt": "I do not know ___ he wants.",
+          "answer": "what",
+          "options": [
+            "what",
+            "that",
+            "which does",
+            "what does"
+          ],
+          "explain": "that/what/whether 从句可作宾语；从句使用陈述语序，what 自身可作句子成分。"
+        },
+        {
+          "id": "gr-noun-clauses-1",
+          "kind": "choice",
+          "prompt": "Choose the correct sentence.",
+          "answer": "I wonder whether she is ready.",
+          "options": [
+            "I wonder whether she is ready.",
+            "I wonder whether is she ready.",
+            "I wonder is she ready.",
+            "I wonder whether ready she."
+          ],
+          "explain": "that/what/whether 从句可作宾语；从句使用陈述语序，what 自身可作句子成分。"
+        },
+        {
+          "id": "gr-noun-clauses-correct",
+          "kind": "correct",
+          "prompt": "Correct the error: I do not know what does he want.",
+          "answer": "I do not know what he wants.",
+          "explain": "that/what/whether 从句可作宾语；从句使用陈述语序，what 自身可作句子成分。 参考答案仅是一种表达；核对意义、结构与标点，允许其他合理答案。"
+        },
+        {
+          "id": "gr-noun-clauses-rewrite",
+          "kind": "rewrite",
+          "prompt": "Rewrite as an indirect question: Is the library open?",
+          "answer": "I wonder whether the library is open.",
+          "explain": "that/what/whether 从句可作宾语；从句使用陈述语序，what 自身可作句子成分。 参考答案仅是一种表达；核对意义、结构与标点，允许其他合理答案。"
+        }
+      ]
+    },
+    {
+      "id": "linking",
+      "title": "逻辑连接",
+      "level": "core",
+      "origin": "original",
+      "rule": "although 后接从句，despite 后接名词或 -ing；表达原因、对比、结果时先判断逻辑。",
+      "points": [
+        "although 后接从句，despite 后接名词或 -ing；表达原因、对比、结果时先判断逻辑。"
+      ],
+      "examples": [
+        {
+          "en": "Although it was raining, we continued.",
+          "note": "although 后接从句，despite 后接名词或 -ing；表达原因、对比、结果时先判断逻辑。"
+        }
+      ],
+      "questions": [
+        {
+          "id": "gr-linking-0",
+          "kind": "choice",
+          "prompt": "___ it was raining, we continued.",
+          "answer": "Although",
+          "options": [
+            "Although",
+            "Despite",
+            "Because of",
+            "In spite of"
+          ],
+          "explain": "although 后接从句，despite 后接名词或 -ing；表达原因、对比、结果时先判断逻辑。"
+        },
+        {
+          "id": "gr-linking-1",
+          "kind": "choice",
+          "prompt": "The road was closed; ___, we took another route.",
+          "answer": "therefore",
+          "options": [
+            "therefore",
+            "although",
+            "despite",
+            "whereas of"
+          ],
+          "explain": "although 后接从句，despite 后接名词或 -ing；表达原因、对比、结果时先判断逻辑。"
+        },
+        {
+          "id": "gr-linking-correct",
+          "kind": "correct",
+          "prompt": "Correct the error: Despite it rained, we continued.",
+          "answer": "Although it rained, we continued.",
+          "explain": "although 后接从句，despite 后接名词或 -ing；表达原因、对比、结果时先判断逻辑。 参考答案仅是一种表达；核对意义、结构与标点，允许其他合理答案。"
+        },
+        {
+          "id": "gr-linking-rewrite",
+          "kind": "rewrite",
+          "prompt": "Rewrite using despite: Although it rained, we continued.",
+          "answer": "Despite the rain, we continued.",
+          "explain": "although 后接从句，despite 后接名词或 -ing；表达原因、对比、结果时先判断逻辑。 参考答案仅是一种表达；核对意义、结构与标点，允许其他合理答案。"
+        }
+      ]
+    },
+    {
+      "id": "punctuation",
+      "title": "句子边界与标点",
+      "level": "core",
+      "origin": "original",
+      "rule": "两个独立句可用句号、分号或逗号加并列连词连接；避免只用逗号拼接。",
+      "points": [
+        "两个独立句可用句号、分号或逗号加并列连词连接；避免只用逗号拼接。"
+      ],
+      "examples": [
+        {
+          "en": "The test was difficult, but I finished it.",
+          "note": "两个独立句可用句号、分号或逗号加并列连词连接；避免只用逗号拼接。"
+        }
+      ],
+      "questions": [
+        {
+          "id": "gr-punctuation-0",
+          "kind": "choice",
+          "prompt": "Choose the correctly joined sentence.",
+          "answer": "It was late, so we left.",
+          "options": [
+            "It was late, so we left.",
+            "It was late, we left.",
+            "It was late we left.",
+            "Because it was late."
+          ],
+          "explain": "两个独立句可用句号、分号或逗号加并列连词连接；避免只用逗号拼接。"
+        },
+        {
+          "id": "gr-punctuation-1",
+          "kind": "choice",
+          "prompt": "Choose the complete sentence.",
+          "answer": "We stayed inside because it rained.",
+          "options": [
+            "We stayed inside because it rained.",
+            "Because it rained.",
+            "Although the rain.",
+            "During the rain because."
+          ],
+          "explain": "两个独立句可用句号、分号或逗号加并列连词连接；避免只用逗号拼接。"
+        },
+        {
+          "id": "gr-punctuation-correct",
+          "kind": "correct",
+          "prompt": "Correct the error: It was late, we left.",
+          "answer": "It was late, so we left.",
+          "explain": "两个独立句可用句号、分号或逗号加并列连词连接；避免只用逗号拼接。 参考答案仅是一种表达；核对意义、结构与标点，允许其他合理答案。"
+        },
+        {
+          "id": "gr-punctuation-rewrite",
+          "kind": "rewrite",
+          "prompt": "Combine into a complete sentence: Because it rained. We stayed inside.",
+          "answer": "We stayed inside because it rained.",
+          "explain": "两个独立句可用句号、分号或逗号加并列连词连接；避免只用逗号拼接。 参考答案仅是一种表达；核对意义、结构与标点，允许其他合理答案。"
+        }
+      ]
+    },
+    {
+      "id": "chart-trends",
+      "title": "雅思应用：图表趋势",
+      "level": "application",
+      "origin": "original",
+      "rule": "用过去时描述已结束时间；rose by 表增量，rose to 表终值；副词修饰变化动词。",
+      "points": [
+        "用过去时描述已结束时间；rose by 表增量，rose to 表终值；副词修饰变化动词。"
+      ],
+      "examples": [
+        {
+          "en": "Sales rose from 20 to 30 in 2020.",
+          "note": "用过去时描述已结束时间；rose by 表增量，rose to 表终值；副词修饰变化动词。"
+        }
+      ],
+      "questions": [
+        {
+          "id": "gr-chart-trends-0",
+          "kind": "choice",
+          "prompt": "Sales rose from 20 to 30: they rose ___ 10.",
+          "answer": "by",
+          "options": [
+            "by",
+            "to",
+            "at",
+            "on"
+          ],
+          "explain": "用过去时描述已结束时间；rose by 表增量，rose to 表终值；副词修饰变化动词。"
+        },
+        {
+          "id": "gr-chart-trends-1",
+          "kind": "choice",
+          "prompt": "Sales increased ___.",
+          "answer": "steadily",
+          "options": [
+            "steadily",
+            "steady",
+            "steadiness",
+            "more steady of"
+          ],
+          "explain": "用过去时描述已结束时间；rose by 表增量，rose to 表终值；副词修饰变化动词。"
+        },
+        {
+          "id": "gr-chart-trends-correct",
+          "kind": "correct",
+          "prompt": "Correct the error: Sales rose to ten, from twenty to thirty.",
+          "answer": "Sales rose by ten, from twenty to thirty.",
+          "explain": "用过去时描述已结束时间；rose by 表增量，rose to 表终值；副词修饰变化动词。 参考答案仅是一种表达；核对意义、结构与标点，允许其他合理答案。"
+        },
+        {
+          "id": "gr-chart-trends-rewrite",
+          "kind": "rewrite",
+          "prompt": "Describe the change: Sales were 20 in 2020 and 30 in 2021.",
+          "answer": "Sales rose from 20 in 2020 to 30 in 2021.",
+          "explain": "用过去时描述已结束时间；rose by 表增量，rose to 表终值；副词修饰变化动词。 参考答案仅是一种表达；核对意义、结构与标点，允许其他合理答案。"
+        }
+      ]
+    },
+    {
+      "id": "process",
+      "title": "雅思应用：过程描述",
+      "level": "application",
+      "origin": "original",
+      "rule": "过程说明常用现在时被动，按步骤连接；不要把没有给出的原因写成事实。",
+      "points": [
+        "过程说明常用现在时被动，按步骤连接；不要把没有给出的原因写成事实。"
+      ],
+      "examples": [
+        {
+          "en": "First, the bottles are collected.",
+          "note": "过程说明常用现在时被动，按步骤连接；不要把没有给出的原因写成事实。"
+        }
+      ],
+      "questions": [
+        {
+          "id": "gr-process-0",
+          "kind": "choice",
+          "prompt": "First, the bottles ___ collected.",
+          "answer": "are",
+          "options": [
+            "are",
+            "is",
+            "have",
+            "being"
+          ],
+          "explain": "过程说明常用现在时被动，按步骤连接；不要把没有给出的原因写成事实。"
+        },
+        {
+          "id": "gr-process-1",
+          "kind": "choice",
+          "prompt": "Next, the glass is ___ into small pieces.",
+          "answer": "broken",
+          "options": [
+            "broken",
+            "broke",
+            "break",
+            "breaking"
+          ],
+          "explain": "过程说明常用现在时被动，按步骤连接；不要把没有给出的原因写成事实。"
+        },
+        {
+          "id": "gr-process-correct",
+          "kind": "correct",
+          "prompt": "Correct the error: The bottles is collected first.",
+          "answer": "The bottles are collected first.",
+          "explain": "过程说明常用现在时被动，按步骤连接；不要把没有给出的原因写成事实。 参考答案仅是一种表达；核对意义、结构与标点，允许其他合理答案。"
+        },
+        {
+          "id": "gr-process-rewrite",
+          "kind": "rewrite",
+          "prompt": "Rewrite as a process step: Workers wash the bottles.",
+          "answer": "The bottles are washed.",
+          "explain": "过程说明常用现在时被动，按步骤连接；不要把没有给出的原因写成事实。 参考答案仅是一种表达；核对意义、结构与标点，允许其他合理答案。"
+        }
+      ]
+    },
+    {
+      "id": "hedging",
+      "title": "雅思应用：审慎论证",
+      "level": "application",
+      "origin": "original",
+      "rule": "may/could/suggest 表有限结论；避免把单一样本推论成绝对事实。",
+      "points": [
+        "may/could/suggest 表有限结论；避免把单一样本推论成绝对事实。"
+      ],
+      "examples": [
+        {
+          "en": "These results may suggest a link.",
+          "note": "may/could/suggest 表有限结论；避免把单一样本推论成绝对事实。"
+        }
+      ],
+      "questions": [
+        {
+          "id": "gr-hedging-0",
+          "kind": "choice",
+          "prompt": "Choose the cautious claim.",
+          "answer": "These results may suggest a link.",
+          "options": [
+            "These results may suggest a link.",
+            "These results prove everything forever.",
+            "No evidence is ever necessary.",
+            "All people always agree."
+          ],
+          "explain": "may/could/suggest 表有限结论；避免把单一样本推论成绝对事实。"
+        },
+        {
+          "id": "gr-hedging-1",
+          "kind": "choice",
+          "prompt": "This policy could ___ waste.",
+          "answer": "reduce",
+          "options": [
+            "reduce",
+            "reduces",
+            "reduced",
+            "reducing"
+          ],
+          "explain": "may/could/suggest 表有限结论；避免把单一样本推论成绝对事实。"
+        },
+        {
+          "id": "gr-hedging-correct",
+          "kind": "correct",
+          "prompt": "Correct the error: This policy could reduces waste.",
+          "answer": "This policy could reduce waste.",
+          "explain": "may/could/suggest 表有限结论；避免把单一样本推论成绝对事实。 参考答案仅是一种表达；核对意义、结构与标点，允许其他合理答案。"
+        },
+        {
+          "id": "gr-hedging-rewrite",
+          "kind": "rewrite",
+          "prompt": "Make this claim cautious: The policy reduces waste.",
+          "answer": "The policy may reduce waste.",
+          "explain": "may/could/suggest 表有限结论；避免把单一样本推论成绝对事实。 参考答案仅是一种表达；核对意义、结构与标点，允许其他合理答案。"
+        }
+      ]
+    },
+    {
+      "id": "relative-nondef",
+      "title": "补充信息与关系从句",
+      "level": "core",
+      "origin": "original",
+      "rule": "非限定性从句用逗号隔开，使用 who/which，不用 that；不能省略关系代词。",
+      "points": [
+        "非限定性从句用逗号隔开，使用 who/which，不用 that；不能省略关系代词。"
+      ],
+      "examples": [
+        {
+          "en": "My bicycle, which is blue, is outside.",
+          "note": "非限定性从句用逗号隔开，使用 who/which，不用 that；不能省略关系代词。"
+        }
+      ],
+      "questions": [
+        {
+          "id": "gr-relative-nondef-0",
+          "kind": "choice",
+          "prompt": "My bicycle, ___ is blue, is outside.",
+          "answer": "which",
+          "options": [
+            "which",
+            "that",
+            "what",
+            "where"
+          ],
+          "explain": "非限定性从句用逗号隔开，使用 who/which，不用 that；不能省略关系代词。"
+        },
+        {
+          "id": "gr-relative-nondef-1",
+          "kind": "choice",
+          "prompt": "My teacher, ___ lives nearby, cycles to school.",
+          "answer": "who",
+          "options": [
+            "who",
+            "that",
+            "which",
+            "whose"
+          ],
+          "explain": "非限定性从句用逗号隔开，使用 who/which，不用 that；不能省略关系代词。"
+        },
+        {
+          "id": "gr-relative-nondef-correct",
+          "kind": "correct",
+          "prompt": "Correct the error: My bicycle, that is blue, is outside.",
+          "answer": "My bicycle, which is blue, is outside.",
+          "explain": "非限定性从句用逗号隔开，使用 who/which，不用 that；不能省略关系代词。 参考答案仅是一种表达；核对意义、结构与标点，允许其他合理答案。"
+        },
+        {
+          "id": "gr-relative-nondef-rewrite",
+          "kind": "rewrite",
+          "prompt": "Combine with extra information: My teacher cycles to school. She lives nearby.",
+          "answer": "My teacher, who lives nearby, cycles to school.",
+          "explain": "非限定性从句用逗号隔开，使用 who/which，不用 that；不能省略关系代词。 参考答案仅是一种表达；核对意义、结构与标点，允许其他合理答案。"
+        }
+      ]
+    }
+  ]
+}
