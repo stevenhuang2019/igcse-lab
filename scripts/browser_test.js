@@ -158,10 +158,10 @@ const server=http.createServer((req,res)=>{
    await page.locator('#mockSubmitEarly').click();
    assert.match(await page.locator('#mockDetailedReport').textContent(),/29 题未答/);
    assert.equal(await page.evaluate(()=>userState.mockExams.records.length),1);
-   await page.locator('#mockDetailedReport summary').click();
+   await page.locator('#mockDetailedReport > details > summary').click();
    assert.match(await page.locator('#mockDetailedReport').textContent(),/参考答案/);
    // Long unbroken formula text must wrap even when random mocks do not sample it.
-   await page.locator('#mockDetailedReport details').evaluate(node=>{const p=document.createElement('p');p.textContent='formula_without_spaces_'.repeat(40);node.append(p);});
+   await page.locator('#mockDetailedReport > details').evaluate(node=>{const p=document.createElement('p');p.textContent='formula_without_spaces_'.repeat(40);node.append(p);});
    await page.screenshot({path:path.join(results,'mock-report-'+width+'.png'),fullPage:true});
    const reportOverflow=await page.evaluate(()=>Array.from(document.querySelectorAll('#mockDetailedReport, #mockDetailedReport *')).filter(e=>e.getBoundingClientRect().right>innerWidth+1).map(e=>({tag:e.tagName,text:e.textContent.slice(0,100)})));
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,'mock overflow '+width+' '+JSON.stringify(reportOverflow));
